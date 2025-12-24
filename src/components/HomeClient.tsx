@@ -569,8 +569,9 @@ export default function HomeClient({ cafes }: Props) {
                   {/* Tournament Spotlight Effect */}
                   <div className="absolute -inset-6 bg-gradient-to-r from-[#ff073a] via-[#00f0ff] to-[#ff073a] blur-3xl opacity-15 rounded-full"></div>
                   
-                  {/* Championship Badge */}
-                  <div className="absolute -top-8 left-1/2 -translate-x-1/2">
+                  {/* Championship Badge - YAHI CHANGE KIYA HAI */}
+                  {/* Mobile pe hidden, tablet aur desktop pe visible */}
+                  <div className="hidden md:flex absolute -top-8 left-1/2 -translate-x-1/2">
                     <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#ff073a] to-[#ff3366] shadow-lg">
                       <Trophy className="w-4 h-4 text-white" />
                       <span className="text-xs font-bold uppercase tracking-widest">Gaming Café Booking</span>
@@ -598,8 +599,8 @@ export default function HomeClient({ cafes }: Props) {
                 </div>
                                
 
-                {/* Tournament Stats Grid */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto mb-8">
+                {/* Tournament Stats Grid - Mobile pe hidden, tablet aur desktop pe visible */}
+                <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto mb-8">
                   <div className="stat-card rounded-2xl p-4 text-center border border-[#ff073a]/30">
                     <div className="flex items-center justify-center gap-2 mb-2">
                       <Trophy className="w-5 h-5 text-[#ff073a]" />

@@ -34,69 +34,163 @@ type Props = {
 
 export default function CafeList({ cafes }: Props) {
   if (!cafes || cafes.length === 0) {
-    return null; // Parent handles empty state
+    return null;
   }
 
   return (
     <>
       <style jsx global>{`
-        .cafe-card {
-          background: linear-gradient(
-            145deg,
-            rgba(16, 16, 22, 0.9) 0%,
-            rgba(10, 10, 15, 0.9) 100%
-          );
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .cafe-card:hover {
-          border-color: rgba(255, 7, 58, 0.4);
-          transform: translateY(-8px);
-          box-shadow: 
-            0 20px 60px rgba(0, 0, 0, 0.5),
-            0 0 0 1px rgba(255, 7, 58, 0.2),
-            0 0 60px rgba(255, 7, 58, 0.1);
-        }
-
-        .cafe-card:active {
-          transform: translateY(-4px);
-        }
-
-        .image-shimmer {
-          background: linear-gradient(
-            110deg,
-            rgba(255, 255, 255, 0) 0%,
-            rgba(255, 255, 255, 0.05) 50%,
-            rgba(255, 255, 255, 0) 100%
-          );
-          background-size: 200% 100%;
-          animation: shimmer 2s infinite;
-        }
-
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-5px); }
-        }
-
-        @keyframes pulse-glow {
-          0%, 100% { 
-            box-shadow: 0 0 20px rgba(255, 7, 58, 0.3),
-                        inset 0 0 10px rgba(255, 7, 58, 0.1);
+        /* Mobile-specific styles - SIMPLIFIED like WhatsApp image */
+        @media (max-width: 768px) {
+          .mobile-cafe-card {
+            background: transparent;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 16px;
           }
-          50% { 
-            box-shadow: 0 0 40px rgba(255, 7, 58, 0.5),
-                        inset 0 0 20px rgba(255, 7, 58, 0.2);
+          
+          .mobile-cafe-image {
+            height: 150px; /* Reduced height */
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+          }
+          
+          .mobile-cafe-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70%; /* Increased gradient */
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+          }
+          
+          .mobile-cafe-title {
+            position: absolute;
+            bottom: 30px; /* Moved up to make space for icons below */
+            left: 12px;
+            right: 12px;
+            z-index: 2;
+          }
+          
+          .mobile-cafe-title h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px; /* Space for icons */
+            line-height: 1.2;
+          }
+          
+          /* Equipment icons BETWEEN title and location */
+          .mobile-icons-between {
+            position: absolute;
+            bottom: 18px; /* Between title and location */
+            left: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 2;
+          }
+          
+          .mobile-icon-item {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 2px 5px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+          }
+          
+          .mobile-icon-label {
+            font-size: 8px;
+            color: rgba(255, 255, 255, 0.9);
+            white-space: nowrap;
+          }
+          
+          .mobile-icon-small {
+            width: 10px;
+            height: 10px;
+            color: white;
+          }
+          
+          .mobile-cafe-location {
+            position: absolute;
+            bottom: 8px; /* Moved down */
+            left: 12px;
+            right: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+            z-index: 2;
+          }
+          
+          .mobile-rating-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            border-radius: 6px;
+            padding: 4px 6px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            z-index: 3;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          
+          .mobile-status-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            border-radius: 6px;
+            padding: 3px 8px;
+            z-index: 3;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          
+          /* Remove price and book button section */
+          .mobile-bottom-bar,
+          .mobile-divider {
+            display: none;
+          }
+        }
+        
+        /* Desktop styles remain the same */
+        @media (min-width: 769px) {
+          .cafe-card {
+            background: linear-gradient(
+              145deg,
+              rgba(16, 16, 22, 0.9) 0%,
+              rgba(10, 10, 15, 0.9) 100%
+            );
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 24px;
+            overflow: hidden;
+          }
+
+          .cafe-card:hover {
+            border-color: rgba(255, 7, 58, 0.4);
+            transform: translateY(-8px);
+            box-shadow: 
+              0 20px 60px rgba(0, 0, 0, 0.5),
+              0 0 0 1px rgba(255, 7, 58, 0.2),
+              0 0 60px rgba(255, 7, 58, 0.1);
           }
         }
 
+        /* Common styles */
         .badge-open {
           background: linear-gradient(135deg, 
             rgba(34, 197, 94, 0.2) 0%,
@@ -121,130 +215,30 @@ export default function CafeList({ cafes }: Props) {
           color: #fbbf24;
         }
 
-        .console-chip {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          transition: all 0.2s ease;
-        }
-
-        .console-chip:hover {
-          background: rgba(255, 255, 255, 0.1);
-          border-color: rgba(255, 7, 58, 0.4);
-          transform: translateY(-2px);
-        }
-
-        .price-tag {
-          background: linear-gradient(135deg, 
-            rgba(255, 7, 58, 0.2) 0%,
-            rgba(255, 7, 58, 0.1) 100%);
-          border: 1px solid rgba(255, 7, 58, 0.3);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .price-tag::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.1),
-            transparent
-          );
-          opacity: 0;
-          transition: opacity 0.3s ease;
-        }
-
-        .price-tag:hover::before {
-          opacity: 1;
-        }
-
-        .book-btn {
-          background: linear-gradient(135deg, 
-            rgba(255, 7, 58, 1) 0%, 
-            rgba(204, 5, 48, 1) 100%);
-          box-shadow: 
-            0 8px 32px rgba(255, 7, 58, 0.4),
-            inset 0 1px 0 rgba(255, 255, 255, 0.2);
-          transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .book-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 255, 255, 0.2),
-            transparent
-          );
-          transition: 0.5s;
-        }
-
-        .book-btn:hover::before {
-          left: 100%;
-        }
-
-        .book-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 
-            0 12px 40px rgba(255, 7, 58, 0.6),
-            inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        .rating-star {
-          filter: drop-shadow(0 0 4px rgba(251, 191, 36, 0.6));
-        }
-
-        .premium-badge {
-          background: linear-gradient(135deg, 
-            rgba(255, 215, 0, 0.2) 0%,
-            rgba(255, 215, 0, 0.1) 100%);
-          border: 1px solid rgba(255, 215, 0, 0.3);
-          color: #ffd700;
-        }
-
-        .feature-chip {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          transition: all 0.2s ease;
-        }
-
-        .feature-chip:hover {
-          background: rgba(255, 7, 58, 0.1);
-          border-color: rgba(255, 7, 58, 0.3);
-        }
-
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-
-        .animate-pulse-glow {
-          animation: pulse-glow 2s ease-in-out infinite;
+        @keyframes pulse-glow {
+          0%, 100% { 
+            box-shadow: 0 0 20px rgba(255, 7, 58, 0.3),
+                        inset 0 0 10px rgba(255, 7, 58, 0.1);
+          }
+          50% { 
+            box-shadow: 0 0 40px rgba(255, 7, 58, 0.5),
+                        inset 0 0 20px rgba(255, 7, 58, 0.2);
+          }
         }
       `}</style>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
+      {/* Desktop View */}
+      <div className="hidden lg:grid lg:grid-cols-2 gap-6 lg:gap-8">
         {cafes.map((cafe, index) => (
           <Link
             key={cafe.id}
             href={`/cafes/${cafe.slug || cafe.id}`}
-            className="cafe-card rounded-3xl overflow-hidden group relative"
+            className="cafe-card group"
             style={{
               animationDelay: `${index * 0.05}s`,
             }}
           >
-            {/* Premium Crown Badge */}
+            {/* Desktop card content - your existing code */}
             {(cafe as any).is_premium && (
               <div className="absolute top-4 right-4 z-20 premium-badge px-3 py-1.5 rounded-full flex items-center gap-1.5 backdrop-blur-sm">
                 <Crown className="w-3.5 h-3.5" />
@@ -254,7 +248,6 @@ export default function CafeList({ cafes }: Props) {
               </div>
             )}
 
-            {/* Image Section */}
             <div className="relative h-64 lg:h-72 overflow-hidden">
               {cafe.cover_url ? (
                 <>
@@ -269,11 +262,9 @@ export default function CafeList({ cafes }: Props) {
                     quality={index === 0 ? 90 : index < 3 ? 80 : 70}
                   />
                   
-                  {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-transparent to-transparent opacity-90" />
                   <div className="absolute inset-0 bg-gradient-to-r from-[#ff073a]/10 via-transparent to-[#00f0ff]/10 opacity-30" />
                   
-                  {/* Top Status Badges */}
                   <div className="absolute top-4 left-4 flex flex-col gap-2">
                     <OpeningBadge
                       openingHours={cafe.opening_hours}
@@ -290,7 +281,6 @@ export default function CafeList({ cafes }: Props) {
                     )}
                   </div>
                   
-                  {/* Bottom Info Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
                     <div className="flex items-center justify-between">
                       <div>
@@ -308,10 +298,9 @@ export default function CafeList({ cafes }: Props) {
                         </div>
                       </div>
                       
-                      {/* Rating */}
                       {(cafe as any).rating && (
                         <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-sm px-3 py-2 rounded-xl">
-                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400 rating-star" />
+                          <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                           <div className="flex flex-col">
                             <span className="text-lg font-bold text-white" style={{ fontFamily: 'Orbitron, sans-serif' }}>
                               {(cafe as any).rating}
@@ -326,14 +315,11 @@ export default function CafeList({ cafes }: Props) {
                   </div>
                 </>
               ) : (
-                // Placeholder when no image
                 <div className="relative h-full w-full bg-gradient-to-br from-zinc-900 to-zinc-950 flex items-center justify-center">
                   <div className="relative">
                     <Gamepad2 className="w-16 h-16 text-zinc-700 opacity-50" />
-                    <div className="absolute inset-0 image-shimmer" />
                   </div>
                   
-                  {/* Status badge for no-image cards */}
                   <div className="absolute top-4 left-4">
                     <OpeningBadge
                       openingHours={cafe.opening_hours}
@@ -341,7 +327,6 @@ export default function CafeList({ cafes }: Props) {
                     />
                   </div>
                   
-                  {/* Title on placeholder */}
                   <div className="absolute bottom-4 left-4 right-4">
                     <h2 
                       className="text-xl font-bold text-white mb-1"
@@ -360,9 +345,7 @@ export default function CafeList({ cafes }: Props) {
               )}
             </div>
 
-            {/* Content Section */}
             <div className="p-6">
-              {/* Features Row */}
               <div className="flex flex-wrap gap-2 mb-4">
                 <FeatureChip icon={<Coffee className="w-3.5 h-3.5" />} label="Café" />
                 <FeatureChip icon={<Wifi className="w-3.5 h-3.5" />} label="High-Speed WiFi" />
@@ -370,13 +353,10 @@ export default function CafeList({ cafes }: Props) {
                 <FeatureChip icon={<Music className="w-3.5 h-3.5" />} label="Ambience" />
               </div>
 
-              {/* Console Equipment Grid */}
               <ConsoleIconsRow cafe={cafe} />
 
-              {/* Additional Info */}
               <div className="mt-4 flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  {/* Distance */}
                   {(cafe as any).distance && (
                     <div className="flex items-center gap-1.5">
                       <MapPin className="w-4 h-4 text-[#00f0ff]" />
@@ -386,7 +366,6 @@ export default function CafeList({ cafes }: Props) {
                     </div>
                   )}
                   
-                  {/* Popularity */}
                   {(cafe as any).popularity && (
                     <div className="flex items-center gap-1.5">
                       <Users className="w-4 h-4 text-[#ff073a]" />
@@ -398,9 +377,7 @@ export default function CafeList({ cafes }: Props) {
                 </div>
               </div>
 
-              {/* Price & Book Row */}
               <div className="mt-6 pt-4 border-t border-white/10 flex items-center justify-between">
-                {/* Price */}
                 <div className="price-tag rounded-2xl px-5 py-3">
                   <div className="flex items-baseline gap-2">
                     <span 
@@ -424,12 +401,10 @@ export default function CafeList({ cafes }: Props) {
                   </div>
                 </div>
 
-                {/* Book Button */}
                 <button 
                   className="book-btn rounded-2xl px-6 py-3.5 flex items-center gap-2 group"
                   onClick={(e) => {
                     e.preventDefault();
-                    // Handle booking logic here
                     window.location.href = `/cafes/${cafe.slug || cafe.id}`;
                   }}
                 >
@@ -444,9 +419,69 @@ export default function CafeList({ cafes }: Props) {
                 </button>
               </div>
             </div>
+          </Link>
+        ))}
+      </div>
 
-            {/* Hover Effect Indicator */}
-            <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#ff073a]/20 rounded-3xl transition-all duration-300 pointer-events-none" />
+      {/* Mobile View - SIMPLIFIED like WhatsApp image */}
+      <div className="block lg:hidden space-y-3">
+        {cafes.map((cafe, index) => (
+          <Link
+            key={cafe.id}
+            href={`/cafes/${cafe.slug || cafe.id}`}
+            className="mobile-cafe-card"
+          >
+            {/* Image Section - All content on image */}
+            <div className="mobile-cafe-image">
+              {cafe.cover_url ? (
+                <Image
+                  src={cafe.cover_url}
+                  alt={cafe.name}
+                  fill
+                  sizes="100vw"
+                  className="object-cover"
+                  priority={index < 3}
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-900" />
+              )}
+              
+              {/* Status Badge */}
+              <div className="mobile-status-badge">
+                <OpeningBadge
+                  openingHours={cafe.opening_hours}
+                  isActive={cafe.is_active !== false}
+                />
+              </div>
+              
+              {/* Rating Badge */}
+              {(cafe as any).rating && (
+                <div className="mobile-rating-badge">
+                  <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                  <span className="text-xs font-semibold text-white">
+                    {(cafe as any).rating}
+                  </span>
+                </div>
+              )}
+              
+              {/* Title */}
+              <div className="mobile-cafe-title">
+                <h3>{cafe.name}</h3>
+              </div>
+              
+              {/* Equipment Icons - BETWEEN title and location */}
+              <div className="mobile-icons-between">
+                <EquipmentIconsMobile cafe={cafe} />
+              </div>
+              
+              {/* Location */}
+              <div className="mobile-cafe-location">
+                <MapPin className="w-3 h-3" />
+                <span>{cafe.city || cafe.address?.split(',')[0] || 'Location'}</span>
+              </div>
+            </div>
+            
+            {/* Price and Book Button REMOVED */}
           </Link>
         ))}
       </div>
@@ -454,7 +489,7 @@ export default function CafeList({ cafes }: Props) {
   );
 }
 
-/* ---------- Opening hours badge ---------- */
+/* ---------- Opening Badge ---------- */
 
 function OpeningBadge({
   openingHours,
@@ -463,33 +498,24 @@ function OpeningBadge({
   openingHours?: string | null;
   isActive: boolean;
 }) {
-  // If café is manually turned off
   if (!isActive) {
     return (
-      <div className="badge-inactive inline-flex items-center gap-2 rounded-full px-3 py-1.5 backdrop-blur-sm">
+      <div className="badge-inactive inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px]">
         <div className="relative">
-          <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-yellow-400 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-yellow-400" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-yellow-400" />
         </div>
-        <span className="text-xs font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
-          Temporarily Closed
-        </span>
+        <span>Closed</span>
       </div>
     );
   }
 
   const range = parseOpeningRange(openingHours ?? undefined);
 
-  // If we couldn't parse times
   if (!range) {
     return (
-      <div className="badge-open inline-flex items-center gap-2 rounded-full px-3 py-1.5 backdrop-blur-sm">
-        <CheckCircle className="w-3.5 h-3.5" />
-        <span className="text-xs font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
-          {openingHours && openingHours.trim().length > 0
-            ? openingHours.trim()
-            : "Open"}
-        </span>
+      <div className="badge-open inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px]">
+        <CheckCircle className="w-3 h-3" />
+        <span>Open</span>
       </div>
     );
   }
@@ -499,29 +525,19 @@ function OpeningBadge({
 
   if (isOpen) {
     return (
-      <div className="badge-open inline-flex items-center gap-2 rounded-full px-3 py-1.5 backdrop-blur-sm animate-pulse-glow">
+      <div className="badge-open inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px]">
         <div className="relative">
-          <span className="absolute inline-flex h-2 w-2 animate-ping rounded-full bg-emerald-400 opacity-75" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
         </div>
-        <span className="text-xs font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
-          Open Now
-        </span>
+        <span>Open Now</span>
       </div>
     );
   }
 
   return (
-    <div className="badge-closed inline-flex items-center gap-2 rounded-full px-3 py-1.5 backdrop-blur-sm">
-      <Clock className="w-3.5 h-3.5" />
-      <div className="flex flex-col">
-        <span className="text-xs font-semibold" style={{ fontFamily: 'Inter, sans-serif' }}>
-          Closed
-        </span>
-        <span className="text-[10px] opacity-80">
-          Opens {range.label.split('–')[0].trim()}
-        </span>
-      </div>
+    <div className="badge-closed inline-flex items-center gap-1 rounded-full px-2 py-1 text-[10px]">
+      <Clock className="w-3 h-3" />
+      <span>Closed</span>
     </div>
   );
 }
@@ -539,7 +555,174 @@ function FeatureChip({ icon, label }: { icon: React.ReactNode; label: string }) 
   );
 }
 
-// Parse strings like "10:00 AM – 11:00 PM"
+/* ---------- Console Icons Row (Desktop) ---------- */
+
+const CONSOLE_CONFIG: {
+  key: keyof Cafe;
+  icon: React.ReactNode;
+  label: string;
+  color: string;
+}[] = [
+  { 
+    key: "ps5_count", 
+    icon: <Gamepad2 className="w-4 h-4" />, 
+    label: "PS5", 
+    color: "linear-gradient(135deg, rgba(0, 112, 243, 0.2) 0%, rgba(0, 112, 243, 0.1) 100%)" 
+  },
+  { 
+    key: "ps4_count", 
+    icon: <Gamepad2 className="w-4 h-4" />, 
+    label: "PS4", 
+    color: "linear-gradient(135deg, rgba(0, 112, 243, 0.15) 0%, rgba(0, 112, 243, 0.08) 100%)" 
+  },
+  { 
+    key: "xbox_count", 
+    icon: <span className="text-green-400">X</span>, 
+    label: "Xbox", 
+    color: "linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%)" 
+  },
+  { 
+    key: "pc_count", 
+    icon: <Monitor className="w-4 h-4" />, 
+    label: "PC", 
+    color: "linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.08) 100%)" 
+  },
+];
+
+function ConsoleIconsRow({ cafe }: { cafe: Cafe }) {
+  const available = CONSOLE_CONFIG.filter(
+    ({ key }) => (((cafe as any)[key] as number | null) ?? 0) > 0
+  );
+
+  if (available.length === 0) return null;
+
+  return (
+    <div>
+      <div className="flex items-center gap-2 mb-2">
+        <Sparkles className="w-4 h-4 text-[#00f0ff]" />
+        <span className="text-sm font-semibold text-zinc-300" style={{ fontFamily: 'Inter, sans-serif' }}>
+          Available Equipment
+        </span>
+      </div>
+      
+      <div className="flex flex-wrap gap-2">
+        {available.map(({ key, icon, label, color }, idx) => {
+          const count = ((cafe as any)[key] as number | null) ?? 0;
+          return (
+            <div
+              key={key}
+              className="console-chip inline-flex items-center gap-2 rounded-xl px-3 py-2 group"
+              style={{ background: color }}
+            >
+              <div className="text-zinc-300 group-hover:scale-110 transition-transform">
+                {icon}
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs font-bold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  {label}
+                </span>
+                <span className="text-[10px] text-zinc-400" style={{ fontFamily: 'Inter, sans-serif' }}>
+                  {count} unit{count !== 1 ? 's' : ''}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Mobile Equipment Icons (BETWEEN title and location) ---------- */
+
+function EquipmentIconsMobile({ cafe }: { cafe: Cafe }) {
+  // Simple small icons for mobile - displayed between title and location
+  const mobileIcons = [
+    { 
+      key: "ps5_count", 
+      icon: <Gamepad2 className="mobile-icon-small" />, 
+      label: "PS5",
+      show: (((cafe as any)["ps5_count"] as number | null) ?? 0) > 0 
+    },
+    { 
+      key: "ps4_count", 
+      icon: <Gamepad2 className="mobile-icon-small" />, 
+      label: "PS4",
+      show: (((cafe as any)["ps4_count"] as number | null) ?? 0) > 0 
+    },
+    { 
+      key: "xbox_count", 
+      icon: <span className="text-xs font-bold" style={{ fontSize: '8px' }}>X</span>, 
+      label: "Xbox",
+      show: (((cafe as any)["xbox_count"] as number | null) ?? 0) > 0 
+    },
+    { 
+      key: "pc_count", 
+      icon: <Monitor className="mobile-icon-small" />, 
+      label: "PC",
+      show: (((cafe as any)["pc_count"] as number | null) ?? 0) > 0 
+    },
+    { 
+      key: "pool_count", 
+      icon: <DollarSign className="mobile-icon-small" />, 
+      label: "Pool",
+      show: (((cafe as any)["pool_count"] as number | null) ?? 0) > 0 
+    },
+    { 
+      key: "vr_count", 
+      icon: <Telescope className="mobile-icon-small" />, 
+      label: "VR",
+      show: (((cafe as any)["vr_count"] as number | null) ?? 0) > 0 
+    },
+    { 
+      key: "arcade_count", 
+      icon: <MonitorPlay className="mobile-icon-small" />, 
+      label: "Arcade",
+      show: (((cafe as any)["arcade_count"] as number | null) ?? 0) > 0 
+    },
+    { 
+      key: "snooker_count", 
+      icon: <Target className="mobile-icon-small" />, 
+      label: "Snooker",
+      show: (((cafe as any)["snooker_count"] as number | null) ?? 0) > 0 
+    },
+  ];
+
+  const availableIcons = mobileIcons.filter(item => item.show);
+
+  if (availableIcons.length === 0) {
+    return (
+      <div className="mobile-icon-item">
+        <Gamepad2 className="mobile-icon-small" />
+        <span className="mobile-icon-label">No equipment</span>
+      </div>
+    );
+  }
+
+  // Show only first 3 icons to fit better between title and location
+  const iconsToShow = availableIcons.slice(0, 3);
+
+  return (
+    <>
+      {iconsToShow.map(({ key, icon, label }) => (
+        <div key={key} className="mobile-icon-item">
+          {icon}
+          <span className="mobile-icon-label">{label}</span>
+        </div>
+      ))}
+      
+      {/* Show +X if there are more icons */}
+      {availableIcons.length > 3 && (
+        <div className="mobile-icon-item">
+          <span className="mobile-icon-label">+{availableIcons.length - 3}</span>
+        </div>
+      )}
+    </>
+  );
+}
+
+/* ---------- Helper Functions ---------- */
+
 function parseOpeningRange(
   openingHours?: string
 ): { open: Date; close: Date; label: string } | null {
@@ -584,123 +767,4 @@ function parseTimeForToday(timeStr: string, baseDate: Date): Date | null {
   const d = new Date(baseDate);
   d.setHours(hour24, minNum, 0, 0);
   return d;
-}
-
-/* ---------- Console icons row ---------- */
-
-const CONSOLE_CONFIG: {
-  key: keyof Cafe;
-  icon: React.ReactNode;
-  label: string;
-  color: string;
-}[] = [
-  { 
-    key: "ps5_count", 
-    icon: <Gamepad2 className="w-4 h-4" />, 
-    label: "PS5", 
-    color: "linear-gradient(135deg, rgba(0, 112, 243, 0.2) 0%, rgba(0, 112, 243, 0.1) 100%)" 
-  },
-  { 
-    key: "ps4_count", 
-    icon: <Gamepad2 className="w-4 h-4" />, 
-    label: "PS4", 
-    color: "linear-gradient(135deg, rgba(0, 112, 243, 0.15) 0%, rgba(0, 112, 243, 0.08) 100%)" 
-  },
-  { 
-    key: "xbox_count", 
-    icon: <span className="text-green-400">X</span>, 
-    label: "Xbox", 
-    color: "linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%)" 
-  },
-  { 
-    key: "pc_count", 
-    icon: <Monitor className="w-4 h-4" />, 
-    label: "PC", 
-    color: "linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(139, 92, 246, 0.08) 100%)" 
-  },
-  { 
-    key: "pool_count", 
-    icon: <DollarSign className="w-4 h-4" />, 
-    label: "Pool", 
-    color: "linear-gradient(135deg, rgba(236, 72, 153, 0.15) 0%, rgba(236, 72, 153, 0.08) 100%)" 
-  },
-  { 
-    key: "arcade_count", 
-    icon: <MonitorPlay className="w-4 h-4" />, 
-    label: "Arcade", 
-    color: "linear-gradient(135deg, rgba(251, 191, 36, 0.15) 0%, rgba(251, 191, 36, 0.08) 100%)" 
-  },
-];
-
-// Extended configs for additional equipment
-const EXTENDED_CONFIG: {
-  key: string;
-  icon: React.ReactNode;
-  label: string;
-  color: string;
-}[] = [
-  { 
-    key: "vr_count", 
-    icon: <Telescope className="w-4 h-4" />, 
-    label: "VR", 
-    color: "linear-gradient(135deg, rgba(6, 182, 212, 0.15) 0%, rgba(6, 182, 212, 0.08) 100%)" 
-  },
-  { 
-    key: "steering_wheel_count", 
-    icon: <Car className="w-4 h-4" />, 
-    label: "Racing", 
-    color: "linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(239, 68, 68, 0.08) 100%)" 
-  },
-  { 
-    key: "snooker_count", 
-    icon: <Target className="w-4 h-4" />, 
-    label: "Snooker", 
-    color: "linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.08) 100%)" 
-  },
-];
-
-function ConsoleIconsRow({ cafe }: { cafe: Cafe }) {
-  const allConfigs = [...CONSOLE_CONFIG, ...EXTENDED_CONFIG];
-  
-  const available = allConfigs.filter(
-    ({ key }) => (((cafe as any)[key] as number | null) ?? 0) > 0
-  );
-
-  if (available.length === 0) return null;
-
-  return (
-    <div>
-      <div className="flex items-center gap-2 mb-2">
-        <Sparkles className="w-4 h-4 text-[#00f0ff]" />
-        <span className="text-sm font-semibold text-zinc-300" style={{ fontFamily: 'Inter, sans-serif' }}>
-          Available Equipment
-        </span>
-      </div>
-      
-      <div className="flex flex-wrap gap-2">
-        {available.map(({ key, icon, label, color }, idx) => {
-          const count = ((cafe as any)[key] as number | null) ?? 0;
-          return (
-            <div
-              key={key}
-              className="console-chip inline-flex items-center gap-2 rounded-xl px-3 py-2 group"
-              style={{ background: color }}
-            >
-              <div className="text-zinc-300 group-hover:scale-110 transition-transform">
-                {icon}
-              </div>
-              <div className="flex flex-col">
-                <span className="text-xs font-bold text-white" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {label}
-                </span>
-                <span className="text-[10px] text-zinc-400" style={{ fontFamily: 'Inter, sans-serif' }}>
-                  {count} unit{count !== 1 ? 's' : ''}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
-  );
 }
