@@ -51,7 +51,7 @@ export default function CafeList({ cafes }: Props) {
           }
           
           .mobile-cafe-image {
-            height: 150px; /* Reduced height */
+            height: 120px; /* Smaller compact height */
             position: relative;
             overflow: hidden;
             border-radius: 12px;
@@ -83,15 +83,9 @@ export default function CafeList({ cafes }: Props) {
             line-height: 1.2;
           }
           
-          /* Equipment icons BETWEEN title and location */
+          /* Equipment icons were between title and location on image; hide on-image version */
           .mobile-icons-between {
-            position: absolute;
-            bottom: 18px; /* Between title and location */
-            left: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            z-index: 2;
+            display: none;
           }
           
           .mobile-icon-item {
@@ -149,18 +143,47 @@ export default function CafeList({ cafes }: Props) {
             position: absolute;
             top: 10px;
             left: 10px;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            border-radius: 6px;
-            padding: 3px 8px;
             z-index: 3;
-            border: 1px solid rgba(255, 255, 255, 0.1);
           }
           
-          /* Remove price and book button section */
-          .mobile-bottom-bar,
           .mobile-divider {
             display: none;
+          }
+
+          /* New mobile equipment row and bottom bar */
+          .mobile-equipment-row {
+            display: flex;
+            gap: 8px;
+            padding: 8px 12px;
+            align-items: center;
+          }
+
+          .mobile-bottom-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 8px 12px 0 12px;
+          }
+
+          .mobile-price {
+            background: rgba(255,255,255,0.03);
+            padding: 6px 8px;
+            border-radius: 999px;
+            font-size: 13px;
+            color: #fff;
+          }
+
+          .mobile-book-btn {
+            background: linear-gradient(90deg, #ff073a, #ff6b7a);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
           }
         }
         
@@ -469,11 +492,6 @@ export default function CafeList({ cafes }: Props) {
                 <h3>{cafe.name}</h3>
               </div>
               
-              {/* Equipment Icons - BETWEEN title and location */}
-              <div className="mobile-icons-between">
-                <EquipmentIconsMobile cafe={cafe} />
-              </div>
-              
               {/* Location */}
               <div className="mobile-cafe-location">
                 <MapPin className="w-3 h-3" />
@@ -481,7 +499,26 @@ export default function CafeList({ cafes }: Props) {
               </div>
             </div>
             
-            {/* Price and Book Button REMOVED */}
+            {/* Equipment icons moved below image to keep image area clean */}
+            <div className="mobile-equipment-row">
+              <EquipmentIconsMobile cafe={cafe} />
+            </div>
+
+            {/* Compact price + small Book button */}
+            <div className="mobile-bottom-bar">
+              <div className="mobile-price">₹{cafe.hourly_price ?? 0} / hr</div>
+              <div>
+                <button
+                  className="mobile-book-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.location.href = `/cafes/${cafe.slug || cafe.id}`;
+                  }}
+                >
+                  Book
+                </button>
+              </div>
+            </div>
           </Link>
         ))}
       </div>

@@ -297,9 +297,8 @@ export default function HomeClient({ cafes }: Props) {
         }
 
         .glow-red {
-          text-shadow: 0 0 20px rgba(255, 7, 58, 0.7),
-                       0 0 40px rgba(255, 7, 58, 0.4),
-                       0 0 60px rgba(255, 7, 58, 0.2);
+          text-shadow: 0 0 8px rgba(255, 7, 58, 0.45),
+                       0 0 14px rgba(255, 7, 58, 0.25);
         }
 
         .glow-cyan {
@@ -454,6 +453,59 @@ export default function HomeClient({ cafes }: Props) {
           padding-bottom: max(env(safe-area-inset-bottom), 24px);
         }
 
+        /* Mobile adjustments: compact filter card, visible search border, smaller sort buttons */
+        @media (max-width: 768px) {
+          .filters-compact {
+            padding: 10px 12px !important;
+            border-radius: 12px !important;
+            gap: 2px !important;
+          }
+
+          .input-field {
+            border: 1px solid rgba(255,255,255,0.16) !important;
+            padding: 8px 10px !important;
+            padding-left: 36px !important;
+            padding-right: 36px !important;
+            font-size: 15px !important;
+            height: 40px !important;
+          }
+
+          /* Center only the placeholder text on small screens so icon doesn't overlap it visually */
+          .input-field::placeholder,
+          .input-field::-webkit-input-placeholder,
+          .input-field:-ms-input-placeholder {
+            text-align: center;
+            opacity: 0.9;
+          }
+
+          /* Keep typed text left-aligned */
+          .input-field {
+            text-align: left;
+          }
+
+          /* Position of the left search icon can be adjusted independently */
+          .search-icon-mobile {
+            left: 10px;
+          }
+
+          .compact-sort-btn {
+            padding: 5px 8px !important;
+            font-size: 12px !important;
+            border-radius: 8px !important;
+            height: 32px !important;
+          }
+
+          /* Tighten spacing in filter section */
+          .filters-compact .space-y-6 {
+            gap: 10px !important;
+          }
+
+          /* Reduce heading text size on mobile */
+          .filters-compact h2 {
+            font-size: 16px !important;
+          }
+        }
+
         .overlay-bg {
           background: rgba(0, 0, 0, 0.8);
           backdrop-filter: blur(8px);
@@ -542,11 +594,7 @@ export default function HomeClient({ cafes }: Props) {
           <div className="absolute inset-0 tournament-pattern z-[13]" />
         </div>
 
-        {/* Gaming Tournament Elements - Aapke original se */}
-        <div className="absolute top-10 left-10 w-8 h-8 rounded-full bg-[#ff073a] animate-pulse opacity-40 z-20"></div>
-        <div className="absolute top-20 right-20 w-12 h-12 rounded-full bg-[#00f0ff] animate-pulse opacity-30 z-20"></div>
-        <div className="absolute bottom-20 left-1/4 w-6 h-6 rounded-full bg-[#ff073a] animate-pulse opacity-50 z-20"></div>
-        <div className="absolute bottom-40 right-1/3 w-10 h-10 rounded-full bg-[#00f0ff] animate-pulse opacity-30 z-20"></div>
+        {/* Gaming Tournament decorative bubbles removed per request */}
 
         {/* Tournament Circuit Lines - Aapke original se */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
@@ -717,14 +765,14 @@ export default function HomeClient({ cafes }: Props) {
             {/* ===== SEARCH & FILTERS ===== */}
             <section 
               ref={listRef}
-              className={`sticky top-20 z-30 mb-8 lg:mb-12 bg-[#08080c]/95 backdrop-blur-xl rounded-3xl border border-white/5 p-6 shadow-2xl ${
+              className={`sticky top-20 z-30 mb-8 lg:mb-12 bg-[#08080c]/95 backdrop-blur-xl rounded-3xl border border-white/5 p-6 shadow-2xl filters-compact ${
                 mounted ? 'animate-fade-in' : 'opacity-0'
               }`}
               style={{ animationDelay: '0.1s' }}
             >
               {/* Search Bar */}
               <div className="relative mb-6">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none search-icon-mobile">
                   <Search className="w-5 h-5 text-zinc-500" />
                 </div>
                 <input
@@ -825,7 +873,7 @@ export default function HomeClient({ cafes }: Props) {
                 <div className="md:hidden flex gap-2 overflow-x-auto hide-scrollbar py-2">
                   <button
                     onClick={() => setSortBy("relevance")}
-                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium transition-all compact-sort-btn ${
                       sortBy === "relevance" 
                         ? 'bg-[#ff073a] text-white' 
                         : 'bg-white/5 text-zinc-400'
@@ -836,7 +884,7 @@ export default function HomeClient({ cafes }: Props) {
                   </button>
                   <button
                     onClick={() => setSortBy("price_asc")}
-                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all ${
+                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all compact-sort-btn ${
                       sortBy === "price_asc" 
                         ? 'bg-[#00f0ff] text-black' 
                         : 'bg-white/5 text-zinc-400'
@@ -848,7 +896,7 @@ export default function HomeClient({ cafes }: Props) {
                   </button>
                   <button
                     onClick={() => setSortBy("price_desc")}
-                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all ${
+                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all compact-sort-btn ${
                       sortBy === "price_desc" 
                         ? 'bg-[#00f0ff] text-black' 
                         : 'bg-white/5 text-zinc-400'
