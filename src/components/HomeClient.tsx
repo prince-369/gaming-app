@@ -596,13 +596,6 @@ export default function HomeClient({ cafes }: Props) {
 
         {/* Gaming Tournament decorative bubbles removed per request */}
 
-        {/* Tournament Circuit Lines - Aapke original se */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-20">
-          <div className="absolute top-1/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#ff073a] to-transparent opacity-30"></div>
-          <div className="absolute top-1/2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00f0ff] to-transparent opacity-30"></div>
-          <div className="absolute top-3/4 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#ff073a] to-transparent opacity-30"></div>
-        </div>
-
         {/* Tournament Stage Effect - Aapke original se */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#08080c] via-transparent to-transparent z-20"></div>
 
