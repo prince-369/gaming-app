@@ -453,56 +453,161 @@ export default function HomeClient({ cafes }: Props) {
           padding-bottom: max(env(safe-area-inset-bottom), 24px);
         }
 
-        /* Mobile adjustments: compact filter card, visible search border, smaller sort buttons */
+        /* MOBILE OPTIMIZATIONS - Everything made more compact */
         @media (max-width: 768px) {
+          /* Main container spacing */
+          .hero-content .mx-auto {
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+          }
+          
+          /* Hero Section - Made more compact */
+          .hero-content section {
+            padding-top: 1rem !important;
+            margin-bottom: 1.5rem !important;
+          }
+          
+          /* Main title - Smaller font */
+          .hero-content h1 {
+            font-size: 2rem !important;
+            line-height: 1.2 !important;
+            margin-bottom: 0.5rem !important;
+          }
+          
+          /* Subtitle - Smaller */
+          .hero-content .subtitle p {
+            font-size: 0.75rem !important;
+            padding: 0.25rem 0.5rem !important;
+          }
+          
+          /* Stats grid - Hide completely on mobile */
+          .stat-card {
+            display: none !important;
+          }
+          
+          /* CTA Buttons - Smaller */
+          .hero-content .cta-buttons button {
+            padding: 0.75rem 1rem !important;
+            font-size: 0.875rem !important;
+            border-radius: 0.75rem !important;
+            margin: 0.25rem !important;
+          }
+          
+          /* Search & Filters section - More compact */
           .filters-compact {
-            padding: 10px 12px !important;
-            border-radius: 12px !important;
-            gap: 2px !important;
+            padding: 0.75rem !important;
+            margin-bottom: 1rem !important;
+            border-radius: 1rem !important;
           }
-
+          
+          /* Search input - Smaller */
           .input-field {
-            border: 1px solid rgba(255,255,255,0.16) !important;
-            padding: 8px 10px !important;
-            padding-left: 36px !important;
-            padding-right: 36px !important;
-            font-size: 15px !important;
-            height: 40px !important;
+            height: 2.5rem !important;
+            padding: 0.5rem 2.5rem !important;
+            font-size: 0.875rem !important;
+            margin-bottom: 0.75rem !important;
           }
-
-          /* Center only the placeholder text on small screens so icon doesn't overlap it visually */
-          .input-field::placeholder,
-          .input-field::-webkit-input-placeholder,
-          .input-field:-ms-input-placeholder {
-            text-align: center;
-            opacity: 0.9;
-          }
-
-          /* Keep typed text left-aligned */
-          .input-field {
-            text-align: left;
-          }
-
-          /* Position of the left search icon can be adjusted independently */
+          
+          /* Search icon position */
           .search-icon-mobile {
-            left: 10px;
+            left: 0.75rem !important;
           }
-
-          .compact-sort-btn {
-            padding: 5px 8px !important;
-            font-size: 12px !important;
-            border-radius: 8px !important;
-            height: 32px !important;
-          }
-
-          /* Tighten spacing in filter section */
-          .filters-compact .space-y-6 {
-            gap: 10px !important;
-          }
-
-          /* Reduce heading text size on mobile */
+          
+          /* Filter header - Smaller */
           .filters-compact h2 {
-            font-size: 16px !important;
+            font-size: 1rem !important;
+            margin: 0 !important;
+          }
+          
+          .filters-compact .space-y-6 {
+            gap: 0.5rem !important;
+          }
+          
+          /* Sort buttons - More compact */
+          .compact-sort-btn {
+            padding: 0.375rem 0.75rem !important;
+            font-size: 0.75rem !important;
+            height: 2rem !important;
+            margin: 0.125rem !important;
+          }
+          
+          /* Results section header - Smaller */
+          .results-header h2 {
+            font-size: 1.25rem !important;
+            margin-bottom: 0.25rem !important;
+          }
+          
+          .results-header p {
+            font-size: 0.875rem !important;
+          }
+          
+          /* Café cards - Reduce padding */
+          .cafe-card {
+            padding: 0.75rem !important;
+            margin-bottom: 0.75rem !important;
+            border-radius: 0.75rem !important;
+          }
+          
+          /* Empty state - More compact */
+          .empty-state {
+            padding: 1.5rem !important;
+          }
+          
+          .empty-state h3 {
+            font-size: 1.25rem !important;
+          }
+          
+          .empty-state p {
+            font-size: 0.875rem !important;
+            margin-bottom: 1rem !important;
+          }
+          
+          /* Mobile filter sheet - More compact */
+          .mobile-filter-sheet .px-6 {
+            padding-left: 1rem !important;
+            padding-right: 1rem !important;
+          }
+          
+          .mobile-filter-sheet .py-4 {
+            padding-top: 0.75rem !important;
+            padding-bottom: 0.75rem !important;
+          }
+          
+          .mobile-filter-sheet h3 {
+            font-size: 1.125rem !important;
+          }
+          
+          .mobile-filter-sheet h4 {
+            font-size: 0.875rem !important;
+          }
+          
+          /* Filter buttons in sheet - Smaller */
+          .mobile-filter-sheet button {
+            padding: 0.75rem !important;
+            font-size: 0.875rem !important;
+          }
+          
+          /* Action buttons in sheet - Smaller */
+          .mobile-filter-sheet .action-buttons button {
+            padding: 0.75rem !important;
+            font-size: 0.875rem !important;
+          }
+        }
+        
+        /* Tablet optimizations */
+        @media (min-width: 769px) and (max-width: 1024px) {
+          /* Medium compact size for tablets */
+          .hero-content h1 {
+            font-size: 3rem !important;
+          }
+          
+          .input-field {
+            height: 3rem !important;
+          }
+          
+          .btn-glow, .btn-ghost {
+            padding: 0.875rem 1.5rem !important;
+            font-size: 0.875rem !important;
           }
         }
 
@@ -579,48 +684,37 @@ export default function HomeClient({ cafes }: Props) {
           </div>
         )}
 
-        {/* Background Patterns - Reference code jaise */}
+        {/* Background Patterns */}
         <div className="absolute inset-0 z-0">
-          {/* Dark Overlay - Reference code se */}
           <div className="absolute inset-0 bg-slate-950/80 z-10" />
-          
-          {/* Cyber Grid Pattern - Reference code se */}
           <div className="absolute inset-0 cyber-grid z-[11] opacity-50" />
-          
-          {/* Circuit Pattern - Reference code se */}
           <div className="absolute inset-0 circuit-pattern z-[12] opacity-60" />
-          
-          {/* Tournament Pattern - Aapke original se */}
           <div className="absolute inset-0 tournament-pattern z-[13]" />
         </div>
 
-        {/* Gaming Tournament decorative bubbles removed per request */}
-
-        {/* Tournament Stage Effect - Aapke original se */}
+        {/* Tournament Stage Effect */}
         <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#08080c] via-transparent to-transparent z-20"></div>
 
         <div className="hero-content">
-          <div className="mx-auto max-w-7xl px-4 pb-20 lg:px-8 relative z-30">
+          <div className="mx-auto max-w-7xl px-4 pb-12 lg:px-8 relative z-30">
             
             {/* ===== HERO SECTION ===== */}
-            <section className={`pt-12 lg:pt-16 mb-10 lg:mb-16 ${mounted ? 'animate-fade-in' : 'opacity-0'}`}>
+            <section className={`pt-6 lg:pt-16 mb-6 lg:mb-16 ${mounted ? 'animate-fade-in' : 'opacity-0'}`}>
               <div className="text-center relative">
-                {/* Main Title with Tournament Theme */}
-                <div className="relative inline-block mb-4">
-                  {/* Tournament Spotlight Effect */}
-                  <div className="absolute -inset-6 bg-gradient-to-r from-[#ff073a] via-[#00f0ff] to-[#ff073a] blur-3xl opacity-15 rounded-full"></div>
+                {/* Main Title */}
+                <div className="relative inline-block mb-2">
+                  <div className="absolute -inset-4 bg-gradient-to-r from-[#ff073a] via-[#00f0ff] to-[#ff073a] blur-2xl opacity-10 rounded-full"></div>
                   
-                  {/* Championship Badge - YAHI CHANGE KIYA HAI */}
-                  {/* Mobile pe hidden, tablet aur desktop pe visible */}
-                  <div className="hidden md:flex absolute -top-8 left-1/2 -translate-x-1/2">
-                    <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-[#ff073a] to-[#ff3366] shadow-lg">
-                      <Trophy className="w-4 h-4 text-white" />
-                      <span className="text-xs font-bold uppercase tracking-widest">Gaming Café Booking</span>
+                  {/* Championship Badge */}
+                  <div className="hidden md:flex absolute -top-6 left-1/2 -translate-x-1/2">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#ff073a] to-[#ff3366] shadow-lg">
+                      <Trophy className="w-3 h-3 text-white" />
+                      <span className="text-xs font-bold uppercase tracking-wider">Gaming Café Booking</span>
                     </div>
                   </div>
 
                   <h1 
-                    className="relative text-4xl md:text-6xl lg:text-7xl font-black tracking-tight leading-none"
+                    className="relative text-3xl md:text-6xl lg:text-7xl font-black tracking-tight leading-tight"
                     style={{ fontFamily: 'Orbitron, sans-serif' }}
                   >
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#910320] via-white to-[#ffffff] glow-red">
@@ -630,23 +724,22 @@ export default function HomeClient({ cafes }: Props) {
                     <span className="text-white">GAME</span>
                   </h1>
                   
-                  {/* Tournament Subtitle */}
-                  <div className="mt-4 relative">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-[#ff073a] to-[#00f0ff] blur opacity-20 rounded-lg"></div>
-                    <p className="relative text-lg md:text-xl text-zinc-300 px-4 py-2 rounded-lg bg-black/50 backdrop-blur-sm">
-                      Reserve your gaming seat instantly at top esports cafes!
+                  {/* Subtitle */}
+                  <div className="mt-2 relative subtitle">
+                    <p className="relative text-xs md:text-base text-white px-2 py-1 inline-block">
+                     Book your gaming seat instantly at nearby cafes!
                     </p>
                   </div>
                 </div>
                                
 
-                {/* Tournament Stats Grid - Mobile pe hidden, tablet aur desktop pe visible */}
-                <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-3xl mx-auto mb-8">
-                  <div className="stat-card rounded-2xl p-4 text-center border border-[#ff073a]/30">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Trophy className="w-5 h-5 text-[#ff073a]" />
+                {/* Tournament Stats Grid - Hidden on mobile */}
+                <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-3 max-w-3xl mx-auto mb-6">
+                  <div className="stat-card rounded-xl p-3 text-center border border-[#ff073a]/30">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <Trophy className="w-4 h-4 text-[#ff073a]" />
                       <div 
-                        className="text-2xl md:text-3xl font-bold text-white"
+                        className="text-xl md:text-3xl font-bold text-white"
                         style={{ fontFamily: 'Orbitron, sans-serif' }}
                       >
                         {safeCafes.length}+
@@ -660,11 +753,11 @@ export default function HomeClient({ cafes }: Props) {
                     </div>
                   </div>
                   
-                  <div className="stat-card rounded-2xl p-4 text-center border border-[#00f0ff]/30">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Clock className="w-5 h-5 text-[#00f0ff]" />
+                  <div className="stat-card rounded-xl p-3 text-center border border-[#00f0ff]/30">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <Clock className="w-4 h-4 text-[#00f0ff]" />
                       <div 
-                        className="text-2xl md:text-3xl font-bold text-white"
+                        className="text-xl md:text-3xl font-bold text-white"
                         style={{ fontFamily: 'Orbitron, sans-serif' }}
                       >
                         24/7
@@ -678,11 +771,11 @@ export default function HomeClient({ cafes }: Props) {
                     </div>
                   </div>
                   
-                  <div className="stat-card rounded-2xl p-4 text-center border border-[#ff073a]/30">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Users className="w-5 h-5 text-[#ff073a]" />
+                  <div className="stat-card rounded-xl p-3 text-center border border-[#ff073a]/30">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <Users className="w-4 h-4 text-[#ff073a]" />
                       <div 
-                        className="text-2xl md:text-3xl font-bold text-white"
+                        className="text-xl md:text-3xl font-bold text-white"
                         style={{ fontFamily: 'Orbitron, sans-serif' }}
                       >
                         50K+
@@ -696,11 +789,11 @@ export default function HomeClient({ cafes }: Props) {
                     </div>
                   </div>
                   
-                  <div className="stat-card rounded-2xl p-4 text-center border border-[#00f0ff]/30">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                      <Award className="w-5 h-5 text-[#00f0ff]" />
+                  <div className="stat-card rounded-xl p-3 text-center border border-[#00f0ff]/30">
+                    <div className="flex items-center justify-center gap-2 mb-1">
+                      <Award className="w-4 h-4 text-[#00f0ff]" />
                       <div 
-                        className="text-2xl md:text-3xl font-bold text-white"
+                        className="text-xl md:text-3xl font-bold text-white"
                         style={{ fontFamily: 'Orbitron, sans-serif' }}
                       >
                         10+
@@ -715,38 +808,34 @@ export default function HomeClient({ cafes }: Props) {
                   </div>
                 </div>
 
-                {/* Tournament CTA Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+                {/* CTA Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4 cta-buttons">
                   <button
                     onClick={handleScrollToList}
-                    className="btn-glow px-8 py-4 rounded-2xl text-lg font-bold tracking-wide uppercase flex items-center gap-3 group animate-float relative overflow-hidden"
+                    className="btn-glow px-6 py-3 rounded-xl text-sm md:text-lg font-bold tracking-wide uppercase flex items-center gap-2 group"
                     style={{ fontFamily: 'Orbitron, sans-serif' }}
                   >
-                    {/* Tournament Sparkle Effect */}
-                    <div className="absolute -inset-1 bg-gradient-to-r from-[#ff073a] to-[#00f0ff] opacity-20 blur"></div>
-                    <Zap className="w-5 h-5 group-hover:scale-125 transition-transform relative z-10" />
-                    <span className="relative z-10">Book Now</span>
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform relative z-10" />
+                    <Zap className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-125 transition-transform" />
+                    <span>Book Now</span>
+                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
                   
-                  <div className="flex gap-3">
+                  <div className="flex gap-2">
                     <button
                       onClick={() => handleComingSoon("Tournaments")}
-                      className="btn-ghost px-6 py-4 rounded-2xl text-base font-semibold flex items-center gap-2 group relative overflow-hidden"
+                      className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#ff073a]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <Trophy className="w-5 h-5 text-zinc-400 group-hover:text-[#ff073a] transition-colors relative z-10" />
-                      <span className="relative z-10">Membership</span>
+                      <Trophy className="w-4 h-4 text-zinc-400" />
+                      <span>Membership</span>
                     </button>
                     <button
                       onClick={() => handleComingSoon("Streaming")}
-                      className="btn-ghost px-6 py-4 rounded-2xl text-base font-semibold flex items-center gap-2 group relative overflow-hidden"
+                      className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
-                      <div className="absolute inset-0 bg-gradient-to-r from-[#00f0ff]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <Award className="w-5 h-5 text-zinc-400 group-hover:text-[#00f0ff] transition-colors relative z-10" />
-                      <span className="relative z-10">Tournaments</span>
+                      <Award className="w-4 h-4 text-zinc-400" />
+                      <span>Tournaments</span>
                     </button>
                   </div>
                 </div>
@@ -758,54 +847,54 @@ export default function HomeClient({ cafes }: Props) {
             {/* ===== SEARCH & FILTERS ===== */}
             <section 
               ref={listRef}
-              className={`sticky top-20 z-30 mb-8 lg:mb-12 bg-[#08080c]/95 backdrop-blur-xl rounded-3xl border border-white/5 p-6 shadow-2xl filters-compact ${
+              className={`sticky top-16 z-30 mb-4 lg:mb-12 bg-[#08080c]/95 backdrop-blur-xl rounded-2xl border border-white/5 p-4 shadow-xl filters-compact ${
                 mounted ? 'animate-fade-in' : 'opacity-0'
               }`}
               style={{ animationDelay: '0.1s' }}
             >
               {/* Search Bar */}
-              <div className="relative mb-6">
-                <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none search-icon-mobile">
-                  <Search className="w-5 h-5 text-zinc-500" />
+              <div className="relative mb-4">
+                <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none search-icon-mobile">
+                  <Search className="w-4 h-4 text-zinc-500" />
                 </div>
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search Cafes, gaming arenas, or equipment..."
-                  className="input-field w-full pl-12 pr-12 py-4 rounded-2xl text-lg placeholder:text-zinc-600 focus:outline-none"
+                  placeholder="Search cafes, arenas, or equipment..."
+                  className="input-field w-full pl-10 pr-10 py-3 rounded-xl text-sm placeholder:text-zinc-600 focus:outline-none"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 />
                 {query && (
                   <button 
                     onClick={() => setQuery("")}
-                    className="absolute inset-y-0 right-4 flex items-center p-2 hover:bg-white/5 rounded-lg transition-colors"
+                    className="absolute inset-y-0 right-3 flex items-center p-1 hover:bg-white/5 rounded-lg transition-colors"
                   >
-                    <X className="w-5 h-5 text-zinc-500" />
+                    <X className="w-4 h-4 text-zinc-500" />
                   </button>
                 )}
               </div>
 
               {/* Filters Section */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Filter Header */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Filter className="w-5 h-5 text-[#ff073a]" />
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-[#ff073a]" />
                     <h2 
-                      className="text-xl font-bold"
+                      className="text-lg font-bold"
                       style={{ fontFamily: 'Orbitron, sans-serif' }}
                     >
                       Find Your Cafes
                     </h2>
                   </div>
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
                     <button
                       onClick={() => setShowFilters(true)}
-                      className="md:hidden relative p-3 rounded-xl btn-ghost"
+                      className="md:hidden relative p-2 rounded-lg btn-ghost"
                     >
-                      <Filter className="w-5 h-5" />
+                      <Filter className="w-4 h-4" />
                       {activeFiltersCount > 0 && (
-                        <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#ff073a] text-white text-xs font-bold rounded-full flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#ff073a] text-white text-xs font-bold rounded-full flex items-center justify-center">
                           {activeFiltersCount}
                         </span>
                       )}
@@ -814,7 +903,7 @@ export default function HomeClient({ cafes }: Props) {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as SortKey)}
-                      className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm font-medium appearance-none cursor-pointer"
+                      className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-xs font-medium appearance-none cursor-pointer"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
                       <option value="relevance">Tournament Ready</option>
@@ -825,7 +914,7 @@ export default function HomeClient({ cafes }: Props) {
                     {activeFiltersCount > 0 && (
                       <button
                         onClick={clearAllFilters}
-                        className="text-sm font-medium text-[#ff073a] hover:text-[#ff073a]/80 transition-colors"
+                        className="text-xs font-medium text-[#ff073a] hover:text-[#ff073a]/80 transition-colors"
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
                         Clear All
@@ -835,38 +924,38 @@ export default function HomeClient({ cafes }: Props) {
                 </div>
 
                 {/* Filter Grid */}
-                <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+                <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-2">
                   {filterButtons.map((filter) => (
                     <button
                       key={filter.key}
                       onClick={filter.toggle}
-                      className={`flex items-center justify-center gap-3 p-4 rounded-xl transition-all ${
+                      className={`flex items-center justify-center gap-2 p-3 rounded-lg transition-all ${
                         filter.active 
                           ? 'chip-active text-white' 
                           : 'chip text-zinc-400 hover:text-white'
                       }`}
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
-                      <div className={`p-2 rounded-lg ${
+                      <div className={`p-1.5 rounded ${
                         filter.active 
                           ? 'bg-white/20' 
                           : 'bg-white/5'
                       }`}>
                         {filter.icon}
                       </div>
-                      <span className="font-semibold">{filter.label}</span>
+                      <span className="text-sm font-semibold">{filter.label}</span>
                       {filter.active && (
-                        <Check className="w-4 h-4 ml-2" />
+                        <Check className="w-3 h-3 ml-1" />
                       )}
                     </button>
                   ))}
                 </div>
 
                 {/* Sort Options (Mobile) */}
-                <div className="md:hidden flex gap-2 overflow-x-auto hide-scrollbar py-2">
+                <div className="md:hidden flex gap-2 overflow-x-auto hide-scrollbar py-1">
                   <button
                     onClick={() => setSortBy("relevance")}
-                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium transition-all compact-sort-btn ${
+                    className={`shrink-0 px-3 py-2 rounded-lg text-xs font-medium transition-all compact-sort-btn ${
                       sortBy === "relevance" 
                         ? 'bg-[#ff073a] text-white' 
                         : 'bg-white/5 text-zinc-400'
@@ -877,26 +966,26 @@ export default function HomeClient({ cafes }: Props) {
                   </button>
                   <button
                     onClick={() => setSortBy("price_asc")}
-                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all compact-sort-btn ${
+                    className={`shrink-0 px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1 transition-all compact-sort-btn ${
                       sortBy === "price_asc" 
                         ? 'bg-[#00f0ff] text-black' 
                         : 'bg-white/5 text-zinc-400'
                     }`}
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    <TrendingUp className="w-4 h-4" />
+                    <TrendingUp className="w-3 h-3" />
                     Price Low
                   </button>
                   <button
                     onClick={() => setSortBy("price_desc")}
-                    className={`shrink-0 px-4 py-2.5 rounded-xl text-sm font-medium flex items-center gap-2 transition-all compact-sort-btn ${
+                    className={`shrink-0 px-3 py-2 rounded-lg text-xs font-medium flex items-center gap-1 transition-all compact-sort-btn ${
                       sortBy === "price_desc" 
                         ? 'bg-[#00f0ff] text-black' 
                         : 'bg-white/5 text-zinc-400'
                     }`}
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    <TrendingDown className="w-4 h-4" />
+                    <TrendingDown className="w-3 h-3" />
                     Price High
                   </button>
                 </div>
@@ -909,10 +998,10 @@ export default function HomeClient({ cafes }: Props) {
               style={{ animationDelay: '0.15s' }}
             >
               {/* Results Header */}
-              <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center justify-between mb-4 results-header">
                 <div>
                   <h2 
-                    className="text-2xl font-bold text-white mb-2"
+                    className="text-xl font-bold text-white mb-1"
                     style={{ fontFamily: 'Orbitron, sans-serif' }}
                   >
                     {query || activeFiltersCount > 0 ? 'Filtered Cafes' : 'All Gaming Cafes'}
@@ -921,18 +1010,18 @@ export default function HomeClient({ cafes }: Props) {
                     className="text-zinc-400"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    {filteredCafes.length} professional venue{filteredCafes.length !== 1 ? 's' : ''} found
+                    {filteredCafes.length} venue{filteredCafes.length !== 1 ? 's' : ''} found
                   </p>
                 </div>
                 
                 {activeFiltersCount > 0 && (
                   <button
                     onClick={clearAllFilters}
-                    className="hidden md:flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                    className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    <X className="w-4 h-4" />
-                    Clear Filters
+                    <X className="w-3 h-3" />
+                    <span className="text-sm">Clear Filters</span>
                   </button>
                 )}
               </div>
@@ -941,33 +1030,33 @@ export default function HomeClient({ cafes }: Props) {
               {filteredCafes.length > 0 ? (
                 <CafeList cafes={filteredCafes} />
               ) : (
-                <div className="card-glass rounded-3xl p-12 text-center">
-                  <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#ff073a]/10 to-[#00f0ff]/10 flex items-center justify-center">
-                    <Frown className="w-12 h-12 text-zinc-600" />
+                <div className="card-glass rounded-2xl p-6 text-center empty-state">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#ff073a]/10 to-[#00f0ff]/10 flex items-center justify-center">
+                    <Frown className="w-8 h-8 text-zinc-600" />
                   </div>
                   <h3 
-                    className="text-2xl font-bold text-white mb-3"
+                    className="text-xl font-bold text-white mb-2"
                     style={{ fontFamily: 'Orbitron, sans-serif' }}
                   >
-                    No Tournament Venues Found
+                    No Venues Found
                   </h3>
                   <p 
-                    className="text-zinc-400 mb-8 max-w-md mx-auto"
+                    className="text-zinc-400 mb-6 max-w-md mx-auto"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    We couldn't find any tournament-ready venues matching your criteria. Try adjusting your filters or search terms.
+                    Try adjusting your filters or search terms.
                   </p>
-                  <div className="flex gap-4 justify-center">
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <button
                       onClick={clearAllFilters}
-                      className="btn-glow px-8 py-3 rounded-xl font-bold"
+                      className="btn-glow px-6 py-2.5 rounded-lg text-sm font-bold"
                       style={{ fontFamily: 'Orbitron, sans-serif' }}
                     >
                       Clear All Filters
                     </button>
                     <button
                       onClick={() => setQuery("")}
-                      className="btn-ghost px-8 py-3 rounded-xl font-semibold"
+                      className="btn-ghost px-6 py-2.5 rounded-lg text-sm font-semibold"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
                       Reset Search
@@ -982,7 +1071,7 @@ export default function HomeClient({ cafes }: Props) {
         {/* ===== MOBILE FILTER SHEET ===== */}
         {showFilters && (
           <div 
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-50 mobile-filter-sheet"
             onClick={() => setShowFilters(false)}
           >
             {/* Overlay */}
@@ -990,25 +1079,25 @@ export default function HomeClient({ cafes }: Props) {
             
             {/* Sheet */}
             <div 
-              className="absolute bottom-0 left-0 right-0 bg-[#101016] rounded-t-[32px] border-t border-white/10 animate-slide-up safe-bottom shadow-2xl"
+              className="absolute bottom-0 left-0 right-0 bg-[#101016] rounded-t-[28px] border-t border-white/10 animate-slide-up safe-bottom shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Handle bar */}
-              <div className="flex justify-center pt-4 pb-2">
-                <div className="w-12 h-1.5 rounded-full bg-white/20" />
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="w-10 h-1 rounded-full bg-white/20" />
               </div>
               
               {/* Header */}
-              <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+              <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
                 <div>
                   <h3 
-                    className="text-xl font-bold"
+                    className="text-lg font-bold"
                     style={{ fontFamily: 'Orbitron, sans-serif' }}
                   >
-                    Tournament Filters
+                    Filters
                   </h3>
                   <p 
-                    className="text-sm text-zinc-400"
+                    className="text-xs text-zinc-400"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     {activeFiltersCount} filter{activeFiltersCount !== 1 ? 's' : ''} active
@@ -1016,78 +1105,78 @@ export default function HomeClient({ cafes }: Props) {
                 </div>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                  className="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
                   aria-label="Close filters"
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
               
               {/* Content */}
-              <div className="px-6 py-4 max-h-[60vh] overflow-y-auto">
+              <div className="px-4 py-3 max-h-[60vh] overflow-y-auto">
                 {/* Equipment Filters */}
-                <div className="mb-6">
+                <div className="mb-4">
                   <h4 
-                    className="text-sm font-semibold text-zinc-300 mb-3"
+                    className="text-xs font-semibold text-zinc-300 mb-2"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
-                    TOURNAMENT EQUIPMENT
+                    EQUIPMENT
                   </h4>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 gap-2">
                     {filterButtons.map((filter) => (
                       <button
                         key={filter.key}
                         onClick={filter.toggle}
-                        className={`flex items-center gap-3 p-4 rounded-xl transition-all ${
+                        className={`flex items-center gap-2 p-3 rounded-lg transition-all ${
                           filter.active 
                             ? 'bg-gradient-to-r from-[#ff073a] to-[#ff073a]/80 text-white' 
                             : 'bg-white/5 text-zinc-400 border border-white/10'
                         }`}
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        <div className={`p-2 rounded-lg ${
+                        <div className={`p-1.5 rounded ${
                           filter.active 
                             ? 'bg-white/20' 
                             : 'bg-white/5'
                         }`}>
                           {filter.icon}
                         </div>
-                        <span className="font-semibold">{filter.label}</span>
+                        <span className="text-sm font-semibold">{filter.label}</span>
                       </button>
                     ))}
                   </div>
                 </div>
                 
                 {/* Sort Options */}
-                <div className="pt-4 border-t border-white/10">
+                <div className="pt-3 border-t border-white/10">
                   <h4 
-                    className="text-sm font-semibold text-zinc-300 mb-3"
+                    className="text-xs font-semibold text-zinc-300 mb-2"
                     style={{ fontFamily: 'Inter, sans-serif' }}
                   >
                     SORT BY
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     {[
-                      { value: 'relevance', label: 'Tournament Ready', icon: <Trophy className="w-4 h-4" /> },
-                      { value: 'price_asc', label: 'Price: Low to High', icon: <TrendingUp className="w-4 h-4" /> },
-                      { value: 'price_desc', label: 'Price: High to Low', icon: <TrendingDown className="w-4 h-4" /> },
+                      { value: 'relevance', label: 'Tournament Ready', icon: <Trophy className="w-3 h-3" /> },
+                      { value: 'price_asc', label: 'Price: Low to High', icon: <TrendingUp className="w-3 h-3" /> },
+                      { value: 'price_desc', label: 'Price: High to Low', icon: <TrendingDown className="w-3 h-3" /> },
                     ].map((option) => (
                       <button
                         key={option.value}
                         onClick={() => setSortBy(option.value as SortKey)}
-                        className={`flex items-center justify-between w-full p-4 rounded-xl transition-all ${
+                        className={`flex items-center justify-between w-full p-3 rounded-lg transition-all ${
                           sortBy === option.value
                             ? 'bg-gradient-to-r from-[#00f0ff] to-[#00f0ff]/80 text-black'
                             : 'bg-white/5 text-zinc-400 hover:bg-white/10'
                         }`}
                         style={{ fontFamily: 'Inter, sans-serif' }}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2">
                           {option.icon}
-                          <span>{option.label}</span>
+                          <span className="text-sm">{option.label}</span>
                         </div>
                         {sortBy === option.value && (
-                          <Check className="w-5 h-5" />
+                          <Check className="w-4 h-4" />
                         )}
                       </button>
                     ))}
@@ -1096,20 +1185,20 @@ export default function HomeClient({ cafes }: Props) {
               </div>
               
               {/* Action Buttons */}
-              <div className="flex gap-3 px-6 py-4 border-t border-white/10">
+              <div className="flex gap-2 px-4 py-3 border-t border-white/10 action-buttons">
                 <button
                   onClick={() => {
                     clearAllFilters();
                     setShowFilters(false);
                   }}
-                  className="flex-1 py-4 rounded-xl text-base font-semibold bg-white/5 hover:bg-white/10 transition-colors"
+                  className="flex-1 py-3 rounded-lg text-sm font-semibold bg-white/5 hover:bg-white/10 transition-colors"
                   style={{ fontFamily: 'Inter, sans-serif' }}
                 >
                   Reset All
                 </button>
                 <button
                   onClick={() => setShowFilters(false)}
-                  className="flex-[2] py-4 rounded-xl text-base font-bold btn-glow"
+                  className="flex-[2] py-3 rounded-lg text-sm font-bold btn-glow"
                   style={{ fontFamily: 'Orbitron, sans-serif' }}
                 >
                   Show {filteredCafes.length} Venues
