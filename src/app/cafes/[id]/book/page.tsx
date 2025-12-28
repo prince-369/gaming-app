@@ -5,10 +5,50 @@ import { useEffect, useMemo, useState, useCallback } from "react";
 import { useRouter, useParams, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import useUser from "@/hooks/useUser";
-import { colors, fonts, CONSOLE_LABELS, CONSOLE_DB_KEYS, CONSOLE_COLORS, CONSOLE_ICONS, OPEN_HOUR, CLOSE_HOUR, PEAK_START, PEAK_END, TIME_INTERVAL, BOOKING_DURATION_MINUTES, type ConsoleId } from "@/lib/constants";
+import { 
+  colors, 
+  fonts, 
+  CONSOLE_LABELS, 
+  CONSOLE_DB_KEYS, 
+  CONSOLE_COLORS, 
+  OPEN_HOUR, 
+  CLOSE_HOUR, 
+  PEAK_START, 
+  PEAK_END, 
+  TIME_INTERVAL, 
+  BOOKING_DURATION_MINUTES, 
+  type ConsoleId 
+} from "@/lib/constants";
+
+// Lucide Icons
+import {
+  ArrowLeft,
+  Calendar,
+  Clock,
+  Gamepad2,
+  Monitor,
+  Car,
+  Target,
+  Telescope,
+  Zap,
+  AlertCircle,
+  CheckCircle,
+  RefreshCw,
+  Loader2,
+  MapPin,
+  Instagram,
+  CreditCard,
+  Plus,
+  Minus,
+  ChevronRight,
+  ShieldCheck,
+  BadgeCheck,
+  Sparkles,
+  Crown,
+  DollarSign
+} from "lucide-react";
 
 // ============ TYPES ============
-
 type DayOption = {
   key: string;
   dayName: string;
@@ -27,7 +67,7 @@ type TimeSlot = {
 type ConsoleOption = {
   id: ConsoleId;
   label: string;
-  icon: string;
+  icon: React.ReactNode;
   color: string;
   dbKey: string;
 };
@@ -50,20 +90,74 @@ type ConsoleAvailability = {
   total: number;
   booked: number;
   available: number;
-  nextAvailableAt: string | null; // Time when console becomes free (e.g., "11:30 pm")
+  nextAvailableAt: string | null;
 };
 
 // ============ CONSTANTS ============
 const CONSOLES: ConsoleOption[] = [
-  { id: "ps5", label: CONSOLE_LABELS.ps5, icon: CONSOLE_ICONS.ps5, color: CONSOLE_COLORS.ps5, dbKey: CONSOLE_DB_KEYS.ps5 },
-  { id: "ps4", label: CONSOLE_LABELS.ps4, icon: CONSOLE_ICONS.ps4, color: CONSOLE_COLORS.ps4, dbKey: CONSOLE_DB_KEYS.ps4 },
-  { id: "xbox", label: CONSOLE_LABELS.xbox, icon: CONSOLE_ICONS.xbox, color: CONSOLE_COLORS.xbox, dbKey: CONSOLE_DB_KEYS.xbox },
-  { id: "pc", label: CONSOLE_LABELS.pc, icon: CONSOLE_ICONS.pc, color: CONSOLE_COLORS.pc, dbKey: CONSOLE_DB_KEYS.pc },
-  { id: "pool", label: CONSOLE_LABELS.pool, icon: CONSOLE_ICONS.pool, color: CONSOLE_COLORS.pool, dbKey: CONSOLE_DB_KEYS.pool },
-  { id: "arcade", label: CONSOLE_LABELS.arcade, icon: CONSOLE_ICONS.arcade, color: CONSOLE_COLORS.arcade, dbKey: CONSOLE_DB_KEYS.arcade },
-  { id: "snooker", label: CONSOLE_LABELS.snooker, icon: CONSOLE_ICONS.snooker, color: CONSOLE_COLORS.snooker, dbKey: CONSOLE_DB_KEYS.snooker },
-  { id: "vr", label: CONSOLE_LABELS.vr, icon: CONSOLE_ICONS.vr, color: CONSOLE_COLORS.vr, dbKey: CONSOLE_DB_KEYS.vr },
-  { id: "steering", label: CONSOLE_LABELS.steering, icon: CONSOLE_ICONS.steering, color: CONSOLE_COLORS.steering, dbKey: CONSOLE_DB_KEYS.steering },
+  { 
+    id: "ps5", 
+    label: CONSOLE_LABELS.ps5, 
+    icon: <Gamepad2 className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.ps5, 
+    dbKey: CONSOLE_DB_KEYS.ps5 
+  },
+  { 
+    id: "ps4", 
+    label: CONSOLE_LABELS.ps4, 
+    icon: <Gamepad2 className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.ps4, 
+    dbKey: CONSOLE_DB_KEYS.ps4 
+  },
+  { 
+    id: "xbox", 
+    label: CONSOLE_LABELS.xbox, 
+    icon: <Gamepad2 className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.xbox, 
+    dbKey: CONSOLE_DB_KEYS.xbox 
+  },
+  { 
+    id: "pc", 
+    label: CONSOLE_LABELS.pc, 
+    icon: <Monitor className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.pc, 
+    dbKey: CONSOLE_DB_KEYS.pc 
+  },
+  { 
+    id: "pool", 
+    label: CONSOLE_LABELS.pool, 
+    icon: <Target className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.pool, 
+    dbKey: CONSOLE_DB_KEYS.pool 
+  },
+  { 
+    id: "arcade", 
+    label: CONSOLE_LABELS.arcade, 
+    icon: <Gamepad2 className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.arcade, 
+    dbKey: CONSOLE_DB_KEYS.arcade 
+  },
+  { 
+    id: "snooker", 
+    label: CONSOLE_LABELS.snooker, 
+    icon: <Target className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.snooker, 
+    dbKey: CONSOLE_DB_KEYS.snooker 
+  },
+  { 
+    id: "vr", 
+    label: CONSOLE_LABELS.vr, 
+    icon: <Telescope className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.vr, 
+    dbKey: CONSOLE_DB_KEYS.vr 
+  },
+  { 
+    id: "steering", 
+    label: CONSOLE_LABELS.steering, 
+    icon: <Car className="w-5 h-5" />, 
+    color: CONSOLE_COLORS.steering, 
+    dbKey: CONSOLE_DB_KEYS.steering 
+  },
 ];
 
 // ============ HELPER FUNCTIONS ============
@@ -108,7 +202,6 @@ function buildTimeSlots(): TimeSlot[] {
   return slots;
 }
 
-// Convert "10:30 pm" to minutes from midnight
 function timeStringToMinutes(timeStr: string): number {
   const match = timeStr.toLowerCase().match(/(\d+):(\d+)\s*(am|pm)/);
   if (!match) return 0;
@@ -126,7 +219,6 @@ function timeStringToMinutes(timeStr: string): number {
   return hours * 60 + minutes;
 }
 
-// Check if two time ranges of given duration overlap
 function doTimeSlotsOverlap(
   slot1StartMinutes: number,
   slot2StartMinutes: number,
@@ -137,7 +229,6 @@ function doTimeSlotsOverlap(
   return slot1StartMinutes < slot2End && slot2StartMinutes < slot1End;
 }
 
-// Convert minutes from midnight to "11:30 pm"
 function minutesToTimeString(totalMinutes: number): string {
   let hours = Math.floor(totalMinutes / 60);
   const mins = totalMinutes % 60;
@@ -173,10 +264,8 @@ function generateTickets(
   for (let qty = 1; qty <= maxConsoles; qty++) {
     let price: number;
 
-    // Use tier-based pricing if available, otherwise fallback to simple multiplication
     if (pricingTier) {
       if (duration === 90) {
-        // 90min = 60min + 30min pricing
         const price60 = pricingTier[`qty${qty}_60min` as keyof typeof pricingTier] ?? (fallbackPrice * qty);
         const price30 = pricingTier[`qty${qty}_30min` as keyof typeof pricingTier] ?? (fallbackPrice * qty * 0.5);
         price = price60 + price30;
@@ -187,13 +276,11 @@ function generateTickets(
         if (tierPrice !== null && tierPrice !== undefined) {
           price = tierPrice;
         } else {
-          // Fallback: calculate based on duration ratio
           price = duration === 30 ? (fallbackPrice * qty * 0.5) : (fallbackPrice * qty);
         }
       }
     } else {
       if (duration === 90) {
-        // 90min = 1.5 hours
         price = fallbackPrice * qty * 1.5;
       } else {
         price = duration === 30 ? (fallbackPrice * qty * 0.5) : (fallbackPrice * qty);
@@ -214,7 +301,6 @@ function generateTickets(
   return tickets;
 }
 
-
 const DAY_OPTIONS = buildNext7Days();
 const ALL_TIME_SLOTS = buildTimeSlots();
 
@@ -225,7 +311,6 @@ export default function BookingPage() {
   const searchParams = useSearchParams();
   const { user, loading: userLoading } = useUser();
 
-
   const rawId = params?.id;
   const cafeId = typeof rawId === "string" && rawId !== "undefined" ? rawId : null;
 
@@ -234,11 +319,8 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<string>(DAY_OPTIONS[0]?.key ?? "");
   const [selectedTime, setSelectedTime] = useState<string>("");
   const [selectedConsole, setSelectedConsole] = useState<ConsoleId>("ps5");
-  const [quantities, setQuantities] = useState<Record<string, number>>({}); // ticketId -> quantity
-  // ticketId format: "ps5_2" (console_quantity) OR "ps5_2_30" / "ps5_2_60" (console_quantity_duration)
-
-  // Cafe data
-  const [actualCafeId, setActualCafeId] = useState<string | null>(null); // Store UUID when slug is used
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [actualCafeId, setActualCafeId] = useState<string | null>(null);
   const [cafeName, setCafeName] = useState<string>("Gaming Café");
   const [cafePrice, setCafePrice] = useState<number>(150);
   const [googleMapsUrl, setGoogleMapsUrl] = useState<string>("");
@@ -261,11 +343,7 @@ export default function BookingPage() {
   const [availableConsoles, setAvailableConsoles] = useState<ConsoleId[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Live Availability State
-  const [liveAvailability, setLiveAvailability] = useState<
-    Partial<Record<ConsoleId, ConsoleAvailability>>
-  >({});
+  const [liveAvailability, setLiveAvailability] = useState<Partial<Record<ConsoleId, ConsoleAvailability>>>({});
   const [loadingAvailability, setLoadingAvailability] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
@@ -276,8 +354,6 @@ export default function BookingPage() {
 
       try {
         setLoading(true);
-
-        // Check if cafeId is a UUID or slug
         const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cafeId);
 
         const { data, error } = await supabase
@@ -293,7 +369,6 @@ export default function BookingPage() {
           return;
         }
 
-        // Store the actual UUID for booking creation
         setActualCafeId(data.id);
         setCafeName(data.name || "Gaming Café");
         setCafePrice(data.hourly_price || 150);
@@ -318,7 +393,6 @@ export default function BookingPage() {
           setSelectedConsole(available[0]);
         }
 
-        // Load console pricing from database (both 30min and 60min)
         const { data: pricingData, error: pricingError } = await supabase
           .from("console_pricing")
           .select("console_type, quantity, duration_minutes, price")
@@ -328,14 +402,11 @@ export default function BookingPage() {
           const pricing: Partial<Record<ConsoleId, ConsolePricingTier>> = {};
 
           pricingData.forEach((item: any) => {
-            // Map database console_type to ConsoleId
             let consoleId = item.console_type as ConsoleId;
-            // Handle steering_wheel mapping
             if (item.console_type === "steering_wheel") {
               consoleId = "steering";
             }
 
-            // Initialize tier object if not exists
             if (!pricing[consoleId]) {
               pricing[consoleId] = {
                 qty1_30min: null, qty1_60min: null,
@@ -345,7 +416,6 @@ export default function BookingPage() {
               };
             }
 
-            // Set the price for the specific quantity and duration
             const qty = item.quantity;
             const duration = item.duration_minutes;
             if (qty >= 1 && qty <= 4 && (duration === 30 || duration === 60)) {
@@ -366,8 +436,7 @@ export default function BookingPage() {
     loadCafeData();
   }, [cafeId, selectedConsole]);
 
-
-  // FETCH LIVE AVAILABILITY with OVERLAP LOGIC
+  // FETCH LIVE AVAILABILITY
   const fetchLiveAvailability = useCallback(async () => {
     const effectiveCafeId = actualCafeId || cafeId;
     if (!effectiveCafeId || !selectedDate || !selectedTime) {
@@ -377,7 +446,6 @@ export default function BookingPage() {
 
     try {
       setLoadingAvailability(true);
-
       const selectedTimeMinutes = timeStringToMinutes(selectedTime);
 
       const { data: bookings, error: bookingsError } = await supabase
@@ -607,23 +675,18 @@ export default function BookingPage() {
   async function handleConfirmBooking() {
     if (summary.totalTickets === 0 || !cafeId) return;
 
-    // Set loading state immediately for instant feedback
     setIsSubmitting(true);
 
-    // Wait for auth check to complete before redirecting
     if (userLoading) {
-      // Still checking auth status, wait a bit
       return;
     }
 
     if (!user) {
-      // User is not logged in, save current page and redirect to login
       sessionStorage.setItem("redirectAfterLogin", window.location.pathname + window.location.search);
       router.push("/login");
       return;
     }
 
-    // User is logged in, check if onboarding is complete
     try {
       const { data: profile } = await supabase
         .from("profiles")
@@ -665,7 +728,6 @@ export default function BookingPage() {
         return;
       }
 
-      // Final capacity check with overlap logic
       const capacityResult = await checkBookingCapacityWithOverlap({
         cafeId,
         bookingDate: selectedDate,
@@ -685,7 +747,7 @@ export default function BookingPage() {
       }
 
       const payload = {
-        cafeId: actualCafeId || cafeId, // Use actual UUID, fallback to cafeId if not set
+        cafeId: actualCafeId || cafeId,
         cafeName,
         bookingDate: selectedDate,
         timeSlot: selectedTime,
@@ -708,211 +770,80 @@ export default function BookingPage() {
   // ===== RENDER =====
   if (!cafeId) {
     return (
-      <div
-        style={{
-          minHeight: "100vh",
-          background: colors.dark,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontFamily: fonts.body,
-          color: colors.red,
-        }}
-      >
-        <link
-          href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-        Missing café ID
+      <div className="error-container">
+        <AlertCircle className="w-12 h-12 mb-4 text-red-500" />
+        <h1 className="error-title">Café not found</h1>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="loading-text">Loading café details...</p>
       </div>
     );
   }
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        background: `linear-gradient(180deg, ${colors.dark} 0%, #0a0a10 100%)`,
-        fontFamily: fonts.body,
-        color: colors.textPrimary,
-        position: "relative",
-      }}
-    >
-      <link
-        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet"
-      />
-
+    <div className="booking-page">
       {/* Background glow */}
-      <div
-        style={{
-          position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: `
-            radial-gradient(ellipse at 20% 0%, rgba(255, 7, 58, 0.08) 0%, transparent 50%),
-            radial-gradient(ellipse at 80% 100%, rgba(0, 240, 255, 0.06) 0%, transparent 50%)
-          `,
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-      />
+      <div className="background-glow" />
 
-      <div
-        style={{
-          maxWidth: "600px",
-          margin: "0 auto",
-          padding: "16px 16px 140px",
-          position: "relative",
-          zIndex: 1,
-        }}
-        className="booking-container"
-      >
+      <div className="booking-container">
         {/* Header */}
-        <header style={{ marginBottom: "24px" }}>
+        <header className="booking-header">
           <button
             onClick={() => (step === 2 ? handleBackToDateTime() : router.back())}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              background: "none",
-              border: "none",
-              color: colors.textSecondary,
-              fontSize: "14px",
-              cursor: "pointer",
-              padding: "0",
-              marginBottom: "16px",
-            }}
+            className="back-button"
           >
-            <span style={{ fontSize: "18px" }}>←</span>
+            <ArrowLeft className="w-5 h-5" />
             {step === 2 ? "Change Date & Time" : "Back"}
           </button>
 
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "4px" }}>
-            <p
-              style={{
-                fontSize: "12px",
-                color: colors.cyan,
-                textTransform: "uppercase",
-                letterSpacing: "2px",
-                margin: 0,
-              }}
-            >
-              {cafeName}
-            </p>
+          <div className="header-top">
+            <p className="cafe-name">{cafeName}</p>
 
-            {/* Social Links */}
             {(googleMapsUrl || instagramUrl) && (
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div className="social-links">
                 {googleMapsUrl && (
                   <a
                     href={googleMapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      background: "linear-gradient(135deg, rgba(66, 133, 244, 0.2) 0%, rgba(66, 133, 244, 0.1) 100%)",
-                      border: "1px solid rgba(66, 133, 244, 0.3)",
-                      transition: "all 0.2s ease",
-                      textDecoration: "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "scale(1.1)";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(66, 133, 244, 0.3)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "scale(1)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
+                    className="social-button maps"
                   >
-                    <span style={{ fontSize: "16px" }}>📍</span>
+                    <MapPin className="w-4 h-4" />
                   </a>
                 )}
-
                 {instagramUrl && (
                   <a
                     href={instagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      width: "32px",
-                      height: "32px",
-                      borderRadius: "8px",
-                      background: "linear-gradient(135deg, rgba(225, 48, 108, 0.2) 0%, rgba(193, 53, 132, 0.1) 100%)",
-                      border: "1px solid rgba(225, 48, 108, 0.3)",
-                      transition: "all 0.2s ease",
-                      textDecoration: "none",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "scale(1.1)";
-                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(225, 48, 108, 0.3)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "scale(1)";
-                      e.currentTarget.style.boxShadow = "none";
-                    }}
+                    className="social-button instagram"
                   >
-                    <span style={{ fontSize: "16px" }}>📷</span>
+                    <Instagram className="w-4 h-4" />
                   </a>
                 )}
               </div>
             )}
           </div>
 
-          <h1
-            style={{
-              fontFamily: fonts.heading,
-              fontSize: "24px",
-              fontWeight: 800,
-              background: `linear-gradient(135deg, ${colors.textPrimary} 0%, ${colors.cyan} 100%)`,
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              margin: 0,
-              marginBottom: "8px",
-            }}
-            className="booking-title"
-          >
+          <h1 className="booking-title">
             {step === 1 ? "Select Date & Time" : "Choose Your Setup"}
           </h1>
 
-          {/* Step indicator with labels */}
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginTop: "16px" }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "10px", color: colors.textMuted, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Step 1: Date & Time
-              </div>
-              <div
-                style={{
-                  height: "4px",
-                  borderRadius: "4px",
-                  background: `linear-gradient(90deg, ${colors.red} 0%, ${colors.cyan} 100%)`,
-                }}
-              />
+          {/* Step indicator */}
+          <div className="step-indicator">
+            <div className="step">
+              <div className="step-label">Step 1: Date & Time</div>
+              <div className="step-bar active" />
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: "10px", color: step === 2 ? colors.cyan : colors.textMuted, marginBottom: "6px", textTransform: "uppercase", letterSpacing: "0.5px" }}>
-                Step 2: Consoles
-              </div>
-              <div
-                style={{
-                  height: "4px",
-                  borderRadius: "4px",
-                  background: step === 2 ? `linear-gradient(90deg, ${colors.cyan} 0%, ${colors.red} 100%)` : "rgba(255, 255, 255, 0.1)",
-                  transition: "background 0.3s ease",
-                }}
-              />
+            <div className="step">
+              <div className={`step-label ${step === 2 ? "active" : ""}`}>Step 2: Consoles</div>
+              <div className={`step-bar ${step === 2 ? "active" : ""}`} />
             </div>
           </div>
         </header>
@@ -921,84 +852,27 @@ export default function BookingPage() {
         {step === 1 && (
           <>
             {/* Date Selection */}
-            <section style={{ marginBottom: "20px" }}>
-              <h2
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: colors.textSecondary,
-                  marginBottom: "12px",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                }}
-                className="section-heading"
-              >
-                📅 Select Date
+            <section className="date-section">
+              <h2 className="section-heading">
+                <Calendar className="w-5 h-5" />
+                Select Date
               </h2>
 
-              <div
-                style={{
-                  display: "flex",
-                  gap: "8px",
-                  overflowX: "auto",
-                  paddingBottom: "8px",
-                  scrollbarWidth: "none",
-                }}
-              >
+              <div className="date-grid">
                 {DAY_OPTIONS.map((day) => {
                   const isActive = day.key === selectedDate;
                   return (
                     <button
                       key={day.key}
                       onClick={() => setSelectedDate(day.key)}
-                      style={{
-                        flexShrink: 0,
-                        width: "68px",
-                        padding: "10px 6px",
-                        borderRadius: "10px",
-                        border: isActive
-                          ? `2px solid ${colors.red}`
-                          : `1px solid ${colors.border}`,
-                        background: isActive
-                          ? `linear-gradient(135deg, rgba(255, 7, 58, 0.2) 0%, rgba(255, 7, 58, 0.1) 100%)`
-                          : colors.darkCard,
-                        cursor: "pointer",
-                        textAlign: "center",
-                        transition: "all 0.2s ease",
-                        boxShadow: isActive ? `0 0 20px rgba(255, 7, 58, 0.3)` : "none",
-                        minHeight: "48px",
-                      }}
-                      className="date-button"
+                      className={`date-button ${isActive ? 'active' : ''}`}
+                      style={{ borderColor: isActive ? colors.red : colors.border }}
                     >
-                      <div
-                        style={{
-                          fontSize: "11px",
-                          color: day.isToday ? colors.cyan : colors.textMuted,
-                          marginBottom: "4px",
-                          fontWeight: 500,
-                        }}
-                      >
+                      <div className={`day-name ${day.isToday ? 'today' : ''}`}>
                         {day.isToday ? "TODAY" : day.dayName}
                       </div>
-                      <div
-                        style={{
-                          fontFamily: fonts.heading,
-                          fontSize: "20px",
-                          fontWeight: 700,
-                          color: isActive ? colors.red : colors.textPrimary,
-                        }}
-                      >
-                        {day.dayNum}
-                      </div>
-                      <div
-                        style={{
-                          fontSize: "11px",
-                          color: colors.textMuted,
-                          marginTop: "2px",
-                        }}
-                      >
-                        {day.month}
-                      </div>
+                      <div className="day-number">{day.dayNum}</div>
+                      <div className="month">{day.month}</div>
                     </button>
                   );
                 })}
@@ -1006,119 +880,41 @@ export default function BookingPage() {
             </section>
 
             {/* Time Selection */}
-            <section>
-              <h2
-                style={{
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  color: colors.textSecondary,
-                  marginBottom: "12px",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                }}
-                className="section-heading"
-              >
-                ⏰ Select Time
+            <section className="time-section">
+              <h2 className="section-heading">
+                <Clock className="w-5 h-5" />
+                Select Time
               </h2>
 
               {filteredTimeSlots.length === 0 ? (
-                <div
-                  style={{
-                    padding: "32px 20px",
-                    background: colors.darkCard,
-                    borderRadius: "12px",
-                    border: `1px solid ${colors.border}`,
-                    textAlign: "center",
-                  }}
-                >
-                  <div style={{ fontSize: "32px", marginBottom: "12px" }}>😔</div>
-                  <p style={{ fontSize: "14px", color: colors.textSecondary, marginBottom: "8px" }}>
-                    No slots available for today
-                  </p>
-                  <p style={{ fontSize: "12px", color: colors.textMuted }}>
-                    Please select another date
-                  </p>
+                <div className="no-slots">
+                  <AlertCircle className="w-12 h-12 mb-3 text-gray-400" />
+                  <p className="no-slots-title">No slots available for today</p>
+                  <p className="no-slots-subtitle">Please select another date</p>
                 </div>
               ) : (
                 <>
-                  <div
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(3, 1fr)",
-                      gap: "8px",
-                    }}
-                    className="time-grid"
-                  >
+                  <div className="time-grid">
                     {filteredTimeSlots.map((slot) => {
                       const isActive = slot.label === selectedTime;
                       return (
                         <button
                           key={slot.label}
                           onClick={() => setSelectedTime(slot.label)}
-                          style={{
-                            padding: "10px 6px",
-                            minHeight: "44px",
-                            borderRadius: "8px",
-                            border: isActive
-                              ? `2px solid ${colors.red}`
-                              : `1px solid ${colors.border}`,
-                            background: isActive
-                              ? `linear-gradient(135deg, rgba(255, 7, 58, 0.2) 0%, rgba(255, 7, 58, 0.1) 100%)`
-                              : colors.darkCard,
-                            cursor: "pointer",
-                            textAlign: "center",
-                            transition: "all 0.2s ease",
-                            position: "relative",
-                            boxShadow: isActive ? `0 0 20px rgba(255, 7, 58, 0.3)` : "none",
-                          }}
-                          className="time-button"
+                          className={`time-button ${isActive ? 'active' : ''}`}
+                          style={{ borderColor: isActive ? colors.red : colors.border }}
                         >
-                          <div
-                            style={{
-                              fontSize: "13px",
-                              fontWeight: 600,
-                              color: isActive ? colors.red : colors.textPrimary,
-                            }}
-                          >
-                            {slot.label}
-                          </div>
+                          <span className="time-label">{slot.label}</span>
                           {slot.isPeak && (
-                            <div
-                              style={{
-                                position: "absolute",
-                                top: "4px",
-                                right: "4px",
-                                width: "6px",
-                                height: "6px",
-                                borderRadius: "50%",
-                                background: "#f59e0b",
-                              }}
-                            />
+                            <div className="peak-indicator" />
                           )}
                         </button>
                       );
                     })}
                   </div>
 
-                  <p
-                    style={{
-                      fontSize: "12px",
-                      color: colors.textMuted,
-                      marginTop: "12px",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: "8px",
-                        height: "8px",
-                        borderRadius: "50%",
-                        background: "#f59e0b",
-                        display: "inline-block",
-                      }}
-                    />
+                  <p className="peak-note">
+                    <span className="peak-dot" />
                     Peak hours (6 PM - 10 PM) may have higher demand
                   </p>
                 </>
@@ -1130,269 +926,78 @@ export default function BookingPage() {
         {/* ========== STEP 2: TICKETS ========== */}
         {step === 2 && (
           <>
-            {/* Selected Date/Time Summary - Redesigned */}
-            <div
-              style={{
-                padding: "18px 20px",
-                background: `linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(255, 7, 58, 0.08) 100%)`,
-                borderRadius: "16px",
-                border: `2px solid rgba(0, 240, 255, 0.2)`,
-                marginBottom: "24px",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              {/* Decorative glow */}
-              <div style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                width: "100px",
-                height: "100px",
-                background: `radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, transparent 70%)`,
-                pointerEvents: "none",
-              }} />
-
-              <div style={{ position: "relative", zIndex: 1 }}>
-                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "12px" }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: "11px", color: colors.textMuted, textTransform: "uppercase", letterSpacing: "1px", marginBottom: "6px" }}>
-                      📅 Your Booking
-                    </div>
-                    <div style={{ fontSize: "16px", fontWeight: 700, color: colors.textPrimary, fontFamily: fonts.heading, marginBottom: "4px" }}>
-                      {dateLabel}
-                    </div>
-                    <div style={{ fontSize: "15px", color: colors.cyan, fontWeight: 600, display: "flex", alignItems: "center", gap: "6px" }}>
-                      <span>⏰</span>
+            {/* Selected Date/Time Summary */}
+            <div className="booking-summary">
+              <div className="summary-content">
+                <div className="summary-header">
+                  <div className="summary-info">
+                    <div className="summary-label">Your Booking</div>
+                    <div className="summary-date">{dateLabel}</div>
+                    <div className="summary-time">
+                      <Clock className="w-4 h-4" />
                       {selectedTime} - {getEndTime(selectedTime, selectedDuration)}
                     </div>
                   </div>
                   <button
                     onClick={handleBackToDateTime}
-                    style={{
-                      padding: "8px 16px",
-                      background: `linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 240, 255, 0.25) 100%)`,
-                      border: `1px solid ${colors.cyan}`,
-                      borderRadius: "10px",
-                      color: colors.cyan,
-                      fontSize: "12px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.5px",
-                    }}
+                    className="change-button"
                   >
                     Change
                   </button>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "6px",
-                      padding: "6px 12px",
-                      borderRadius: "999px",
-                      background: "rgba(0, 240, 255, 0.15)",
-                      border: `1px solid ${colors.cyan}`,
-                      fontSize: "11px",
-                      fontWeight: 700,
-                      color: colors.cyan,
-                    }}
-                  >
-                    <span>⏱️</span>
-                    <span>{selectedDuration === 30 ? "30 min" : selectedDuration === 60 ? "1 hour" : "1.5 hours"}</span>
-                  </div>
+                <div className="duration-badge">
+                  <Clock className="w-4 h-4" />
+                  <span>{selectedDuration === 30 ? "30 min" : selectedDuration === 60 ? "1 hour" : "1.5 hours"}</span>
                 </div>
               </div>
             </div>
 
-            {/* Duration Selector - Improved */}
-            <div style={{ marginBottom: "24px" }}>
-              <h2
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  color: colors.textPrimary,
-                  marginBottom: "14px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                }}
-                className="section-heading"
-              >
-                <span style={{ fontSize: "18px" }}>⏱️</span>
-                <span>Select Duration</span>
+            {/* Duration Selector */}
+            <div className="duration-section">
+              <h2 className="section-heading">
+                <Clock className="w-5 h-5" />
+                Select Duration
               </h2>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "10px" }}>
+              <div className="duration-grid">
                 <button
                   onClick={() => { setSelectedDuration(30); setQuantities({}); }}
-                  style={{
-                    padding: "16px 12px",
-                    minHeight: "80px",
-                    borderRadius: "14px",
-                    border: selectedDuration === 30
-                      ? `2.5px solid ${colors.cyan}`
-                      : `1.5px solid ${colors.border}`,
-                    background: selectedDuration === 30
-                      ? `linear-gradient(135deg, rgba(0, 240, 255, 0.22) 0%, rgba(0, 240, 255, 0.10) 100%)`
-                      : `linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%)`,
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    boxShadow: selectedDuration === 30 ? `0 6px 20px rgba(0, 240, 255, 0.3)` : "0 2px 6px rgba(0, 0, 0, 0.15)",
-                    transform: selectedDuration === 30 ? "translateY(-1px)" : "none",
-                  }}
-                  className="duration-button"
+                  className={`duration-button ${selectedDuration === 30 ? 'active' : ''}`}
                 >
-                  <div
-                    style={{
-                      fontSize: "26px",
-                      fontWeight: 900,
-                      fontFamily: fonts.heading,
-                      color: selectedDuration === 30 ? colors.cyan : colors.textPrimary,
-                      marginBottom: "4px",
-                      letterSpacing: "-0.5px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    30
-                  </div>
-                  <div style={{ fontSize: "12px", color: selectedDuration === 30 ? colors.cyan : colors.textMuted, fontWeight: 600 }}>
-                    min
-                  </div>
+                  <div className="duration-number">30</div>
+                  <div className="duration-label">min</div>
                 </button>
                 <button
                   onClick={() => { setSelectedDuration(60); setQuantities({}); }}
-                  style={{
-                    padding: "16px 12px",
-                    minHeight: "80px",
-                    borderRadius: "14px",
-                    border: selectedDuration === 60
-                      ? `2.5px solid ${colors.cyan}`
-                      : `1.5px solid ${colors.border}`,
-                    background: selectedDuration === 60
-                      ? `linear-gradient(135deg, rgba(0, 240, 255, 0.22) 0%, rgba(0, 240, 255, 0.10) 100%)`
-                      : `linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%)`,
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    boxShadow: selectedDuration === 60 ? `0 6px 20px rgba(0, 240, 255, 0.3)` : "0 2px 6px rgba(0, 0, 0, 0.15)",
-                    transform: selectedDuration === 60 ? "translateY(-1px)" : "none",
-                  }}
-                  className="duration-button"
+                  className={`duration-button ${selectedDuration === 60 ? 'active' : ''}`}
                 >
-                  <div
-                    style={{
-                      fontSize: "26px",
-                      fontWeight: 900,
-                      fontFamily: fonts.heading,
-                      color: selectedDuration === 60 ? colors.cyan : colors.textPrimary,
-                      marginBottom: "4px",
-                      letterSpacing: "-0.5px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    60
-                  </div>
-                  <div style={{ fontSize: "12px", color: selectedDuration === 60 ? colors.cyan : colors.textMuted, fontWeight: 600 }}>
-                    min
-                  </div>
+                  <div className="duration-number">60</div>
+                  <div className="duration-label">min</div>
                 </button>
                 <button
                   onClick={() => { setSelectedDuration(90); setQuantities({}); }}
-                  style={{
-                    padding: "16px 12px",
-                    minHeight: "80px",
-                    borderRadius: "14px",
-                    border: selectedDuration === 90
-                      ? `2.5px solid ${colors.red}`
-                      : `1.5px solid ${colors.border}`,
-                    background: selectedDuration === 90
-                      ? `linear-gradient(135deg, rgba(255, 7, 58, 0.22) 0%, rgba(255, 7, 58, 0.10) 100%)`
-                      : `linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%)`,
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    boxShadow: selectedDuration === 90 ? `0 6px 20px rgba(255, 7, 58, 0.3)` : "0 2px 6px rgba(0, 0, 0, 0.15)",
-                    transform: selectedDuration === 90 ? "translateY(-1px)" : "none",
-                    position: "relative",
-                  }}
-                  className="duration-button"
+                  className={`duration-button premium ${selectedDuration === 90 ? 'active' : ''}`}
                 >
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "6px",
-                      right: "6px",
-                      fontSize: "10px",
-                    }}
-                  >
-                    🔥
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "26px",
-                      fontWeight: 900,
-                      fontFamily: fonts.heading,
-                      color: selectedDuration === 90 ? colors.red : colors.textPrimary,
-                      marginBottom: "4px",
-                      letterSpacing: "-0.5px",
-                      lineHeight: "1",
-                    }}
-                  >
-                    90
-                  </div>
-                  <div style={{ fontSize: "12px", color: selectedDuration === 90 ? colors.red : colors.textMuted, fontWeight: 600 }}>
-                    min
-                  </div>
+                  <Crown className="w-3 h-3 absolute top-2 right-2" />
+                  <div className="duration-number">90</div>
+                  <div className="duration-label">min</div>
                 </button>
               </div>
             </div>
 
             {/* Live Availability Banner */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                padding: "12px 16px",
-                background: `linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(0, 240, 255, 0.05) 100%)`,
-                borderRadius: "10px",
-                border: `1px solid rgba(0, 240, 255, 0.2)`,
-                marginBottom: "20px",
-              }}
-            >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <div
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    background: colors.green,
-                    animation: "pulse 2s ease-in-out infinite",
-                  }}
-                />
-                <span style={{ fontSize: "13px", color: colors.cyan, fontWeight: 500 }}>
-                  Live Availability
-                </span>
-                <span style={{ fontSize: "11px", color: colors.textMuted }}>
-                  (accounts for overlapping bookings)
-                </span>
+            <div className="availability-banner">
+              <div className="availability-info">
+                <div className="live-indicator" />
+                <span className="live-text">Live Availability</span>
+                <span className="live-note">(accounts for overlapping bookings)</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <div className="availability-actions">
                 {loadingAvailability && (
-                  <div
-                    style={{
-                      width: "14px",
-                      height: "14px",
-                      border: `2px solid ${colors.border}`,
-                      borderTopColor: colors.cyan,
-                      borderRadius: "50%",
-                      animation: "spin 1s linear infinite",
-                    }}
-                  />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 )}
                 {lastUpdated && (
-                  <span style={{ fontSize: "11px", color: colors.textMuted }}>
+                  <span className="update-time">
                     Updated{" "}
                     {lastUpdated.toLocaleTimeString("en-IN", {
                       hour: "2-digit",
@@ -1403,51 +1008,21 @@ export default function BookingPage() {
                 <button
                   onClick={fetchLiveAvailability}
                   disabled={loadingAvailability}
-                  style={{
-                    padding: "4px 10px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    border: `1px solid ${colors.border}`,
-                    borderRadius: "6px",
-                    color: colors.textSecondary,
-                    fontSize: "11px",
-                    cursor: loadingAvailability ? "not-allowed" : "pointer",
-                  }}
+                  className="refresh-button"
                 >
-                  Refresh
+                  <RefreshCw className="w-3 h-3" />
                 </button>
               </div>
             </div>
 
-            {/* Console Selection with Live Availability */}
-            <section style={{ marginBottom: "24px" }}>
-              <h2
-                style={{
-                  fontSize: "14px",
-                  fontWeight: 700,
-                  color: colors.textPrimary,
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  marginBottom: "12px",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                }}
-                className="section-heading"
-              >
-                <span style={{ fontSize: "18px" }}>🎮</span>
-                <span>Select Console</span>
+            {/* Console Selection */}
+            <section className="console-section">
+              <h2 className="section-heading">
+                <Gamepad2 className="w-5 h-5" />
+                Select Console
               </h2>
 
-              {/* Compact console cards grid */}
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: "8px",
-                  justifyContent: "flex-start",
-                }}
-                className="console-grid-container"
-              >
+              <div className="console-grid">
                 {availableConsoles.map((consoleId) => {
                   const console = CONSOLES.find((c) => c.id === consoleId);
                   if (!console) return null;
@@ -1466,98 +1041,36 @@ export default function BookingPage() {
                       key={consoleId}
                       onClick={() => !isSoldOut && setSelectedConsole(consoleId)}
                       disabled={isSoldOut}
-                      style={{
-                        minWidth: "85px",
-                        maxWidth: "85px",
-                        padding: "10px 6px",
-                        borderRadius: "10px",
-                        border: isActive
-                          ? `2px solid ${console.color}`
-                          : isSoldOut
-                          ? `1px solid rgba(255, 255, 255, 0.06)`
-                          : `1px solid ${colors.border}`,
-                        background: isActive
-                          ? `linear-gradient(135deg, ${console.color}25 0%, ${console.color}10 100%)`
-                          : isSoldOut
-                          ? "rgba(255, 255, 255, 0.02)"
-                          : colors.darkCard,
-                        cursor: isSoldOut ? "not-allowed" : "pointer",
-                        transition: "all 0.2s ease",
-                        boxShadow: isActive ? `0 4px 16px ${console.color}35` : "none",
-                        opacity: isSoldOut ? 0.5 : 1,
-                        textAlign: "center",
-                        transform: isActive ? "scale(1.02)" : "none",
+                      className={`console-card ${isActive ? 'active' : ''} ${isSoldOut ? 'sold-out' : ''}`}
+                      style={{ 
+                        borderColor: isActive ? console.color : colors.border,
+                        background: isActive ? `linear-gradient(135deg, ${console.color}25 0%, ${console.color}10 100%)` : colors.darkCard
                       }}
-                      className="console-card"
                     >
-                      {/* Console icon */}
-                      <div style={{
-                        fontSize: "24px",
-                        marginBottom: "4px",
-                        filter: isSoldOut ? "grayscale(1)" : "none",
-                      }}>
+                      <div className={`console-icon ${isSoldOut ? 'disabled' : ''}`}>
                         {console.icon}
                       </div>
 
-                      {/* Console name */}
-                      <div
-                        style={{
-                          fontSize: "11px",
-                          fontWeight: 800,
-                          fontFamily: fonts.heading,
-                          color: isActive ? console.color : colors.textPrimary,
-                          marginBottom: "2px",
-                          letterSpacing: "-0.2px",
-                        }}
-                      >
+                      <div className="console-name" style={{ color: isActive ? console.color : colors.textPrimary }}>
                         {console.label}
                       </div>
 
-                      {/* Price */}
-                      <div style={{ fontSize: "10px", color: colors.textMuted, fontWeight: 600, marginBottom: "6px" }}>
-                        ₹{
-                          selectedDuration === 90
-                            ? ((consolePricing[consoleId]?.qty1_60min ?? cafePrice) + (consolePricing[consoleId]?.qty1_30min ?? cafePrice * 0.5))
-                            : (consolePricing[consoleId]?.[`qty1_${selectedDuration}min` as keyof ConsolePricingTier] ?? (selectedDuration === 30 ? cafePrice * 0.5 : cafePrice))
+                      <div className="console-price">
+                        <DollarSign className="w-3 h-3 inline" />
+                        {selectedDuration === 90
+                          ? ((consolePricing[consoleId]?.qty1_60min ?? cafePrice) + (consolePricing[consoleId]?.qty1_30min ?? cafePrice * 0.5))
+                          : (consolePricing[consoleId]?.[`qty1_${selectedDuration}min` as keyof ConsolePricingTier] ?? (selectedDuration === 30 ? cafePrice * 0.5 : cafePrice))
                         }
                       </div>
 
-                      {/* Availability badge - compact */}
-                      <div
-                        style={{
-                          padding: "4px 8px",
-                          background: isSoldOut
-                            ? "rgba(239, 68, 68, 0.2)"
-                            : isLowStock
-                            ? "rgba(245, 158, 11, 0.2)"
-                            : "rgba(34, 197, 94, 0.2)",
-                          borderRadius: "6px",
-                          fontSize: "9px",
-                          fontWeight: 700,
-                          color: isSoldOut
-                            ? "#ef4444"
-                            : isLowStock
-                            ? colors.orange
-                            : colors.green,
-                          marginBottom: mySelection > 0 ? "6px" : "0",
-                        }}
-                      >
+                      <div className={`availability-badge ${isSoldOut ? 'sold-out' : isLowStock ? 'low-stock' : 'available'}`}>
                         {isSoldOut ? "Sold Out" : `${availableSlots}/${totalSlots}`}
                       </div>
 
-                      {/* Selected indicator - compact */}
                       {mySelection > 0 && (
-                        <div
-                          style={{
-                            padding: "3px 6px",
-                            background: `${console.color}30`,
-                            borderRadius: "5px",
-                            fontSize: "9px",
-                            fontWeight: 700,
-                            color: console.color,
-                          }}
-                        >
-                          ✓ {mySelection}
+                        <div className="selected-indicator" style={{ background: `${console.color}30`, color: console.color }}>
+                          <CheckCircle className="w-3 h-3" />
+                          {mySelection}
                         </div>
                       )}
                     </button>
@@ -1567,250 +1080,79 @@ export default function BookingPage() {
             </section>
 
             {/* Ticket Cards */}
-            <section>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginBottom: "12px",
-                }}
-              >
-                <h2
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: 600,
-                    color: colors.textSecondary,
-                    textTransform: "uppercase",
-                    letterSpacing: "1px",
-                  }}
-                  className="section-heading"
-                >
-                  🎟️ Select Tickets
+            <section className="tickets-section">
+              <div className="tickets-header">
+                <h2 className="section-heading">
+                  <CreditCard className="w-5 h-5" />
+                  Select Tickets
                 </h2>
 
                 {!atLimit && remainingForSelected > 0 && (
-                  <span
-                    style={{
-                      fontSize: "12px",
-                      color:
-                        remainingForSelected <= 2 ? colors.orange : colors.green,
-                      fontWeight: 500,
-                    }}
-                  >
-                    {remainingForSelected} slot
-                    {remainingForSelected > 1 ? "s" : ""} available
+                  <span className={`availability-text ${remainingForSelected <= 2 ? 'low' : 'high'}`}>
+                    {remainingForSelected} slot{remainingForSelected > 1 ? "s" : ""} available
                   </span>
                 )}
               </div>
 
               {atLimit && usedForSelected === 0 ? (
-                <div
-                  style={{
-                    padding: "32px 20px",
-                    background: colors.darkCard,
-                    borderRadius: "14px",
-                    border: `1px solid rgba(239, 68, 68, 0.2)`,
-                    textAlign: "center",
-                  }}
-                >
-                  <div style={{ fontSize: "40px", marginBottom: "12px" }}>😔</div>
-                  <p
-                    style={{
-                      fontSize: "15px",
-                      fontWeight: 600,
-                      color: "#ef4444",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    Sold Out for This Time Slot
-                  </p>
-                  <p
-                    style={{
-                      fontSize: "13px",
-                      color: colors.textMuted,
-                      marginBottom: "12px",
-                    }}
-                  >
+                <div className="sold-out-card">
+                  <AlertCircle className="w-10 h-10 mb-3 text-red-500" />
+                  <p className="sold-out-title">Sold Out for This Time Slot</p>
+                  <p className="sold-out-subtitle">
                     All {CONSOLE_LABELS[selectedConsole]} setups are booked for{" "}
                     {selectedTime} - {getEndTime(selectedTime)}.
                   </p>
                   {liveAvailability[selectedConsole]?.nextAvailableAt && (
-                    <div
-                      style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: "8px",
-                        padding: "10px 16px",
-                        background: `rgba(0, 240, 255, 0.1)`,
-                        border: `1px solid rgba(0, 240, 255, 0.2)`,
-                        borderRadius: "10px",
-                        marginBottom: "12px",
-                      }}
-                    >
-                      <span style={{ fontSize: "16px" }}>🕐</span>
-                      <span
-                        style={{
-                          fontSize: "13px",
-                          color: colors.cyan,
-                          fontWeight: 500,
-                        }}
-                      >
-                        Available from {liveAvailability[selectedConsole]?.nextAvailableAt}
-                      </span>
+                    <div className="next-available">
+                      <Clock className="w-4 h-4" />
+                      <span>Available from {liveAvailability[selectedConsole]?.nextAvailableAt}</span>
                     </div>
                   )}
-                  <p style={{ fontSize: "12px", color: colors.textMuted }}>
-                    Try selecting a different time or console.
-                  </p>
+                  <p className="sold-out-hint">Try selecting a different time or console.</p>
                 </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <div className="tickets-list">
                   {tickets.map((ticket) => {
                     const qty = getQty(ticket.id);
                     const hasQty = qty > 0;
                     const canAdd = remainingForSelected > 0;
 
                     return (
-                      <div
-                        key={ticket.id}
-                        style={{
-                          padding: "16px",
-                          background: hasQty
-                            ? `linear-gradient(135deg, rgba(255, 7, 58, 0.1) 0%, ${colors.darkCard} 100%)`
-                            : colors.darkCard,
-                          borderRadius: "14px",
-                          border: hasQty
-                            ? `1px solid rgba(255, 7, 58, 0.3)`
-                            : `1px solid ${colors.border}`,
-                          transition: "all 0.2s ease",
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "flex-start",
-                            gap: "12px",
-                          }}
-                        >
-                          <div style={{ flex: 1 }}>
-                            <div
-                              style={{
-                                fontSize: "15px",
-                                fontWeight: 600,
-                                color: colors.textPrimary,
-                                marginBottom: "6px",
-                              }}
-                            >
-                              {ticket.title}
+                      <div key={ticket.id} className={`ticket-card ${hasQty ? 'selected' : ''}`}>
+                        <div className="ticket-content">
+                          <div className="ticket-info">
+                            <div className="ticket-title">{ticket.title}</div>
+                            <div className="ticket-price">
+                              <DollarSign className="w-4 h-4 inline" />
+                              {ticket.price}
+                              <span className="price-unit">/hr</span>
                             </div>
-                            <div
-                              style={{
-                                fontFamily: fonts.heading,
-                                fontSize: "22px",
-                                fontWeight: 700,
-                                color: colors.cyan,
-                                marginBottom: "8px",
-                              }}
-                            >
-                              ₹{ticket.price}
-                              <span
-                                style={{
-                                  fontSize: "12px",
-                                  color: colors.textMuted,
-                                  fontFamily: fonts.body,
-                                  fontWeight: 400,
-                                }}
-                              >
-                                {" "}
-                                /hr
-                              </span>
-                            </div>
-                            <p
-                              style={{
-                                fontSize: "13px",
-                                color: colors.textSecondary,
-                                lineHeight: 1.4,
-                              }}
-                            >
-                              {ticket.description}
-                            </p>
+                            <p className="ticket-description">{ticket.description}</p>
                           </div>
 
                           {!hasQty ? (
                             <button
                               disabled={!canAdd}
                               onClick={() => canAdd && setQty(ticket.id, 1)}
-                              style={{
-                                padding: "10px 20px",
-                                minHeight: "44px",
-                                background: canAdd
-                                  ? `linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%)`
-                                  : "rgba(255, 255, 255, 0.05)",
-                                border: "none",
-                                borderRadius: "10px",
-                                color: canAdd ? "white" : colors.textMuted,
-                                fontSize: "13px",
-                                fontWeight: 600,
-                                cursor: canAdd ? "pointer" : "not-allowed",
-                                transition: "all 0.2s ease",
-                              }}
-                              className="add-button"
+                              className={`add-button ${canAdd ? 'enabled' : 'disabled'}`}
                             >
                               Add
                             </button>
                           ) : (
-                            <div
-                              style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "0",
-                                background: colors.red,
-                                borderRadius: "10px",
-                                overflow: "hidden",
-                              }}
-                            >
+                            <div className="quantity-selector">
                               <button
                                 onClick={() => setQty(ticket.id, qty - 1)}
-                                style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  background: "transparent",
-                                  border: "none",
-                                  color: "white",
-                                  fontSize: "18px",
-                                  cursor: "pointer",
-                                }}
+                                className="quantity-btn minus"
                               >
-                                −
+                                <Minus className="w-4 h-4" />
                               </button>
-                              <span
-                                style={{
-                                  width: "32px",
-                                  textAlign: "center",
-                                  fontFamily: fonts.heading,
-                                  fontSize: "16px",
-                                  fontWeight: 700,
-                                  color: "white",
-                                }}
-                              >
-                                {qty}
-                              </span>
+                              <span className="quantity-display">{qty}</span>
                               <button
                                 disabled={!canAdd}
                                 onClick={() => canAdd && setQty(ticket.id, qty + 1)}
-                                style={{
-                                  width: "36px",
-                                  height: "36px",
-                                  background: "transparent",
-                                  border: "none",
-                                  color: canAdd ? "white" : "rgba(255,255,255,0.4)",
-                                  fontSize: "18px",
-                                  cursor: canAdd ? "pointer" : "not-allowed",
-                                }}
+                                className={`quantity-btn plus ${!canAdd ? 'disabled' : ''}`}
                               >
-                                +
+                                <Plus className="w-4 h-4" />
                               </button>
                             </div>
                           )}
@@ -1825,131 +1167,50 @@ export default function BookingPage() {
         )}
       </div>
 
-      {/* ========== BOTTOM BAR ========== */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: 0,
-          left: 0,
-          right: 0,
-          background: "rgba(15, 15, 20, 0.95)",
-          backdropFilter: "blur(20px)",
-          borderTop: `1px solid ${colors.border}`,
-          padding: "16px",
-          zIndex: 100,
-        }}
-      >
-        <div
-          style={{
-            maxWidth: "600px",
-            margin: "0 auto",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: "16px",
-          }}
-        >
+      {/* Bottom Action Bar */}
+      <div className="action-bar">
+        <div className="action-content">
           {step === 1 ? (
             <>
-              <div>
-                <div style={{ fontSize: "14px", fontWeight: 600, color: colors.textPrimary }}>
+              <div className="step1-info">
+                <div className="date-display">
                   {selectedDate ? dateLabel : "Select a date"}
                 </div>
-                <div
-                  style={{
-                    fontSize: "13px",
-                    color: selectedTime ? colors.cyan : colors.textMuted,
-                  }}
-                >
+                <div className={`time-display ${selectedTime ? 'selected' : ''}`}>
                   {selectedTime || "Select a time"}
                 </div>
               </div>
               <button
                 onClick={handleContinueToTickets}
                 disabled={!selectedDate || !selectedTime}
-                style={{
-                  padding: "14px 28px",
-                  background:
-                    selectedDate && selectedTime
-                      ? `linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%)`
-                      : "rgba(255, 255, 255, 0.1)",
-                  border: "none",
-                  borderRadius: "12px",
-                  color: selectedDate && selectedTime ? "white" : colors.textMuted,
-                  fontFamily: fonts.heading,
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  cursor: selectedDate && selectedTime ? "pointer" : "not-allowed",
-                  transition: "all 0.2s ease",
-                }}
+                className={`continue-button ${selectedDate && selectedTime ? 'enabled' : 'disabled'}`}
               >
-                Continue →
+                Continue <ChevronRight className="w-4 h-4" />
               </button>
             </>
           ) : (
             <>
-              <div>
+              <div className="step2-info">
                 {summary.totalTickets > 0 ? (
                   <>
-                    <div
-                      style={{
-                        fontSize: "14px",
-                        fontWeight: 600,
-                        color: colors.textPrimary,
-                      }}
-                    >
-                      {summary.totalTickets} ticket
-                      {summary.totalTickets > 1 ? "s" : ""} selected
+                    <div className="ticket-count">
+                      {summary.totalTickets} ticket{summary.totalTickets > 1 ? "s" : ""} selected
                     </div>
-                    <div style={{ fontSize: "13px", color: colors.textSecondary }}>
+                    <div className="booking-details">
                       {dateLabel} • {selectedTime}
                     </div>
                   </>
                 ) : (
-                  <div style={{ fontSize: "14px", color: colors.textMuted }}>
-                    Add tickets to continue
-                  </div>
+                  <div className="no-tickets">Add tickets to continue</div>
                 )}
               </div>
               <button
                 onClick={handleConfirmBooking}
                 disabled={summary.totalTickets === 0 || isSubmitting}
-                style={{
-                  padding: "14px 24px",
-                  background:
-                    summary.totalTickets > 0 && !isSubmitting
-                      ? `linear-gradient(135deg, ${colors.green} 0%, #16a34a 100%)`
-                      : "rgba(255, 255, 255, 0.1)",
-                  border: "none",
-                  borderRadius: "12px",
-                  color: summary.totalTickets > 0 ? "white" : colors.textMuted,
-                  fontFamily: fonts.heading,
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  cursor: summary.totalTickets > 0 && !isSubmitting ? "pointer" : "not-allowed",
-                  transition: "all 0.2s ease",
-                  minWidth: "140px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                }}
+                className={`confirm-button ${summary.totalTickets > 0 && !isSubmitting ? 'enabled' : 'disabled'}`}
               >
                 {isSubmitting && (
-                  <div
-                    style={{
-                      width: "14px",
-                      height: "14px",
-                      border: "2px solid rgba(255, 255, 255, 0.3)",
-                      borderTopColor: "white",
-                      borderRadius: "50%",
-                      animation: "spin 0.6s linear infinite",
-                    }}
-                  />
+                  <Loader2 className="w-4 h-4 animate-spin" />
                 )}
                 {isSubmitting
                   ? "Processing..."
@@ -1962,49 +1223,980 @@ export default function BookingPage() {
         </div>
       </div>
 
-      {/* Animations & Responsive styles */}
-      <style>{`
-        /* Hide scrollbar but keep functionality */}
-        .console-scroll-container::-webkit-scrollbar {
-          display: none;
+      {/* CSS Styles */}
+      <style jsx global>{`
+        .booking-page {
+          min-height: 100vh;
+          background: linear-gradient(180deg, ${colors.dark} 0%, #0a0a10 100%);
+          font-family: ${fonts.body};
+          color: ${colors.textPrimary};
+          position: relative;
         }
-        .console-scroll-container {
-          -ms-overflow-style: none;
+
+        .background-glow {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(ellipse at 20% 0%, rgba(255, 7, 58, 0.08) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 100%, rgba(0, 240, 255, 0.06) 0%, transparent 50%);
+          pointer-events: none;
+          z-index: 0;
+        }
+
+        /* Loading and Error States */
+        .error-container, .loading-container {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          font-family: ${fonts.body};
+        }
+
+        .error-container {
+          color: ${colors.red};
+        }
+
+        .error-title {
+          font-family: ${fonts.heading};
+          font-size: 24px;
+          margin-bottom: 16px;
+        }
+
+        .loading-container {
+          color: ${colors.blue};
+        }
+
+        .loading-text {
+          margin-top: 12px;
+          font-size: 14px;
+          color: ${colors.textSecondary};
+        }
+
+        /* Main Container */
+        .booking-container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 16px 16px 140px;
+          position: relative;
+          z-index: 1;
+        }
+
+        /* Header */
+        .booking-header {
+          margin-bottom: 24px;
+        }
+
+        .back-button {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          background: none;
+          border: none;
+          color: ${colors.textSecondary};
+          font-size: 14px;
+          cursor: pointer;
+          padding: 0;
+          margin-bottom: 16px;
+        }
+
+        .header-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 4px;
+        }
+
+        .cafe-name {
+          font-size: 12px;
+          color: ${colors.cyan};
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          margin: 0;
+        }
+
+        .social-links {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .social-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 8px;
+          transition: all 0.2s ease;
+          text-decoration: none;
+        }
+
+        .social-button.maps {
+          background: linear-gradient(135deg, rgba(66, 133, 244, 0.2) 0%, rgba(66, 133, 244, 0.1) 100%);
+          border: 1px solid rgba(66, 133, 244, 0.3);
+          color: #4285f4;
+        }
+
+        .social-button.instagram {
+          background: linear-gradient(135deg, rgba(225, 48, 108, 0.2) 0%, rgba(193, 53, 132, 0.1) 100%);
+          border: 1px solid rgba(225, 48, 108, 0.3);
+          color: #e1306c;
+        }
+
+        .social-button:hover {
+          transform: scale(1.1);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .booking-title {
+          font-family: ${fonts.heading};
+          font-size: 24px;
+          font-weight: 800;
+          background: linear-gradient(135deg, ${colors.textPrimary} 0%, ${colors.cyan} 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          margin: 0 0 8px 0;
+        }
+
+        .step-indicator {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-top: 16px;
+        }
+
+        .step {
+          flex: 1;
+        }
+
+        .step-label {
+          font-size: 10px;
+          color: ${colors.textMuted};
+          margin-bottom: 6px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .step-label.active {
+          color: ${colors.cyan};
+        }
+
+        .step-bar {
+          height: 4px;
+          border-radius: 4px;
+          background: rgba(255, 255, 255, 0.1);
+        }
+
+        .step-bar.active {
+          background: linear-gradient(90deg, ${colors.red} 0%, ${colors.cyan} 100%);
+        }
+
+        /* Section Styles */
+        .section-heading {
+          font-size: 13px;
+          font-weight: 600;
+          color: ${colors.textSecondary};
+          margin-bottom: 12px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        /* Date Section */
+        .date-section {
+          margin-bottom: 20px;
+        }
+
+        .date-grid {
+          display: flex;
+          gap: 8px;
+          overflow-x: auto;
+          padding-bottom: 8px;
           scrollbar-width: none;
         }
 
-        @keyframes spin {
-          to { transform: rotate(360deg); }
+        .date-grid::-webkit-scrollbar {
+          display: none;
         }
+
+        .date-button {
+          flex-shrink: 0;
+          width: 68px;
+          padding: 10px 6px;
+          border-radius: 10px;
+          border: 1px solid ${colors.border};
+          background: ${colors.darkCard};
+          cursor: pointer;
+          text-align: center;
+          transition: all 0.2s ease;
+          min-height: 48px;
+        }
+
+        .date-button.active {
+          border: 2px solid ${colors.red};
+          background: linear-gradient(135deg, rgba(255, 7, 58, 0.2) 0%, rgba(255, 7, 58, 0.1) 100%);
+          box-shadow: 0 0 20px rgba(255, 7, 58, 0.3);
+        }
+
+        .day-name {
+          font-size: 11px;
+          color: ${colors.textMuted};
+          margin-bottom: 4px;
+          font-weight: 500;
+        }
+
+        .day-name.today {
+          color: ${colors.cyan};
+        }
+
+        .day-number {
+          font-family: ${fonts.heading};
+          font-size: 20px;
+          font-weight: 700;
+          color: ${colors.textPrimary};
+        }
+
+        .month {
+          font-size: 11px;
+          color: ${colors.textMuted};
+          margin-top: 2px;
+        }
+
+        /* Time Section */
+        .time-section {
+          margin-bottom: 20px;
+        }
+
+        .time-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 8px;
+        }
+
+        .time-button {
+          padding: 10px 6px;
+          min-height: 44px;
+          border-radius: 8px;
+          border: 1px solid ${colors.border};
+          background: ${colors.darkCard};
+          cursor: pointer;
+          text-align: center;
+          transition: all 0.2s ease;
+          position: relative;
+        }
+
+        .time-button.active {
+          border: 2px solid ${colors.red};
+          background: linear-gradient(135deg, rgba(255, 7, 58, 0.2) 0%, rgba(255, 7, 58, 0.1) 100%);
+          box-shadow: 0 0 20px rgba(255, 7, 58, 0.3);
+        }
+
+        .time-label {
+          font-size: 13px;
+          font-weight: 600;
+          color: ${colors.textPrimary};
+        }
+
+        .peak-indicator {
+          position: absolute;
+          top: 4px;
+          right: 4px;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: #f59e0b;
+        }
+
+        .no-slots {
+          padding: 32px 20px;
+          background: ${colors.darkCard};
+          border-radius: 12px;
+          border: 1px solid ${colors.border};
+          text-align: center;
+        }
+
+        .no-slots-title {
+          font-size: 14px;
+          color: ${colors.textSecondary};
+          margin-bottom: 8px;
+        }
+
+        .no-slots-subtitle {
+          font-size: 12px;
+          color: ${colors.textMuted};
+        }
+
+        .peak-note {
+          font-size: 12px;
+          color: ${colors.textMuted};
+          margin-top: 12px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .peak-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #f59e0b;
+          display: inline-block;
+        }
+
+        /* Step 2 Styles */
+        .booking-summary {
+          padding: 18px 20px;
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(255, 7, 58, 0.08) 100%);
+          border-radius: 16px;
+          border: 2px solid rgba(0, 240, 255, 0.2);
+          margin-bottom: 24px;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .summary-content {
+          position: relative;
+          z-index: 1;
+        }
+
+        .summary-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          margin-bottom: 12px;
+        }
+
+        .summary-label {
+          font-size: 11px;
+          color: ${colors.textMuted};
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          margin-bottom: 6px;
+        }
+
+        .summary-date {
+          font-size: 16px;
+          font-weight: 700;
+          color: ${colors.textPrimary};
+          font-family: ${fonts.heading};
+          margin-bottom: 4px;
+        }
+
+        .summary-time {
+          font-size: 15px;
+          color: ${colors.cyan};
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .change-button {
+          padding: 8px 16px;
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 240, 255, 0.25) 100%);
+          border: 1px solid ${colors.cyan};
+          border-radius: 10px;
+          color: ${colors.cyan};
+          font-size: 12px;
+          font-weight: 700;
+          cursor: pointer;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .duration-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 6px 12px;
+          border-radius: 999px;
+          background: rgba(0, 240, 255, 0.15);
+          border: 1px solid ${colors.cyan};
+          font-size: 11px;
+          font-weight: 700;
+          color: ${colors.cyan};
+        }
+
+        /* Duration Selector */
+        .duration-section {
+          margin-bottom: 24px;
+        }
+
+        .duration-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+        }
+
+        .duration-button {
+          padding: 16px 12px;
+          min-height: 80px;
+          border-radius: 14px;
+          border: 1.5px solid ${colors.border};
+          background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          position: relative;
+        }
+
+        .duration-button.active {
+          border: 2.5px solid ${colors.cyan};
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.22) 0%, rgba(0, 240, 255, 0.10) 100%);
+          box-shadow: 0 6px 20px rgba(0, 240, 255, 0.3);
+          transform: translateY(-1px);
+        }
+
+        .duration-button.premium.active {
+          border-color: ${colors.red};
+          background: linear-gradient(135deg, rgba(255, 7, 58, 0.22) 0%, rgba(255, 7, 58, 0.10) 100%);
+          box-shadow: 0 6px 20px rgba(255, 7, 58, 0.3);
+        }
+
+        .duration-number {
+          font-size: 26px;
+          font-weight: 900;
+          font-family: ${fonts.heading};
+          color: ${colors.textPrimary};
+          margin-bottom: 4px;
+          letter-spacing: -0.5px;
+          line-height: 1;
+        }
+
+        .duration-button.active .duration-number {
+          color: ${colors.cyan};
+        }
+
+        .duration-button.premium.active .duration-number {
+          color: ${colors.red};
+        }
+
+        .duration-label {
+          font-size: 12px;
+          color: ${colors.textMuted};
+          font-weight: 600;
+        }
+
+        .duration-button.active .duration-label {
+          color: ${colors.cyan};
+        }
+
+        .duration-button.premium.active .duration-label {
+          color: ${colors.red};
+        }
+
+        /* Availability Banner */
+        .availability-banner {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 12px 16px;
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(0, 240, 255, 0.05) 100%);
+          border-radius: 10px;
+          border: 1px solid rgba(0, 240, 255, 0.2);
+          margin-bottom: 20px;
+        }
+
+        .availability-info {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .live-indicator {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: ${colors.green};
+          animation: pulse 2s ease-in-out infinite;
+        }
+
         @keyframes pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
 
-        /* Mobile-first responsive styles */
-        @media (min-width: 480px) {
-          .time-grid {
-            grid-template-columns: repeat(4, 1fr) !important;
+        .live-text {
+          font-size: 13px;
+          color: ${colors.cyan};
+          font-weight: 500;
+        }
+
+        .live-note {
+          font-size: 11px;
+          color: ${colors.textMuted};
+        }
+
+        .availability-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .update-time {
+          font-size: 11px;
+          color: ${colors.textMuted};
+        }
+
+        .refresh-button {
+          padding: 4px 10px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid ${colors.border};
+          border-radius: 6px;
+          color: ${colors.textSecondary};
+          font-size: 11px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        /* Console Grid */
+        .console-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          justify-content: flex-start;
+        }
+
+        .console-card {
+          min-width: 85px;
+          max-width: 85px;
+          padding: 10px 6px;
+          border-radius: 10px;
+          border: 1px solid ${colors.border};
+          background: ${colors.darkCard};
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .console-card.active {
+          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+          transform: scale(1.02);
+        }
+
+        .console-card.sold-out {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .console-icon {
+          font-size: 24px;
+          margin-bottom: 4px;
+        }
+
+        .console-icon.disabled {
+          filter: grayscale(1);
+        }
+
+        .console-name {
+          font-size: 11px;
+          font-weight: 800;
+          font-family: ${fonts.heading};
+          margin-bottom: 2px;
+          letter-spacing: -0.2px;
+        }
+
+        .console-price {
+          font-size: 10px;
+          color: ${colors.textMuted};
+          font-weight: 600;
+          margin-bottom: 6px;
+        }
+
+        .availability-badge {
+          padding: 4px 8px;
+          border-radius: 6px;
+          font-size: 9px;
+          font-weight: 700;
+          margin-bottom: 6px;
+        }
+
+        .availability-badge.available {
+          background: rgba(34, 197, 94, 0.2);
+          color: ${colors.green};
+        }
+
+        .availability-badge.low-stock {
+          background: rgba(245, 158, 11, 0.2);
+          color: ${colors.orange};
+        }
+
+        .availability-badge.sold-out {
+          background: rgba(239, 68, 68, 0.2);
+          color: #ef4444;
+        }
+
+        .selected-indicator {
+          padding: 3px 6px;
+          border-radius: 5px;
+          font-size: 9px;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+
+        /* Tickets Section */
+        .tickets-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 12px;
+        }
+
+        .availability-text {
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        .availability-text.high {
+          color: ${colors.green};
+        }
+
+        .availability-text.low {
+          color: ${colors.orange};
+        }
+
+        .sold-out-card {
+          padding: 32px 20px;
+          background: ${colors.darkCard};
+          border-radius: 14px;
+          border: 1px solid rgba(239, 68, 68, 0.2);
+          text-align: center;
+        }
+
+        .sold-out-title {
+          font-size: 15px;
+          font-weight: 600;
+          color: #ef4444;
+          margin-bottom: 8px;
+        }
+
+        .sold-out-subtitle {
+          font-size: 13px;
+          color: ${colors.textMuted};
+          margin-bottom: 12px;
+        }
+
+        .next-available {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 16px;
+          background: rgba(0, 240, 255, 0.1);
+          border: 1px solid rgba(0, 240, 255, 0.2);
+          border-radius: 10px;
+          margin-bottom: 12px;
+        }
+
+        .sold-out-hint {
+          font-size: 12px;
+          color: ${colors.textMuted};
+        }
+
+        .tickets-list {
+          display: flex;
+          flex-direction: column;
+          gap: 12px;
+        }
+
+        .ticket-card {
+          padding: 16px;
+          background: ${colors.darkCard};
+          border-radius: 14px;
+          border: 1px solid ${colors.border};
+          transition: all 0.2s ease;
+        }
+
+        .ticket-card.selected {
+          background: linear-gradient(135deg, rgba(255, 7, 58, 0.1) 0%, ${colors.darkCard} 100%);
+          border: 1px solid rgba(255, 7, 58, 0.3);
+        }
+
+        .ticket-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          gap: 12px;
+        }
+
+        .ticket-info {
+          flex: 1;
+        }
+
+        .ticket-title {
+          font-size: 15px;
+          font-weight: 600;
+          color: ${colors.textPrimary};
+          margin-bottom: 6px;
+        }
+
+        .ticket-price {
+          font-family: ${fonts.heading};
+          font-size: 22px;
+          font-weight: 700;
+          color: ${colors.cyan};
+          margin-bottom: 8px;
+        }
+
+        .price-unit {
+          font-size: 12px;
+          color: ${colors.textMuted};
+          font-family: ${fonts.body};
+          font-weight: 400;
+        }
+
+        .ticket-description {
+          font-size: 13px;
+          color: ${colors.textSecondary};
+          line-height: 1.4;
+        }
+
+        .add-button {
+          padding: 10px 20px;
+          min-height: 44px;
+          border: none;
+          border-radius: 10px;
+          color: white;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .add-button.enabled {
+          background: linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%);
+        }
+
+        .add-button.disabled {
+          background: rgba(255, 255, 255, 0.05);
+          color: ${colors.textMuted};
+          cursor: not-allowed;
+        }
+
+        .quantity-selector {
+          display: flex;
+          align-items: center;
+          gap: 0;
+          background: ${colors.red};
+          border-radius: 10px;
+          overflow: hidden;
+        }
+
+        .quantity-btn {
+          width: 36px;
+          height: 36px;
+          background: transparent;
+          border: none;
+          color: white;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .quantity-btn.disabled {
+          color: rgba(255, 255, 255, 0.4);
+          cursor: not-allowed;
+        }
+
+        .quantity-display {
+          width: 32px;
+          text-align: center;
+          font-family: ${fonts.heading};
+          font-size: 16px;
+          font-weight: 700;
+          color: white;
+        }
+
+        /* Bottom Action Bar */
+        .action-bar {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          background: rgba(15, 15, 20, 0.95);
+          backdrop-filter: blur(20px);
+          border-top: 1px solid ${colors.border};
+          padding: 16px;
+          z-index: 100;
+        }
+
+        .action-content {
+          max-width: 600px;
+          margin: 0 auto;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+        }
+
+        .step1-info {
+          flex: 1;
+        }
+
+        .date-display {
+          font-size: 14px;
+          font-weight: 600;
+          color: ${colors.textPrimary};
+          margin-bottom: 4px;
+        }
+
+        .time-display {
+          font-size: 13px;
+          color: ${colors.textMuted};
+        }
+
+        .time-display.selected {
+          color: ${colors.cyan};
+        }
+
+        .step2-info {
+          flex: 1;
+        }
+
+        .ticket-count {
+          font-size: 14px;
+          font-weight: 600;
+          color: ${colors.textPrimary};
+          margin-bottom: 4px;
+        }
+
+        .booking-details {
+          font-size: 13px;
+          color: ${colors.textSecondary};
+        }
+
+        .no-tickets {
+          font-size: 14px;
+          color: ${colors.textMuted};
+        }
+
+        .continue-button, .confirm-button {
+          padding: 14px 28px;
+          border: none;
+          border-radius: 12px;
+          font-family: ${fonts.heading};
+          font-size: 13px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          min-width: 140px;
+          justify-content: center;
+        }
+
+        .continue-button.enabled {
+          background: linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%);
+          color: white;
+        }
+
+        .continue-button.disabled {
+          background: rgba(255, 255, 255, 0.1);
+          color: ${colors.textMuted};
+          cursor: not-allowed;
+        }
+
+        .confirm-button.enabled {
+          background: linear-gradient(135deg, ${colors.green} 0%, #16a34a 100%);
+          color: white;
+        }
+
+        .confirm-button.disabled {
+          background: rgba(255, 255, 255, 0.1);
+          color: ${colors.textMuted};
+          cursor: not-allowed;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+          .booking-container {
+            padding: 12px 12px 120px;
           }
+
+          .booking-title {
+            font-size: 20px;
+          }
+
           .date-button {
-            width: 72px !important;
-            padding: 12px 8px !important;
+            width: 60px;
+            padding: 8px 4px;
+          }
+
+          .time-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .console-grid {
+            justify-content: center;
+          }
+
+          .console-card {
+            min-width: 75px;
+            max-width: 75px;
+            padding: 8px 4px;
+          }
+
+          .duration-grid {
+            grid-template-columns: repeat(3, 1fr);
+          }
+
+          .duration-button {
+            padding: 12px 8px;
+            min-height: 70px;
+          }
+
+          .duration-number {
+            font-size: 22px;
+          }
+
+          .action-content {
+            gap: 12px;
+          }
+
+          .continue-button, .confirm-button {
+            padding: 12px 20px;
+            font-size: 12px;
+            min-width: 120px;
           }
         }
 
         @media (min-width: 640px) {
           .booking-container {
-            padding: 20px 16px 140px !important;
+            padding: 20px 16px 140px;
           }
+
           .booking-title {
-            font-size: 22px !important;
+            font-size: 22px;
           }
-          .section-heading {
-            font-size: 14px !important;
+
+          .time-grid {
+            grid-template-columns: repeat(4, 1fr);
           }
-          .duration-button {
-            padding: 16px !important;
+
+          .date-button {
+            width: 72px;
+            padding: 12px 8px;
           }
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
         }
       `}</style>
     </div>
@@ -2030,7 +2222,6 @@ function getEndTime(startTime: string, durationMinutes: number = BOOKING_DURATIO
 }
 
 /* ================= CAPACITY CHECK WITH OVERLAP ================= */
-
 async function checkBookingCapacityWithOverlap(options: {
   cafeId: string;
   bookingDate: string;
@@ -2049,7 +2240,6 @@ async function checkBookingCapacityWithOverlap(options: {
     return { ok: false, message: "No tickets selected." };
   }
 
-  // Check if cafeId is a UUID or slug
   const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(cafeId);
 
   const { data: cafeRow, error: cafeError } = await supabase

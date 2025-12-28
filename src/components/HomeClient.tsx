@@ -822,7 +822,7 @@ export default function HomeClient({ cafes }: Props) {
                   
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleComingSoon("Tournaments")}
+                      onClick={() => handleComingSoon("Membership")}
                       className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
@@ -830,7 +830,7 @@ export default function HomeClient({ cafes }: Props) {
                       <span>Membership</span>
                     </button>
                     <button
-                      onClick={() => handleComingSoon("Streaming")}
+                      onClick={() => handleComingSoon("Tournaments")}
                       className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >

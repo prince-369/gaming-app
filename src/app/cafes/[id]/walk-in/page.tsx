@@ -5,19 +5,39 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
 import { colors, fonts } from "@/lib/constants";
+import {
+  Gamepad2,
+  Monitor,
+  Car,
+  Target,
+  Telescope,
+  User,
+  Phone,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  Calendar,
+  CreditCard,
+  Shield,
+  Sparkles,
+  DollarSign,
+  Hash,
+  Users
+} from "lucide-react";
 
 type ConsoleId = "ps5" | "ps4" | "xbox" | "pc" | "pool" | "arcade" | "snooker" | "vr" | "steering_wheel";
 
-const CONSOLES: { id: ConsoleId; label: string; icon: string; color: string }[] = [
-  { id: "ps5", label: "PS5", icon: "🎮", color: "#0070d1" },
-  { id: "ps4", label: "PS4", icon: "🎮", color: "#003791" },
-  { id: "xbox", label: "Xbox", icon: "🎮", color: "#107c10" },
-  { id: "pc", label: "PC", icon: "💻", color: "#ff073a" },
-  { id: "pool", label: "Pool Table", icon: "🎱", color: "#8b4513" },
-  { id: "arcade", label: "Arcade", icon: "🕹️", color: "#ff6b00" },
-  { id: "snooker", label: "Snooker", icon: "🎱", color: "#228b22" },
-  { id: "vr", label: "VR", icon: "🥽", color: "#9945ff" },
-  { id: "steering_wheel", label: "Racing Rig", icon: "🏎️", color: "#e10600" },
+const CONSOLES: { id: ConsoleId; label: string; icon: React.ReactNode; color: string }[] = [
+  { id: "ps5", label: "PS5", icon: <Gamepad2 className="w-6 h-6" />, color: "#3b82f6" },
+  { id: "ps4", label: "PS4", icon: <Gamepad2 className="w-6 h-6" />, color: "#1d4ed8" },
+  { id: "xbox", label: "Xbox", icon: <Gamepad2 className="w-6 h-6" />, color: "#16a34a" },
+  { id: "pc", label: "PC", icon: <Monitor className="w-6 h-6" />, color: "#ef4444" },
+  { id: "pool", label: "Pool Table", icon: <Target className="w-6 h-6" />, color: "#92400e" },
+  { id: "arcade", label: "Arcade", icon: <Gamepad2 className="w-6 h-6" />, color: "#ea580c" },
+  { id: "snooker", label: "Snooker", icon: <Target className="w-6 h-6" />, color: "#059669" },
+  { id: "vr", label: "VR", icon: <Telescope className="w-6 h-6" />, color: "#7c3aed" },
+  { id: "steering_wheel", label: "Racing Rig", icon: <Car className="w-6 h-6" />, color: "#dc2626" },
 ];
 
 const CONSOLE_DB_KEYS: Record<ConsoleId, string> = {
@@ -115,13 +135,9 @@ export default function WalkInBookingPage() {
         if (!pricingError && pricingData) {
           const pricing: Partial<Record<ConsoleId, ConsolePricingTier>> = {};
 
-          console.log('Raw pricing data from database:', pricingData);
-
           pricingData.forEach((item: any) => {
-            // Map database console_type to ConsoleId
             let consoleId = item.console_type as ConsoleId;
 
-            // Initialize pricing object if it doesn't exist
             if (!pricing[consoleId]) {
               pricing[consoleId] = {
                 qty1_30min: null,
@@ -135,17 +151,11 @@ export default function WalkInBookingPage() {
               };
             }
 
-            // Map the pricing data to the correct tier
             const key = `qty${item.quantity}_${item.duration_minutes}min` as keyof ConsolePricingTier;
             pricing[consoleId]![key] = item.price;
           });
 
-          console.log('Processed console pricing:', pricing);
           setConsolePricing(pricing);
-        } else if (pricingError) {
-          console.error('Error loading pricing:', pricingError);
-        } else {
-          console.warn('No pricing data found for cafe');
         }
 
         // Auto-select first available console
@@ -170,36 +180,19 @@ export default function WalkInBookingPage() {
     const tier = consolePricing[selectedConsole];
     const basePrice = cafePrice;
 
-    console.log('=== WALK-IN PRICING CALCULATION ===');
-    console.log('Selected console:', selectedConsole);
-    console.log('Quantity:', quantity);
-    console.log('Duration:', duration);
-    console.log('Base cafe hourly price:', basePrice);
-    console.log('Tier pricing for this console:', tier);
-
     if (tier) {
-      // Use tier-based pricing
       const key = `qty${quantity}_${duration}min` as keyof ConsolePricingTier;
       const tierPrice = tier[key];
 
-      console.log('Looking for pricing key:', key);
-      console.log('Tier price found:', tierPrice);
-
       if (tierPrice !== null && tierPrice !== undefined) {
-        console.log('✓ Using tier-based price:', tierPrice);
         return tierPrice;
-      } else {
-        console.log('✗ Tier price is null/undefined, using fallback');
       }
-    } else {
-      console.log('✗ No tier pricing object found for console, using fallback');
     }
 
     // Fallback to simple calculation
     const durationMultiplier = duration / 60;
     const fallbackAmount = basePrice * quantity * durationMultiplier;
-    console.log('Fallback calculation:', `${basePrice} × ${quantity} × ${durationMultiplier} = ${fallbackAmount}`);
-    return fallbackAmount;
+    return Math.round(fallbackAmount);
   };
 
   const totalAmount = calculateAmount();
@@ -238,7 +231,6 @@ export default function WalkInBookingPage() {
     try {
       setSubmitting(true);
 
-      // Get current date and time
       const now = new Date();
       const bookingDate = now.toISOString().split("T")[0];
       const hours = now.getHours();
@@ -319,37 +311,18 @@ export default function WalkInBookingPage() {
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%)",
-        fontFamily: fonts.body,
-      }}>
-        <div style={{ color: colors.textSecondary, fontSize: "16px" }}>Loading...</div>
+      <div className="loading-container">
+        <Loader2 className="loading-spinner" />
+        <p className="loading-text">Loading café details...</p>
       </div>
     );
   }
 
   if (error && !cafeId) {
     return (
-      <div style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%)",
-        fontFamily: fonts.body,
-        padding: "20px",
-      }}>
-        <div style={{
-          textAlign: "center",
-          color: colors.red,
-          fontSize: "18px",
-        }}>
-          {error}
-        </div>
+      <div className="error-container">
+        <AlertCircle className="error-icon" />
+        <h1 className="error-title">{error}</h1>
       </div>
     );
   }
@@ -358,422 +331,660 @@ export default function WalkInBookingPage() {
   const availableConsoleOptions = CONSOLES.filter(c => availableConsoles.includes(c.id));
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%)",
-      fontFamily: fonts.body,
-      padding: "16px",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}>
-      <div style={{
-        maxWidth: "480px",
-        width: "100%",
-      }}>
-        {/* Success Message */}
-        {success ? (
-          <div style={{
-            background: "rgba(20, 20, 28, 0.95)",
-            border: "2px solid rgba(34, 197, 94, 0.5)",
-            borderRadius: "20px",
-            padding: "40px 24px",
-            textAlign: "center",
-            animation: "fadeIn 0.3s ease",
-          }}>
-            <div style={{
-              fontSize: "64px",
-              marginBottom: "16px",
-              animation: "scaleIn 0.5s ease",
-            }}>
-              ✅
-            </div>
-            <div style={{
-              color: "#22c55e",
-              fontFamily: fonts.heading,
-              fontSize: "24px",
-              fontWeight: 700,
-              marginBottom: "8px",
-              textTransform: "uppercase",
-              letterSpacing: "1px",
-            }}>
-              Booking Confirmed!
-            </div>
-            <div style={{
-              color: colors.textPrimary,
-              fontSize: "16px",
-              marginBottom: "8px",
-              fontWeight: 600,
-            }}>
-              Booking ID: #{bookingId}
-            </div>
-            <div style={{
-              color: colors.textSecondary,
-              fontSize: "14px",
-              marginTop: "16px",
-            }}>
-              Please proceed to the counter for payment
-            </div>
-            <div style={{
-              marginTop: "24px",
-              padding: "16px",
-              background: "rgba(255, 7, 58, 0.1)",
-              borderRadius: "12px",
-            }}>
-              <div style={{ color: colors.textSecondary, fontSize: "13px", marginBottom: "4px" }}>
-                Amount to Pay
-              </div>
-              <div style={{
-                color: colors.red,
-                fontSize: "32px",
-                fontWeight: 700,
-                fontFamily: fonts.heading,
-              }}>
-                ₹{totalAmount}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <>
-            {/* Header */}
-            <div style={{
-              textAlign: "center",
-              marginBottom: "24px",
-            }}>
-              <h1 style={{
-                fontFamily: fonts.heading,
-                fontSize: "28px",
-                fontWeight: 700,
-                color: colors.textPrimary,
-                marginBottom: "8px",
-                textTransform: "uppercase",
-                letterSpacing: "1px",
-              }}>
-                {cafeName}
-              </h1>
-              <p style={{
-                color: colors.textSecondary,
-                fontSize: "13px",
-              }}>
-                Walk-In Booking Form
-              </p>
-            </div>
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} style={{
-              background: "rgba(20, 20, 28, 0.95)",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-              borderRadius: "20px",
-              padding: "24px",
-            }}>
-              {/* Error Message */}
-              {error && (
-                <div style={{
-                  background: "rgba(239, 68, 68, 0.15)",
-                  border: "1px solid rgba(239, 68, 68, 0.4)",
-                  borderRadius: "12px",
-                  padding: "12px 16px",
-                  marginBottom: "20px",
-                  color: "#ef4444",
-                  fontSize: "14px",
-                  textAlign: "center",
-                }}>
-                  {error}
-                </div>
-              )}
-
-              {/* Name Input */}
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{
-                  display: "block",
-                  color: colors.textPrimary,
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  marginBottom: "8px",
-                }}>
-                  Your Name *
-                </label>
-                <input
-                  type="text"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Enter your full name"
-                  disabled={submitting}
-                  autoComplete="name"
-                  style={{
-                    width: "100%",
-                    padding: "14px 16px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "12px",
-                    color: colors.textPrimary,
-                    fontSize: "16px",
-                    fontFamily: fonts.body,
-                    outline: "none",
-                  }}
-                />
-              </div>
-
-              {/* Phone Input */}
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{
-                  display: "block",
-                  color: colors.textPrimary,
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  marginBottom: "8px",
-                }}>
-                  Phone Number *
-                </label>
-                <input
-                  type="tel"
-                  value={customerPhone}
-                  onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                  placeholder="10-digit mobile number"
-                  disabled={submitting}
-                  autoComplete="tel"
-                  inputMode="numeric"
-                  style={{
-                    width: "100%",
-                    padding: "14px 16px",
-                    background: "rgba(255, 255, 255, 0.05)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    borderRadius: "12px",
-                    color: colors.textPrimary,
-                    fontSize: "16px",
-                    fontFamily: fonts.body,
-                    outline: "none",
-                  }}
-                />
-              </div>
-
-              {/* Console Selection - Only Available Consoles */}
-              <div style={{ marginBottom: "20px" }}>
-                <label style={{
-                  display: "block",
-                  color: colors.textPrimary,
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  marginBottom: "10px",
-                }}>
-                  Select Console *
-                </label>
-                <div style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(3, 1fr)",
-                  gap: "10px",
-                }}>
-                  {availableConsoleOptions.map((console) => {
-                    const isSelected = selectedConsole === console.id;
-
-                    return (
-                      <button
-                        key={console.id}
-                        type="button"
-                        onClick={() => setSelectedConsole(console.id)}
-                        disabled={submitting}
-                        style={{
-                          padding: "14px 8px",
-                          background: isSelected
-                            ? `linear-gradient(135deg, ${console.color}33 0%, ${console.color}11 100%)`
-                            : "rgba(255, 255, 255, 0.03)",
-                          border: isSelected
-                            ? `2px solid ${console.color}`
-                            : "1px solid rgba(255, 255, 255, 0.1)",
-                          borderRadius: "12px",
-                          color: colors.textPrimary,
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                          textAlign: "center",
-                        }}
-                      >
-                        <div style={{ fontSize: "24px", marginBottom: "4px" }}>{console.icon}</div>
-                        <div style={{ fontSize: "12px", fontWeight: 600 }}>{console.label}</div>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Quantity Selection */}
-              <div style={{ marginBottom: "16px" }}>
-                <label style={{
-                  display: "block",
-                  color: colors.textPrimary,
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  marginBottom: "8px",
-                }}>
-                  No. of Controllers
-                </label>
-                <div style={{ display: "flex", gap: "8px" }}>
-                  {[1, 2, 3, 4].map((num) => {
-                    const isSelected = quantity === num;
-
-                    return (
-                      <button
-                        key={num}
-                        type="button"
-                        onClick={() => setQuantity(num)}
-                        disabled={submitting}
-                        style={{
-                          flex: 1,
-                          padding: "14px",
-                          background: isSelected
-                            ? `linear-gradient(135deg, ${colors.red} 0%, #cc0530 100%)`
-                            : "rgba(255, 255, 255, 0.05)",
-                          border: isSelected
-                            ? `2px solid ${colors.red}`
-                            : "1px solid rgba(255, 255, 255, 0.1)",
-                          borderRadius: "12px",
-                          color: colors.textPrimary,
-                          fontSize: "18px",
-                          fontWeight: 700,
-                          cursor: "pointer",
-                          transition: "all 0.2s",
-                        }}
-                      >
-                        {num}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Duration Selection */}
-              <div style={{ marginBottom: "24px" }}>
-                <label style={{
-                  display: "block",
-                  color: colors.textPrimary,
-                  fontSize: "13px",
-                  fontWeight: 600,
-                  marginBottom: "8px",
-                }}>
-                  Duration
-                </label>
-                <div style={{ display: "flex", gap: "10px" }}>
-                  <button
-                    type="button"
-                    onClick={() => setDuration(30)}
-                    disabled={submitting}
-                    style={{
-                      flex: 1,
-                      padding: "14px",
-                      background: duration === 30
-                        ? `linear-gradient(135deg, ${colors.cyan} 0%, #00b8d4 100%)`
-                        : "rgba(255, 255, 255, 0.05)",
-                      border: duration === 30
-                        ? `2px solid ${colors.cyan}`
-                        : "1px solid rgba(255, 255, 255, 0.1)",
-                      borderRadius: "12px",
-                      color: colors.textPrimary,
-                      fontSize: "16px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    30 min
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDuration(60)}
-                    disabled={submitting}
-                    style={{
-                      flex: 1,
-                      padding: "14px",
-                      background: duration === 60
-                        ? `linear-gradient(135deg, ${colors.cyan} 0%, #00b8d4 100%)`
-                        : "rgba(255, 255, 255, 0.05)",
-                      border: duration === 60
-                        ? `2px solid ${colors.cyan}`
-                        : "1px solid rgba(255, 255, 255, 0.1)",
-                      borderRadius: "12px",
-                      color: colors.textPrimary,
-                      fontSize: "16px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                      transition: "all 0.2s",
-                    }}
-                  >
-                    60 min
-                  </button>
-                </div>
-              </div>
-
-              {/* Amount Display */}
-              <div style={{
-                background: "rgba(255, 7, 58, 0.1)",
-                border: "1px solid rgba(255, 7, 58, 0.3)",
-                borderRadius: "16px",
-                padding: "20px",
-                marginBottom: "24px",
-              }}>
-                <div style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}>
-                  <div>
-                    <div style={{ color: colors.textSecondary, fontSize: "13px", marginBottom: "4px" }}>
-                      Total Amount
-                    </div>
-                    <div style={{ color: colors.textPrimary, fontSize: "11px" }}>
-                      Pay at Counter
-                    </div>
-                  </div>
-                  <div style={{
-                    fontFamily: fonts.heading,
-                    fontSize: "36px",
-                    fontWeight: 700,
-                    color: colors.red,
-                  }}>
-                    ₹{totalAmount}
-                  </div>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={submitting || !selectedConsole}
-                style={{
-                  width: "100%",
-                  padding: "18px",
-                  background: submitting
-                    ? "rgba(148, 163, 184, 0.3)"
-                    : `linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%)`,
-                  border: "none",
-                  borderRadius: "14px",
-                  color: "white",
-                  fontSize: "17px",
-                  fontWeight: 700,
-                  fontFamily: fonts.heading,
-                  textTransform: "uppercase",
-                  letterSpacing: "1.5px",
-                  cursor: submitting ? "not-allowed" : "pointer",
-                  opacity: submitting ? 0.6 : 1,
-                  boxShadow: submitting ? "none" : "0 4px 20px rgba(255, 7, 58, 0.3)",
-                  transition: "all 0.2s",
-                }}
-              >
-                {submitting ? "Creating..." : "Confirm Booking"}
-              </button>
-            </form>
-          </>
-        )}
-      </div>
-
+    <>
       <style jsx global>{`
+        .walk-in-page {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          font-family: ${fonts.body};
+          padding: 20px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .walk-in-container {
+          max-width: 480px;
+          width: 100%;
+        }
+
+        /* Loading States */
+        .loading-container {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          font-family: ${fonts.body};
+        }
+
+        .loading-spinner {
+          width: 40px;
+          height: 40px;
+          color: ${colors.blue};
+          animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+          margin-top: 12px;
+          font-size: 14px;
+          color: ${colors.textSecondary};
+        }
+
+        /* Error States */
+        .error-container {
+          min-height: 100vh;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+          font-family: ${fonts.body};
+          padding: 20px;
+          text-align: center;
+        }
+
+        .error-icon {
+          width: 48px;
+          height: 48px;
+          color: ${colors.red};
+          margin-bottom: 16px;
+        }
+
+        .error-title {
+          color: ${colors.red};
+          font-size: 18px;
+          font-family: ${fonts.heading};
+        }
+
+        /* Success State */
+        .success-card {
+          background: rgba(20, 20, 28, 0.95);
+          border: 2px solid rgba(34, 197, 94, 0.5);
+          border-radius: 20px;
+          padding: 40px 24px;
+          text-align: center;
+          animation: fadeIn 0.3s ease;
+        }
+
+        .success-icon {
+          font-size: 64px;
+          margin-bottom: 16px;
+          animation: scaleIn 0.5s ease;
+          color: #22c55e;
+        }
+
+        .success-title {
+          color: #22c55e;
+          font-family: ${fonts.heading};
+          font-size: 24px;
+          font-weight: 700;
+          margin-bottom: 8px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .booking-id {
+          color: ${colors.textPrimary};
+          font-size: 16px;
+          margin-bottom: 8px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        .success-message {
+          color: ${colors.textSecondary};
+          font-size: 14px;
+          margin-top: 16px;
+        }
+
+        .amount-card {
+          margin-top: 24px;
+          padding: 16px;
+          background: rgba(255, 7, 58, 0.1);
+          border-radius: 12px;
+        }
+
+        .amount-label {
+          color: ${colors.textSecondary};
+          font-size: 13px;
+          margin-bottom: 4px;
+        }
+
+        .amount-value {
+          color: ${colors.red};
+          font-size: 32px;
+          font-weight: 700;
+          font-family: ${fonts.heading};
+        }
+
+        /* Header */
+        .header {
+          text-align: center;
+          margin-bottom: 24px;
+        }
+
+        .cafe-name {
+          font-family: ${fonts.heading};
+          font-size: 28px;
+          font-weight: 700;
+          color: ${colors.textPrimary};
+          margin-bottom: 8px;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .page-title {
+          color: ${colors.textSecondary};
+          font-size: 13px;
+        }
+
+        /* Form */
+        .form-container {
+          background: rgba(20, 20, 28, 0.95);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          padding: 24px;
+        }
+
+        /* Error Message */
+        .error-message {
+          background: rgba(239, 68, 68, 0.15);
+          border: 1px solid rgba(239, 68, 68, 0.4);
+          border-radius: 12px;
+          padding: 12px 16px;
+          margin-bottom: 20px;
+          color: #ef4444;
+          font-size: 14px;
+          text-align: center;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        /* Form Inputs */
+        .form-group {
+          margin-bottom: 16px;
+        }
+
+        .form-label {
+          display: block;
+          color: ${colors.textPrimary};
+          font-size: 13px;
+          font-weight: 600;
+          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+
+        .form-input {
+          width: 100%;
+          padding: 14px 16px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          color: ${colors.textPrimary};
+          font-size: 16px;
+          font-family: ${fonts.body};
+          outline: none;
+          transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+          border-color: ${colors.blue};
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-input:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        /* Console Selection */
+        .console-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+        }
+
+        .console-button {
+          padding: 14px 8px;
+          border-radius: 12px;
+          color: ${colors.textPrimary};
+          cursor: pointer;
+          transition: all 0.2s;
+          text-align: center;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.03);
+        }
+
+        .console-button.selected {
+          border-width: 2px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .console-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .console-icon {
+          margin-bottom: 4px;
+        }
+
+        .console-label {
+          font-size: 12px;
+          font-weight: 600;
+        }
+
+        /* Quantity Selection */
+        .quantity-grid {
+          display: flex;
+          gap: 8px;
+        }
+
+        .quantity-button {
+          flex: 1;
+          padding: 14px;
+          border-radius: 12px;
+          color: ${colors.textPrimary};
+          font-size: 18px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.05);
+        }
+
+        .quantity-button.selected {
+          background: linear-gradient(135deg, ${colors.red} 0%, #cc0530 100%);
+          border-color: ${colors.red};
+          color: white;
+          box-shadow: 0 4px 12px rgba(255, 7, 58, 0.2);
+        }
+
+        .quantity-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        /* Duration Selection */
+        .duration-grid {
+          display: flex;
+          gap: 10px;
+        }
+
+        .duration-button {
+          flex: 1;
+          padding: 14px;
+          border-radius: 12px;
+          color: ${colors.textPrimary};
+          font-size: 16px;
+          font-weight: 700;
+          cursor: pointer;
+          transition: all 0.2s;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.05);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+        }
+
+        .duration-button.selected {
+          background: linear-gradient(135deg, ${colors.cyan} 0%, #00b8d4 100%);
+          border-color: ${colors.cyan};
+          color: white;
+          box-shadow: 0 4px 12px rgba(0, 240, 255, 0.2);
+        }
+
+        .duration-button:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        /* Amount Display */
+        .total-amount-card {
+          background: rgba(255, 7, 58, 0.1);
+          border: 1px solid rgba(255, 7, 58, 0.3);
+          border-radius: 16px;
+          padding: 20px;
+          margin-bottom: 24px;
+        }
+
+        .amount-content {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        }
+
+        .amount-info {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .amount-label {
+          color: ${colors.textSecondary};
+          font-size: 13px;
+          margin-bottom: 4px;
+        }
+
+        .amount-note {
+          color: ${colors.textPrimary};
+          font-size: 11px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .amount-value {
+          font-family: ${fonts.heading};
+          font-size: 36px;
+          font-weight: 700;
+          color: ${colors.red};
+        }
+
+        /* Submit Button */
+        .submit-button {
+          width: 100%;
+          padding: 18px;
+          border: none;
+          border-radius: 14px;
+          color: white;
+          font-size: 17px;
+          font-weight: 700;
+          font-family: ${fonts.heading};
+          text-transform: uppercase;
+          letter-spacing: 1.5px;
+          cursor: pointer;
+          transition: all 0.2s;
+          background: linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%);
+          box-shadow: 0 4px 20px rgba(255, 7, 58, 0.3);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
+        .submit-button:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          background: rgba(148, 163, 184, 0.3);
+          box-shadow: none;
+        }
+
+        .submit-button:not(:disabled):hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 25px rgba(255, 7, 58, 0.4);
+        }
+
+        /* Animations */
         @keyframes fadeIn {
           from { opacity: 0; transform: translateY(10px); }
           to { opacity: 1; transform: translateY(0); }
         }
+
         @keyframes scaleIn {
           from { transform: scale(0.5); }
           to { transform: scale(1); }
         }
+
+        /* Mobile Responsive */
+        @media (max-width: 480px) {
+          .walk-in-page {
+            padding: 12px;
+          }
+
+          .console-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .cafe-name {
+            font-size: 24px;
+          }
+
+          .form-container {
+            padding: 20px 16px;
+          }
+
+          .quantity-button,
+          .duration-button {
+            padding: 12px;
+            font-size: 16px;
+          }
+
+          .amount-value {
+            font-size: 28px;
+          }
+
+          .submit-button {
+            padding: 16px;
+            font-size: 15px;
+          }
+        }
+
+        @media (min-width: 640px) {
+          .walk-in-page {
+            padding: 24px;
+          }
+
+          .form-container {
+            padding: 32px;
+          }
+        }
       `}</style>
-    </div>
+
+      <div className="walk-in-page">
+        <div className="walk-in-container">
+          {/* Success Message */}
+          {success ? (
+            <div className="success-card">
+              <CheckCircle className="success-icon" />
+              <div className="success-title">Booking Confirmed!</div>
+              <div className="booking-id">
+                <Hash className="w-4 h-4" />
+                Booking ID: #{bookingId}
+              </div>
+              <div className="success-message">
+                Please proceed to the counter for payment
+              </div>
+              <div className="amount-card">
+                <div className="amount-label">Amount to Pay</div>
+                <div className="amount-value">₹{totalAmount}</div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Header */}
+              <div className="header">
+                <h1 className="cafe-name">{cafeName}</h1>
+                <p className="page-title">
+                  <Calendar className="inline w-4 h-4 mr-2" />
+                  Walk-In Booking Form
+                </p>
+              </div>
+
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="form-container">
+                {/* Error Message */}
+                {error && (
+                  <div className="error-message">
+                    <AlertCircle className="w-4 h-4" />
+                    {error}
+                  </div>
+                )}
+
+                {/* Name Input */}
+                <div className="form-group">
+                  <label className="form-label">
+                    <User className="w-4 h-4" />
+                    Your Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    placeholder="Enter your full name"
+                    disabled={submitting}
+                    autoComplete="name"
+                    className="form-input"
+                  />
+                </div>
+
+                {/* Phone Input */}
+                <div className="form-group">
+                  <label className="form-label">
+                    <Phone className="w-4 h-4" />
+                    Phone Number *
+                  </label>
+                  <input
+                    type="tel"
+                    value={customerPhone}
+                    onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                    placeholder="10-digit mobile number"
+                    disabled={submitting}
+                    autoComplete="tel"
+                    inputMode="numeric"
+                    className="form-input"
+                  />
+                </div>
+
+                {/* Console Selection */}
+                <div className="form-group">
+                  <label className="form-label">
+                    <Gamepad2 className="w-4 h-4" />
+                    Select Console *
+                  </label>
+                  <div className="console-grid">
+                    {availableConsoleOptions.map((console) => {
+                      const isSelected = selectedConsole === console.id;
+
+                      return (
+                        <button
+                          key={console.id}
+                          type="button"
+                          onClick={() => setSelectedConsole(console.id)}
+                          disabled={submitting}
+                          className={`console-button ${isSelected ? 'selected' : ''}`}
+                          style={{
+                            borderColor: isSelected ? console.color : undefined,
+                            background: isSelected ? `linear-gradient(135deg, ${console.color}33 0%, ${console.color}11 100%)` : undefined
+                          }}
+                        >
+                          <div className="console-icon" style={{ color: isSelected ? console.color : colors.textPrimary }}>
+                            {console.icon}
+                          </div>
+                          <div className="console-label">{console.label}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Quantity Selection */}
+                <div className="form-group">
+                  <label className="form-label">
+                    <Users className="w-4 h-4" />
+                    No. of Players
+                  </label>
+                  <div className="quantity-grid">
+                    {[1, 2, 3, 4].map((num) => {
+                      const isSelected = quantity === num;
+
+                      return (
+                        <button
+                          key={num}
+                          type="button"
+                          onClick={() => setQuantity(num)}
+                          disabled={submitting}
+                          className={`quantity-button ${isSelected ? 'selected' : ''}`}
+                        >
+                          {num}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Duration Selection */}
+                <div className="form-group">
+                  <label className="form-label">
+                    <Clock className="w-4 h-4" />
+                    Duration
+                  </label>
+                  <div className="duration-grid">
+                    <button
+                      type="button"
+                      onClick={() => setDuration(30)}
+                      disabled={submitting}
+                      className={`duration-button ${duration === 30 ? 'selected' : ''}`}
+                    >
+                      <Clock className="w-4 h-4" />
+                      30 min
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDuration(60)}
+                      disabled={submitting}
+                      className={`duration-button ${duration === 60 ? 'selected' : ''}`}
+                    >
+                      <Clock className="w-4 h-4" />
+                      60 min
+                    </button>
+                  </div>
+                </div>
+
+                {/* Amount Display */}
+                <div className="total-amount-card">
+                  <div className="amount-content">
+                    <div className="amount-info">
+                      <div className="amount-label">Total Amount</div>
+                      <div className="amount-note">
+                        <CreditCard className="w-3 h-3" />
+                        Pay at Counter
+                      </div>
+                    </div>
+                    <div className="amount-value">₹{totalAmount}</div>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={submitting || !selectedConsole}
+                  className="submit-button"
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Shield className="w-5 h-5" />
+                      Confirm Booking
+                    </>
+                  )}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      </div>
+    </>
   );
 }

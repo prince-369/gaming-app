@@ -4,6 +4,8 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import dynamicImport from "next/dynamic";
 import Link from "next/link";
+import { Gamepad, MapPin, Camera, Info, Check, Monitor, Cpu } from "lucide-react";
+import StickyFullWidthCTA from "@/components/StickyFullWidthCTA";
 
 // Lazy load heavy components
 const CafeGallery = dynamicImport(() => import("@/components/CafeGallery"), {
@@ -39,15 +41,15 @@ const CONSOLE_CONFIG: {
   icon: string;
   color: string;
 }[] = [
-  { key: "ps5_count", label: "PS5", icon: "🎮", color: "#0070d1" },
-  { key: "ps4_count", label: "PS4", icon: "🎮", color: "#003791" },
-  { key: "xbox_count", label: "Xbox", icon: "🎮", color: "#107c10" },
-  { key: "pc_count", label: "PC", icon: "💻", color: "#ff073a" },
-  { key: "pool_count", label: "Pool", icon: "🎱", color: "#8b4513" },
-  { key: "arcade_count", label: "Arcade", icon: "🕹️", color: "#ff6b00" },
-  { key: "snooker_count", label: "Snooker", icon: "🎱", color: "#228b22" },
-  { key: "steering_wheel_count", label: "Racing", icon: "🏎️", color: "#e10600" },
-  { key: "vr_count", label: "VR", icon: "🥽", color: "#9945ff" },
+  { key: "ps5_count", label: "PS5", icon: "gamepad", color: "#0070d1" },
+  { key: "ps4_count", label: "PS4", icon: "gamepad", color: "#003791" },
+  { key: "xbox_count", label: "Xbox", icon: "gamepad", color: "#107c10" },
+  { key: "pc_count", label: "PC", icon: "monitor", color: "#ff073a" },
+  { key: "pool_count", label: "Pool", icon: "cpu", color: "#8b4513" },
+  { key: "arcade_count", label: "Arcade", icon: "gamepad", color: "#ff6b00" },
+  { key: "snooker_count", label: "Snooker", icon: "cpu", color: "#228b22" },
+  { key: "steering_wheel_count", label: "Racing", icon: "steering", color: "#e10600" },
+  { key: "vr_count", label: "VR", icon: "gamepad", color: "#9945ff" },
 ];
 
 export const dynamic = "force-dynamic";
@@ -193,6 +195,20 @@ export default async function CafePage({ params }: CafePageProps) {
     const value = (cafe as any)[key] as number | null;
     return (value ?? 0) > 0;
   });
+
+  const renderConsoleIcon = (iconName: string, color: string) => {
+    const baseStyle: React.CSSProperties = { color, display: "inline-flex" };
+    switch (iconName) {
+      case "monitor":
+        return <Monitor size={16} style={baseStyle} />;
+      case "cpu":
+        return <Cpu size={16} style={baseStyle} />;
+      case "steering":
+        return <Gamepad size={16} style={baseStyle} />;
+      default:
+        return <Gamepad size={16} style={baseStyle} />;
+    }
+  };
 
   // Styles
   const sectionCardStyle: React.CSSProperties = {
@@ -358,7 +374,9 @@ export default async function CafePage({ params }: CafePageProps) {
                         gap: "6px",
                       }}
                     >
-                      <span style={{ color: colors.red }}>📍</span>
+                      <span style={{ display: 'inline-flex', color: colors.red, alignItems: 'center' }}>
+                        <MapPin size={14} style={{ color: colors.red }} />
+                      </span>
                       {cafe.address}
                     </span>
                   )}
@@ -391,7 +409,7 @@ export default async function CafePage({ params }: CafePageProps) {
                   opacity: 0.1,
                 }}
               >
-                🎮
+                <Gamepad size={80} style={{ opacity: 0.08 }} />
               </div>
               <div style={{ position: "relative", zIndex: 1 }}>
                 <h1
@@ -479,7 +497,9 @@ export default async function CafePage({ params }: CafePageProps) {
                     minWidth: 0,
                   }}
                 >
-                  <span style={{ fontSize: "16px", color: colors.red }}>📍</span>
+                  <span style={{ fontSize: "16px", color: colors.red, display: 'inline-flex', alignItems: 'center' }}>
+                    <MapPin size={16} style={{ color: colors.red }} />
+                  </span>
                   <span
                     style={{
                       fontSize: "13px",
@@ -562,7 +582,7 @@ export default async function CafePage({ params }: CafePageProps) {
                   marginTop: "6px",
                 }}
               >
-                💡 Prices may vary based on console/device
+                Prices may vary based on console/device
               </p>
             </div>
 
@@ -576,7 +596,7 @@ export default async function CafePage({ params }: CafePageProps) {
                   marginBottom: "20px",
                 }}
               >
-                {availableConsoles.slice(0, 4).map(({ key, icon, label }) => (
+                {availableConsoles.slice(0, 4).map(({ key, icon, label, color }) => (
                   <span
                     key={key}
                     style={{
@@ -590,7 +610,7 @@ export default async function CafePage({ params }: CafePageProps) {
                       gap: "4px",
                     }}
                   >
-                    <span style={{ fontSize: "14px" }}>{icon}</span>
+                    <span style={{ fontSize: "14px", display: 'inline-flex' }}>{renderConsoleIcon((icon as unknown as string) ?? 'gamepad', color)}</span>
                     {label}
                   </span>
                 ))}
@@ -610,29 +630,7 @@ export default async function CafePage({ params }: CafePageProps) {
               </div>
             )}
 
-            {/* Book Now Button */}
-            <Link href={`/cafes/${(cafe as any).slug || cafe.id}/book`} style={{ display: "block" }}>
-              <button
-                style={{
-                  width: "100%",
-                  padding: "16px 24px",
-                  minHeight: "48px",
-                  background: `linear-gradient(135deg, ${colors.red} 0%, #ff3366 50%, ${colors.red} 100%)`,
-                  border: "none",
-                  borderRadius: "12px",
-                  color: "white",
-                  fontFamily: fonts.heading,
-                  fontWeight: 600,
-                  fontSize: "14px",
-                  textTransform: "uppercase",
-                  letterSpacing: "1px",
-                  cursor: "pointer",
-                }}
-                className="book-button"
-              >
-                🎮 Book Your Session
-              </button>
-            </Link>
+
 
             {/* Trust indicators */}
             <div
@@ -654,7 +652,7 @@ export default async function CafePage({ params }: CafePageProps) {
                   gap: "4px",
                 }}
               >
-                <span style={{ color: "#22c55e" }}>✓</span> Instant Confirmation
+                <Check size={12} style={{ color: "#22c55e" }} /> Instant Confirmation
               </span>
               <span
                 style={{
@@ -665,7 +663,7 @@ export default async function CafePage({ params }: CafePageProps) {
                   gap: "4px",
                 }}
               >
-                <span style={{ color: "#22c55e" }}>✓</span> Free Cancellation
+                <Check size={12} style={{ color: "#22c55e" }} /> Free Cancellation
               </span>
             </div>
           </div>
@@ -675,7 +673,7 @@ export default async function CafePage({ params }: CafePageProps) {
         {availableConsoles.length > 0 && (
           <section style={sectionCardStyle}>
             <h2 style={sectionTitleStyle}>
-              <span>🎮</span> Available Equipment
+              {<Gamepad size={16} />} Available Equipment
               <span
                 style={{
                   flex: 1,
@@ -711,10 +709,9 @@ export default async function CafePage({ params }: CafePageProps) {
                     <span
                       style={{
                         fontSize: "18px",
-                        filter: `drop-shadow(0 0 8px ${color})`,
                       }}
                     >
-                      {icon}
+                      {renderConsoleIcon((icon as unknown as string) ?? "gamepad", color)}
                     </span>
                     <span>{label}</span>
                   </div>
@@ -727,7 +724,7 @@ export default async function CafePage({ params }: CafePageProps) {
         {/* About Section */}
         <section style={sectionCardStyle}>
           <h2 style={sectionTitleStyle}>
-            <span>📖</span> About
+            {<Info size={16} />} About
             <span
               style={{
                 flex: 1,
@@ -766,7 +763,7 @@ export default async function CafePage({ params }: CafePageProps) {
         {/* Gallery Section */}
         <section style={sectionCardStyle}>
           <h2 style={sectionTitleStyle}>
-            <span>📸</span> Gallery
+            {<Camera size={16} />} Gallery
             <span
               style={{
                 flex: 1,
@@ -818,7 +815,9 @@ export default async function CafePage({ params }: CafePageProps) {
                   marginBottom: "8px",
                 }}
               >
-                📍 {cafe.name}
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                  <MapPin size={16} /> {cafe.name}
+                </span>
               </h3>
               <p
                 style={{
@@ -869,8 +868,11 @@ export default async function CafePage({ params }: CafePageProps) {
         </section>
 
         {/* Bottom spacing for mobile */}
-        <div style={{ height: "80px" }} />
+        <div style={{ height: "120px" }} />
       </div>
+
+      {/* Sticky booking CTA */}
+      <StickyFullWidthCTA href={`/cafes/${(cafe as any).slug || cafe.id}/book`} label={"Book Your Session"} ariaLabel={`Book ${cafe.name}`} />
 
       {/* Responsive styles */}
       <style>{`
