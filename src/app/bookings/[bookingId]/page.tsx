@@ -9,10 +9,6 @@ import { colors, fonts } from "@/lib/constants";
 import {
   ArrowLeft,
   Gamepad2,
-  Monitor,
-  Car,
-  Target,
-  Telescope,
   Calendar,
   Clock,
   MapPin,
@@ -23,18 +19,15 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
-  AlertCircle,
-  Home,
   Users,
-  DollarSign,
   Hash,
-  Shield,
   Star,
   ExternalLink,
-  ChevronRight,
   AlertTriangle,
   History,
-  CheckSquare
+  Sparkles,
+  ShieldCheck,
+  Share2
 } from "lucide-react";
 
 type BookingRow = {
@@ -73,20 +66,6 @@ type BookingWithRelations = BookingRow & {
   cafe: CafeRow | null;
 };
 
-// Console icons mapping
-const consoleIcons: Record<string, React.ReactNode> = {
-  ps5: <Gamepad2 className="w-6 h-6" />,
-  ps4: <Gamepad2 className="w-6 h-6" />,
-  xbox: <Gamepad2 className="w-6 h-6" />,
-  pc: <Monitor className="w-6 h-6" />,
-  pool: <Target className="w-6 h-6" />,
-  arcade: <Gamepad2 className="w-6 h-6" />,
-  snooker: <Target className="w-6 h-6" />,
-  vr: <Telescope className="w-6 h-6" />,
-  steering: <Car className="w-6 h-6" />,
-  steering_wheel: <Car className="w-6 h-6" />,
-};
-
 export default function BookingDetailsPage() {
   const params = useParams<{ bookingId: string }>();
   const bookingId = params?.bookingId;
@@ -97,7 +76,7 @@ export default function BookingDetailsPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isCancelling, setIsCancelling] = useState(false);
 
-  // Load booking + items + cafe
+  // Load booking data
   useEffect(() => {
     if (!bookingId) return;
 
@@ -108,34 +87,29 @@ export default function BookingDetailsPage() {
         setLoading(true);
         setErrorMsg(null);
 
+        // Fetch booking
         const { data: booking, error: bookingError } = await supabase
           .from("bookings")
           .select("*")
           .eq("id", bookingId)
           .maybeSingle<BookingRow>();
 
-        if (bookingError) {
-          console.error("[BookingDetails] bookingError:", bookingError);
-          throw bookingError;
-        }
-
+        if (bookingError) throw bookingError;
         if (!booking) {
-          setErrorMsg("This booking could not be found.");
+          setErrorMsg("Booking not found.");
           return;
         }
 
+        // Fetch items
         const { data: itemsRows, error: itemsError } = await supabase
           .from("booking_items")
           .select("*")
           .eq("booking_id", bookingId);
 
-        if (itemsError) {
-          console.error("[BookingDetails] itemsError:", itemsError);
-          throw itemsError;
-        }
-
+        if (itemsError) throw itemsError;
         const items = (itemsRows || []) as BookingItemRow[];
 
+        // Fetch cafe
         let cafe: CafeRow | null = null;
         if (booking.cafe_id) {
           const { data: cafeRow, error: cafeError } = await supabase
@@ -144,11 +118,7 @@ export default function BookingDetailsPage() {
             .eq("id", booking.cafe_id)
             .maybeSingle<CafeRow>();
 
-          if (cafeError) {
-            console.error("[BookingDetails] cafeError:", cafeError);
-            throw cafeError;
-          }
-          cafe = cafeRow ?? null;
+          if (!cafeError) cafe = cafeRow ?? null;
         }
 
         if (!cancelled) {
@@ -159,9 +129,9 @@ export default function BookingDetailsPage() {
           });
         }
       } catch (err) {
-        console.error("Error loading booking details:", err);
+        console.error("Error loading booking:", err);
         if (!cancelled) {
-          setErrorMsg("Could not load booking details. Please try again.");
+          setErrorMsg("Could not load booking details.");
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -175,7 +145,7 @@ export default function BookingDetailsPage() {
     };
   }, [bookingId]);
 
-  // Helpers
+  // Memoized values
   const formattedDate = useMemo(() => {
     if (!data?.booking_date) return "Date not set";
     try {
@@ -218,18 +188,44 @@ export default function BookingDetailsPage() {
     return "Online";
   }, [data?.source]);
 
-  async function handleCancelBooking() {
-    if (!data || !bookingId) return;
-    if (!canCancel) return;
+  // Status info - BLACK/RED THEME
+  const getStatusInfo = (status?: string | null) => {
+    const value = (status || "confirmed").toLowerCase();
+    
+    if (value === "cancelled") {
+      return {
+        label: "CANCELLED",
+        bg: "rgba(239, 68, 68, 0.15)",
+        color: "#ef4444",
+        icon: <XCircle className="w-4 h-4" />,
+      };
+    }
+    if (value === "pending") {
+      return {
+        label: "PENDING",
+        bg: "rgba(255, 166, 0, 0.15)",
+        color: "#ffa600",
+        icon: <Loader2 className="w-4 h-4 animate-spin" />,
+      };
+    }
+    return {
+      label: "CONFIRMED",
+      bg: "rgba(0, 255, 0, 0.15)",
+      color: "#00ff00",
+      icon: <CheckCircle className="w-4 h-4" />,
+    };
+  };
 
-    const ok = window.confirm(
-      "Are you sure you want to cancel this booking? This cannot be undone."
-    );
-    if (!ok) return;
+  const statusInfo = getStatusInfo(data?.status);
+
+  // Handle cancel booking
+  const handleCancelBooking = async () => {
+    if (!data || !bookingId || !canCancel) return;
+    
+    if (!window.confirm("Cancel this booking? This cannot be undone.")) return;
 
     try {
       setIsCancelling(true);
-
       const { error } = await supabase
         .from("bookings")
         .update({
@@ -239,981 +235,312 @@ export default function BookingDetailsPage() {
         .eq("id", bookingId);
 
       if (error) throw error;
-
-      setData((prev) =>
-        prev
-          ? { ...prev, status: "cancelled" }
-          : prev
-      );
+      
+      setData(prev => prev ? { ...prev, status: "cancelled" } : prev);
     } catch (err) {
-      console.error("Error cancelling booking:", err);
-      alert("Could not cancel booking. Please try again.");
+      console.error("Cancel error:", err);
+      alert("Failed to cancel booking.");
     } finally {
       setIsCancelling(false);
     }
-  }
+  };
 
-  function getStatusInfo(status?: string | null) {
-    const value = (status || "confirmed").toLowerCase();
-    
-    if (value === "cancelled") {
-      return {
-        label: "CANCELLED",
-        bg: "rgba(239, 68, 68, 0.15)",
-        border: "rgba(239, 68, 68, 0.3)",
-        color: "#ef4444",
-        icon: <XCircle className="w-4 h-4" />,
-      };
-    }
-    if (value === "pending") {
-      return {
-        label: "PENDING",
-        bg: "rgba(245, 158, 11, 0.15)",
-        border: "rgba(245, 158, 11, 0.3)",
-        color: "#f59e0b",
-        icon: <AlertCircle className="w-4 h-4" />,
-      };
-    }
-    return {
-      label: "CONFIRMED",
-      bg: "rgba(34, 197, 94, 0.15)",
-      border: "rgba(34, 197, 94, 0.3)",
-      color: "#22c55e",
-      icon: <CheckCircle className="w-4 h-4" />,
-    };
-  }
-
-  // Loading state
+  // Loading state - BLACK THEME
   if (loading) {
     return (
-      <div className="loading-container">
-        <Loader2 className="loading-spinner" />
-        <p className="loading-text">Loading booking details...</p>
-        <style jsx global>{`
-          .loading-container {
-            min-height: 100vh;
-            background: linear-gradient(180deg, ${colors.dark} 0%, #0a0a10 100%);
-            font-family: ${fonts.body};
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-          }
-          .loading-spinner {
-            width: 48px;
-            height: 48px;
-            color: ${colors.cyan};
-            animation: spin 1s linear infinite;
-          }
-          .loading-text {
-            margin-top: 16px;
-            color: ${colors.textSecondary};
-            font-size: 14px;
-          }
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <Gamepad2 className="w-16 h-16 text-red-500 mx-auto mb-6 animate-pulse" />
+          <p className="text-gray-400 text-sm font-medium">Loading your gaming ticket...</p>
+        </div>
       </div>
     );
   }
 
-  // Error state
+  // Error state - BLACK/RED THEME
   if (errorMsg || !data) {
     return (
-      <div className="error-container">
-        <AlertCircle className="error-icon" />
-        <h1 className="error-title">Booking Not Found</h1>
-        <p className="error-message">
-          {errorMsg ?? "This booking doesn't exist or has been removed."}
-        </p>
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="error-button"
-        >
-          Go to Dashboard
-        </button>
-        <style jsx global>{`
-          .error-container {
-            min-height: 100vh;
-            background: linear-gradient(180deg, ${colors.dark} 0%, #0a0a10 100%);
-            font-family: ${fonts.body};
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-          }
-          .error-icon {
-            width: 64px;
-            height: 64px;
-            color: ${colors.red};
-            margin-bottom: 20px;
-          }
-          .error-title {
-            font-family: ${fonts.heading};
-            font-size: 20px;
-            color: ${colors.red};
-            margin-bottom: 12px;
-          }
-          .error-message {
-            color: ${colors.textSecondary};
-            font-size: 14px;
-            margin-bottom: 24px;
-            max-width: 300px;
-          }
-          .error-button {
-            padding: 14px 28px;
-            background: linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-family: ${fonts.heading};
-            font-size: 13px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-          }
-        `}</style>
+      <div className="min-h-screen bg-black flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <XCircle className="w-20 h-20 text-red-500 mx-auto mb-6" />
+          <h1 className="text-2xl font-bold text-white mb-3">Booking Not Found</h1>
+          <p className="text-gray-400 mb-8">{errorMsg || "This booking doesn't exist."}</p>
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg font-semibold hover:opacity-90 transition"
+          >
+            Go to Dashboard
+          </button>
+        </div>
       </div>
     );
   }
 
-  const statusInfo = getStatusInfo(data.status);
-
   return (
-    <>
-      <style jsx global>{`
-        .booking-details-page {
-          min-height: 100vh;
-          background: linear-gradient(180deg, ${colors.dark} 0%, #0a0a10 100%);
-          font-family: ${fonts.body};
-          color: ${colors.textPrimary};
-          position: relative;
-        }
-
-        .background-glow {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: radial-gradient(ellipse at 20% 0%, rgba(255, 7, 58, 0.06) 0%, transparent 50%),
-                      radial-gradient(ellipse at 80% 100%, rgba(0, 240, 255, 0.04) 0%, transparent 50%);
-          pointer-events: none;
-          z-index: 0;
-        }
-
-        .booking-container {
-          max-width: 600px;
-          margin: 0 auto;
-          padding: 20px 16px 40px;
-          position: relative;
-          z-index: 1;
-        }
-
-        /* Header */
-        .booking-header {
-          margin-bottom: 24px;
-        }
-
-        .back-button {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          background: none;
-          border: none;
-          color: ${colors.textSecondary};
-          font-size: 14px;
-          cursor: pointer;
-          padding: 0;
-          margin-bottom: 16px;
-        }
-
-        .header-top {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 8px;
-        }
-
-        .booking-id-label {
-          font-size: 12px;
-          color: ${colors.cyan};
-          text-transform: uppercase;
-          letter-spacing: 2px;
-          margin-bottom: 4px;
-        }
-
-        .booking-id-value {
-          font-family: ${fonts.heading};
-          font-size: 20px;
-          font-weight: 700;
-          color: ${colors.textPrimary};
-          margin: 0;
-        }
-
-        .status-badge {
-          padding: 8px 16px;
-          border-radius: 20px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          font-size: 12px;
-          font-weight: 600;
-          letter-spacing: 0.5px;
-        }
-
-        /* Session Badge */
-        .session-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 10px 16px;
-          border-radius: 10px;
-          margin-bottom: 20px;
-        }
-
-        .session-badge.upcoming {
-          background: rgba(0, 240, 255, 0.1);
-          border: 1px solid rgba(0, 240, 255, 0.2);
-        }
-
-        .session-badge.past {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid ${colors.border};
-        }
-
-        .session-badge-text {
-          font-size: 13px;
-          font-weight: 500;
-        }
-
-        /* Ticket Card */
-        .ticket-card {
-          background: linear-gradient(180deg, #1a1a1a 0%, ${colors.darkCard} 100%);
-          border-radius: 16px;
-          margin-bottom: 16px;
-          position: relative;
-          overflow: hidden;
-          border: 2px dashed ${colors.border};
-          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-        }
-
-        .ticket-header {
-          background: linear-gradient(90deg, ${colors.red} 0%, ${colors.cyan} 100%);
-          padding: 4px 0;
-          position: relative;
-        }
-
-        .ticket-body {
-          padding: 24px 20px;
-        }
-
-        .venue-section {
-          text-align: center;
-          margin-bottom: 24px;
-        }
-
-        .venue-icon {
-          font-size: 56px;
-          margin-bottom: 12px;
-          color: ${colors.cyan};
-        }
-
-        .venue-name {
-          font-size: 20px;
-          font-weight: 800;
-          color: ${colors.textPrimary};
-          margin: 0 0 8px 0;
-          font-family: ${fonts.heading};
-          letter-spacing: 1px;
-        }
-
-        .venue-type {
-          display: inline-block;
-          padding: 4px 12px;
-          background: linear-gradient(135deg, ${colors.red}30 0%, ${colors.cyan}30 100%);
-          border-radius: 20px;
-          font-size: 11px;
-          color: ${colors.cyan};
-          font-weight: 700;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        /* Ticket Divider */
-        .ticket-divider {
-          position: relative;
-          height: 1px;
-          background: linear-gradient(90deg, ${colors.border} 0%, ${colors.border} 100%);
-          margin: 0 -20px 24px -20px;
-        }
-
-        .ticket-hole {
-          position: absolute;
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: ${colors.dark};
-          border: 1px solid ${colors.border};
-          top: -9px;
-        }
-
-        .ticket-hole.left {
-          left: -10px;
-        }
-
-        .ticket-hole.right {
-          right: -10px;
-        }
-
-        /* Details Grid */
-        .details-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
-          margin-bottom: 24px;
-        }
-
-        .detail-item {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .detail-label {
-          font-size: 10px;
-          color: ${colors.textMuted};
-          text-transform: uppercase;
-          letter-spacing: 1.5px;
-          margin-bottom: 6px;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .detail-value {
-          font-size: 16px;
-          font-weight: 700;
-          color: ${colors.textPrimary};
-        }
-
-        .detail-value.time {
-          color: ${colors.cyan};
-        }
-
-        /* Social Links */
-        .social-section {
-          margin-bottom: 20px;
-        }
-
-        .social-label {
-          font-size: 10px;
-          color: ${colors.textMuted};
-          text-transform: uppercase;
-          letter-spacing: 1.5px;
-          margin-bottom: 12px;
-          font-weight: 600;
-          text-align: center;
-        }
-
-        .social-grid {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 10px;
-        }
-
-        .social-link {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-          padding: 12px;
-          border-radius: 10px;
-          text-decoration: none;
-          transition: all 0.2s ease;
-        }
-
-        .social-link.maps {
-          background: #4285F4;
-          color: white;
-        }
-
-        .social-link.instagram {
-          background: #E1306C;
-          color: white;
-        }
-
-        .social-link:hover {
-          transform: scale(1.05);
-        }
-
-        .social-link-text {
-          font-size: 12px;
-          font-weight: 700;
-        }
-
-        /* Review Banner */
-        .review-banner {
-          padding: 12px;
-          background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(34, 197, 94, 0.05) 100%);
-          border-radius: 10px;
-          border: 1px solid rgba(34, 197, 94, 0.3);
-          text-align: center;
-        }
-
-        .review-stars {
-          font-size: 16px;
-          margin-bottom: 4px;
-          color: #fbbf24;
-        }
-
-        .review-text {
-          font-size: 11px;
-          color: ${colors.textMuted};
-          line-height: 1.4;
-        }
-
-        .review-text strong {
-          color: #22c55e;
-        }
-
-        /* Tickets Section */
-        .tickets-section {
-          background: ${colors.darkCard};
-          border: 1px solid ${colors.border};
-          border-radius: 16px;
-          padding: 20px;
-          margin-bottom: 20px;
-        }
-
-        .section-title {
-          font-size: 12px;
-          color: ${colors.textMuted};
-          text-transform: uppercase;
-          letterSpacing: 1.5px;
-          margin-bottom: 16px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .tickets-list {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .ticket-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 14px 16px;
-          background: rgba(255, 255, 255, 0.03);
-          border-radius: 12px;
-          border: 1px solid ${colors.border};
-        }
-
-        .ticket-info {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .ticket-icon {
-          color: ${colors.cyan};
-        }
-
-        .ticket-details {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .ticket-name {
-          font-size: 14px;
-          font-weight: 600;
-          color: ${colors.textPrimary};
-          margin-bottom: 2px;
-        }
-
-        .ticket-quantity {
-          font-size: 12px;
-          color: ${colors.textMuted};
-        }
-
-        .ticket-price {
-          font-family: ${fonts.heading};
-          font-size: 16px;
-          font-weight: 600;
-          color: ${colors.cyan};
-        }
-
-        /* Payment Summary */
-        .payment-summary {
-          background: ${colors.darkCard};
-          border: 1px solid ${colors.border};
-          border-radius: 16px;
-          padding: 20px;
-          margin-bottom: 20px;
-        }
-
-        .payment-card {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 16px;
-          background: rgba(34, 197, 94, 0.08);
-          border-radius: 12px;
-          border: 1px solid rgba(34, 197, 94, 0.15);
-        }
-
-        .payment-info {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .payment-label {
-          font-size: 12px;
-          color: ${colors.textMuted};
-          margin-bottom: 4px;
-        }
-
-        .payment-amount {
-          font-family: ${fonts.heading};
-          font-size: 28px;
-          font-weight: 700;
-          color: ${colors.textPrimary};
-        }
-
-        .payment-status {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          padding: 8px 14px;
-          background: rgba(34, 197, 94, 0.15);
-          border-radius: 8px;
-        }
-
-        .payment-status-text {
-          font-size: 12px;
-          color: #22c55e;
-          font-weight: 600;
-        }
-
-        /* Info Banner */
-        .info-banner {
-          background: rgba(0, 240, 255, 0.05);
-          border: 1px solid rgba(0, 240, 255, 0.15);
-          border-radius: 12px;
-          padding: 14px 16px;
-          margin-bottom: 24px;
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-        }
-
-        .info-content {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .info-text {
-          font-size: 13px;
-          color: ${colors.textSecondary};
-          line-height: 1.5;
-          margin: 0;
-        }
-
-        .info-date {
-          font-size: 11px;
-          color: ${colors.textMuted};
-          margin-top: 8px;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .primary-button {
-          padding: 16px 24px;
-          border: none;
-          border-radius: 14px;
-          color: ${colors.dark};
-          font-family: ${fonts.heading};
-          font-size: 14px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .primary-button.blue {
-          background: linear-gradient(135deg, ${colors.cyan} 0%, #0891b2 100%);
-          box-shadow: 0 8px 32px rgba(0, 240, 255, 0.4);
-        }
-
-        .primary-button.blue:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 12px 40px rgba(0, 240, 255, 0.6);
-        }
-
-        .secondary-button {
-          padding: 16px 24px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid ${colors.border};
-          border-radius: 14px;
-          color: ${colors.textPrimary};
-          font-family: ${fonts.heading};
-          font-size: 14px;
-          font-weight: 600;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          text-decoration: none;
-          transition: all 0.2s ease;
-        }
-
-        .secondary-button:hover {
-          background: rgba(255, 255, 255, 0.08);
-          transform: translateY(-2px);
-        }
-
-        .cancel-button {
-          padding: 14px 24px;
-          background: rgba(239, 68, 68, 0.1);
-          border: 1px solid rgba(239, 68, 68, 0.3);
-          border-radius: 12px;
-          color: #ef4444;
-          font-family: ${fonts.body};
-          font-size: 13px;
-          font-weight: 600;
-          cursor: pointer;
-          margin-top: 8px;
-          transition: all 0.2s ease;
-        }
-
-        .cancel-button:hover:not(:disabled) {
-          background: rgba(239, 68, 68, 0.15);
-        }
-
-        .cancel-button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 480px) {
-          .booking-container {
-            padding: 16px 12px 32px;
-          }
-
-          .details-grid {
-            grid-template-columns: 1fr;
-            gap: 16px;
-          }
-
-          .social-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .ticket-card {
-            margin: 0 -12px;
-            border-radius: 12px;
-          }
-
-          .ticket-body {
-            padding: 20px 16px;
-          }
-
-          .venue-icon {
-            font-size: 48px;
-          }
-
-          .venue-name {
-            font-size: 18px;
-          }
-
-          .primary-button,
-          .secondary-button {
-            padding: 14px 20px;
-            font-size: 13px;
-          }
-        }
-
-        @media (min-width: 640px) {
-          .booking-container {
-            padding: 24px 20px 48px;
-          }
-        }
-      `}</style>
-
-      <div className="booking-details-page">
-        {/* Background glow */}
-        <div className="background-glow" />
-
-        <div className="booking-container">
-          {/* Header */}
-          <header className="booking-header">
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="back-button"
+    <div className="min-h-screen bg-black text-white">
+      {/* Background Effects - BLACK/RED GRADIENT */}
+      <div className="fixed inset-0 overflow-hidden">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-red-800/5 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+      </div>
+
+      <div className="relative max-w-4xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <button
+            onClick={() => router.back()}
+            className="flex items-center gap-2 text-gray-400 hover:text-red-400 transition"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm font-medium">Back</span>
+          </button>
+          
+          <div className="flex items-center gap-3">
+            <div 
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold"
+              style={{ background: statusInfo.bg, color: statusInfo.color }}
             >
-              <ArrowLeft className="w-5 h-5" />
-              Back to Dashboard
-            </button>
-
-            <div className="header-top">
-              <div>
-                <p className="booking-id-label">Booking Details</p>
-                <h1 className="booking-id-value">
-                  #{data.id.slice(0, 8).toUpperCase()}
-                </h1>
-              </div>
-
-              {/* Status Badge */}
-              <div 
-                className="status-badge"
-                style={{
-                  background: statusInfo.bg,
-                  border: `1px solid ${statusInfo.border}`,
-                  color: statusInfo.color,
-                }}
-              >
-                {statusInfo.icon}
-                <span>{statusInfo.label}</span>
-              </div>
+              {statusInfo.icon}
+              {statusInfo.label}
             </div>
-          </header>
+          </div>
+        </div>
 
-          {/* Upcoming/Past Badge */}
-          {data.status?.toLowerCase() !== "cancelled" && (
-            <div className={`session-badge ${isUpcoming ? 'upcoming' : 'past'}`}>
-              {isUpcoming ? (
-                <>
-                  <Calendar className="w-4 h-4" />
-                  <span className="session-badge-text">Upcoming Session</span>
-                </>
-              ) : (
-                <>
-                  <History className="w-4 h-4" />
-                  <span className="session-badge-text">Past Session</span>
-                </>
-              )}
-            </div>
+        {/* Booking ID */}
+        <div className="mb-8">
+          <p className="text-red-400 text-sm font-semibold uppercase tracking-wider mb-2">
+            Booking Details
+          </p>
+          <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-red-400 to-red-600 bg-clip-text text-transparent">
+            #{data.id.slice(0, 8).toUpperCase()}
+          </h1>
+        </div>
+
+        {/* Session Badge - BLACK/RED */}
+        <div className={`flex items-center gap-3 px-5 py-3 rounded-2xl mb-8 ${
+          isUpcoming 
+            ? 'bg-gradient-to-r from-red-500/10 to-red-700/10 border border-red-500/20' 
+            : 'bg-gray-900/50 border border-gray-800'
+        }`}>
+          {isUpcoming ? (
+            <>
+              <Calendar className="w-5 h-5 text-red-400" />
+              <span className="font-semibold text-red-400">Upcoming Session</span>
+              <Sparkles className="w-4 h-4 text-red-400 ml-auto" />
+            </>
+          ) : (
+            <>
+              <History className="w-5 h-5 text-gray-400" />
+              <span className="font-semibold text-gray-400">Past Session</span>
+            </>
           )}
+        </div>
 
-          {/* Ticket-Style Card */}
-          <section className="ticket-card">
-            {/* Ticket Header Bar */}
-            <div className="ticket-header" />
-
-            {/* Main Ticket Body */}
-            <div className="ticket-body">
-              {/* Venue Name & Icon */}
-              <div className="venue-section">
-                <div className="venue-icon">
-                  <Gamepad2 className="w-full h-full" />
-                </div>
-                <h2 className="venue-name">
-                  {data.cafe?.name ?? "Gaming Café"}
+        {/* Main Card - BLACK/RED THEME */}
+        <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 overflow-hidden mb-8 shadow-2xl">
+          {/* Card Header */}
+          <div className="p-6 md:p-8">
+            <div className="flex flex-col md:flex-row md:items-center gap-6 mb-8">
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center">
+                <Gamepad2 className="w-10 h-10 text-white" />
+              </div>
+              
+              <div className="flex-1">
+                <h2 className="text-2xl font-bold mb-2">
+                  {data.cafe?.name || "Gaming Cafe"}
                 </h2>
-                <div className="venue-type">
-                  Gaming Session
-                </div>
-              </div>
-
-              {/* Divider with circles */}
-              <div className="ticket-divider">
-                <div className="ticket-hole left" />
-                <div className="ticket-hole right" />
-              </div>
-
-              {/* Ticket Details Grid */}
-              <div className="details-grid">
-                {/* Date */}
-                <div className="detail-item">
-                  <div className="detail-label">
-                    <Calendar className="w-3 h-3" />
-                    Date
-                  </div>
-                  <div className="detail-value">
-                    {formattedDate}
-                  </div>
-                </div>
-
-                {/* Time */}
-                <div className="detail-item">
-                  <div className="detail-label">
-                    <Clock className="w-3 h-3" />
-                    Time
-                  </div>
-                  <div className="detail-value time">
-                    {data.start_time || "Time not set"}
-                  </div>
-                </div>
-
-                {/* Duration */}
-                {data.duration && (
-                  <div className="detail-item">
-                    <div className="detail-label">
-                      <Clock className="w-3 h-3" />
-                      Duration
-                    </div>
-                    <div className="detail-value">
-                      {data.duration} minutes
-                    </div>
+                {data.cafe?.address && (
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <MapPin className="w-4 h-4" />
+                    <span className="text-sm">{data.cafe.address}</span>
                   </div>
                 )}
-
-                {/* Booking Source */}
-                <div className="detail-item">
-                  <div className="detail-label">
-                    <Hash className="w-3 h-3" />
-                    Source
-                  </div>
-                  <div className="detail-value">
-                    {bookingSource}
-                  </div>
-                </div>
-              </div>
-
-              {/* Social Links */}
-              {data.cafe && (data.cafe.google_maps_url || data.cafe.instagram_url) && (
-                <div className="social-section">
-                  <div className="social-label">
-                    Stay Connected
-                  </div>
-                  <div className="social-grid">
-                    {data.cafe.google_maps_url && (
-                      <a
-                        href={data.cafe.google_maps_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="social-link maps"
-                      >
-                        <MapPin className="w-4 h-4" />
-                        <span className="social-link-text">Google Maps</span>
-                      </a>
-                    )}
-
-                    {data.cafe.instagram_url && (
-                      <a
-                        href={data.cafe.instagram_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="social-link instagram"
-                      >
-                        <Instagram className="w-4 h-4" />
-                        <span className="social-link-text">Instagram</span>
-                      </a>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Review Banner */}
-              <div className="review-banner">
-                <div className="review-stars">
-                  <Star className="w-4 h-4 inline" />
-                  <Star className="w-4 h-4 inline" />
-                  <Star className="w-4 h-4 inline" />
-                  <Star className="w-4 h-4 inline" />
-                  <Star className="w-4 h-4 inline" />
-                </div>
-                <div className="review-text">
-                  <strong>Love it?</strong> Leave a review and help other gamers!
+                <div className="flex flex-wrap gap-2 mt-3">
+                  <span className="px-3 py-1 bg-red-500/10 text-red-400 text-xs font-semibold rounded-full">
+                    Premium Gaming
+                  </span>
+                  <span className="px-3 py-1 bg-red-800/10 text-red-300 text-xs font-semibold rounded-full">
+                    High Performance
+                  </span>
                 </div>
               </div>
             </div>
-          </section>
 
-          {/* Tickets Section */}
-          <section className="tickets-section">
-            <h3 className="section-title">
-              <Ticket className="w-4 h-4" />
-              Tickets ({totalTickets})
-            </h3>
+            {/* Divider - RED THEME */}
+            <div className="h-px bg-gradient-to-r from-transparent via-red-800/50 to-transparent my-8"></div>
 
-            {data.items.length === 0 ? (
-              <p style={{ fontSize: "13px", color: colors.textSecondary }}>
-                No ticket details available.
+            {/* Details Grid - BLACK/RED */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="bg-gray-900/70 p-5 rounded-2xl border border-gray-800">
+                <div className="flex items-center gap-3 text-gray-400 mb-2">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Date</span>
+                </div>
+                <p className="text-xl font-bold">{formattedDate}</p>
+              </div>
+
+              <div className="bg-gray-900/70 p-5 rounded-2xl border border-gray-800">
+                <div className="flex items-center gap-3 text-gray-400 mb-2">
+                  <Clock className="w-4 h-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Time</span>
+                </div>
+                <p className="text-xl font-bold text-red-400">
+                  {data.start_time || "Time not set"}
+                  {data.duration && ` • ${data.duration} min`}
+                </p>
+              </div>
+
+              <div className="bg-gray-900/70 p-5 rounded-2xl border border-gray-800">
+                <div className="flex items-center gap-3 text-gray-400 mb-2">
+                  <Hash className="w-4 h-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Source</span>
+                </div>
+                <p className="text-xl font-bold">{bookingSource}</p>
+              </div>
+
+              <div className="bg-gray-900/70 p-5 rounded-2xl border border-gray-800">
+                <div className="flex items-center gap-3 text-gray-400 mb-2">
+                  <Ticket className="w-4 h-4" />
+                  <span className="text-xs font-semibold uppercase tracking-wider">Tickets</span>
+                </div>
+                <p className="text-xl font-bold">{totalTickets} {totalTickets === 1 ? 'Ticket' : 'Tickets'}</p>
+              </div>
+            </div>
+
+            {/* Social Links - BLACK/RED */}
+            {(data.cafe?.google_maps_url || data.cafe?.instagram_url) && (
+              <div className="mb-8">
+                <p className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-4">
+                  Connect With Venue
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  {data.cafe.google_maps_url && (
+                    <a
+                      href={data.cafe.google_maps_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-red-700 to-red-900 rounded-xl hover:opacity-90 transition"
+                    >
+                      <MapPin className="w-5 h-5" />
+                      <span className="font-semibold">Google Maps</span>
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  )}
+                  
+                  {data.cafe.instagram_url && (
+                    <a
+                      href={data.cafe.instagram_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-5 py-3 bg-gradient-to-r from-red-600 to-pink-700 rounded-xl hover:opacity-90 transition"
+                    >
+                      <Instagram className="w-5 h-5" />
+                      <span className="font-semibold">Instagram</span>
+                      <ExternalLink className="w-4 h-4 ml-2" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Review Section - BLACK/GREEN */}
+            <div className="bg-gradient-to-r from-green-500/10 to-green-700/10 border border-green-500/20 rounded-2xl p-6">
+              <div className="flex items-center gap-2 mb-3">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />
+                ))}
+              </div>
+              <p className="text-gray-300">
+                <span className="font-semibold text-green-400">Enjoyed your session?</span>{' '}
+                Leave a review and help other gamers!
               </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Tickets Section - BLACK/RED */}
+        <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 p-6 md:p-8 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <Ticket className="w-6 h-6 text-red-400" />
+              <h3 className="text-xl font-bold">Your Tickets</h3>
+            </div>
+            <span className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-800 rounded-full text-sm font-bold">
+              {totalTickets} Total
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            {data.items.length === 0 ? (
+              <p className="text-gray-400 text-center py-8">No ticket details available.</p>
             ) : (
-              <div className="tickets-list">
-                {data.items.map((item) => (
-                  <div
-                    key={item.id ?? `${item.ticket_id}-${item.console}`}
-                    className="ticket-item"
-                  >
-                    <div className="ticket-info">
-                      <div className="ticket-icon">
-                        {consoleIcons[item.console || "ps5"] || <Gamepad2 className="w-6 h-6" />}
+              data.items.map((item) => (
+                <div
+                  key={item.id || `${item.ticket_id}-${item.console}`}
+                  className="bg-gray-900/70 p-5 rounded-2xl border border-gray-800 hover:border-red-500/30 transition"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-red-500/20 to-red-800/20 flex items-center justify-center">
+                        <Gamepad2 className="w-6 h-6 text-red-400" />
                       </div>
-                      <div className="ticket-details">
-                        <p className="ticket-name">
-                          {item.title ?? "Ticket"}
-                        </p>
-                        <p className="ticket-quantity">
-                          {item.quantity ?? 0} × ₹{item.price ?? 0}
+                      <div>
+                        <h4 className="font-bold">{item.title || "Gaming Session"}</h4>
+                        <p className="text-gray-400 text-sm">
+                          {item.quantity} × ₹{item.price}
                         </p>
                       </div>
                     </div>
-                    <p className="ticket-price">
-                      ₹{(item.price ?? 0) * (item.quantity ?? 0)}
-                    </p>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-red-400">
+                        ₹{(item.price ?? 0) * (item.quantity ?? 0)}
+                      </p>
+                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))
             )}
-          </section>
+          </div>
+        </div>
 
-          {/* Payment Summary */}
-          <section className="payment-summary">
-            <h3 className="section-title">
-              <CreditCard className="w-4 h-4" />
-              Payment Summary
-            </h3>
+        {/* Payment Section - BLACK/RED */}
+        <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 p-6 md:p-8 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <CreditCard className="w-6 h-6 text-red-400" />
+            <h3 className="text-xl font-bold">Payment Summary</h3>
+          </div>
 
-            <div className="payment-card">
-              <div className="payment-info">
-                <p className="payment-label">Total Amount Paid</p>
-                <p className="payment-amount">
-                  ₹{data.total_amount ?? 0}
+          <div className="bg-gradient-to-r from-green-500/10 to-green-700/10 border border-green-500/20 rounded-2xl p-6">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div>
+                <p className="text-gray-400 text-sm font-semibold uppercase tracking-wider mb-2">
+                  Total Amount Paid
+                </p>
+                <p className="text-4xl font-bold">
+                  ₹{data.total_amount || 0}
                 </p>
               </div>
-              <div className="payment-status">
-                <CheckCircle className="w-4 h-4" />
-                <span className="payment-status-text">Paid</span>
+              <div className="flex items-center gap-3 px-6 py-3 bg-green-500/20 rounded-full border border-green-500/30">
+                <ShieldCheck className="w-5 h-5 text-green-400" />
+                <span className="font-semibold text-green-400">Payment Secured</span>
               </div>
             </div>
-          </section>
+          </div>
+        </div>
 
-          {/* Booking Info */}
-          <section className="info-banner">
-            <Info className="w-5 h-5 text-cyan-400" />
-            <div className="info-content">
-              <p className="info-text">
+        {/* Info Section - BLACK/RED */}
+        <div className="bg-gradient-to-br from-red-500/10 to-red-700/10 backdrop-blur-xl rounded-3xl border border-red-500/20 p-6 md:p-8 mb-8">
+          <div className="flex items-start gap-4">
+            <Info className="w-6 h-6 text-red-400 mt-1" />
+            <div>
+              <p className="text-lg mb-2">
                 {isUpcoming 
-                  ? "Show this booking at the venue. Arrive 5 minutes early for the best experience!"
-                  : "Thank you for gaming with us! We hope you had a great time."
+                  ? "🎮 Show this booking at the venue. Arrive 5 minutes early for the best experience!"
+                  : "🎉 Thank you for gaming with us! Hope you had an epic time."
                 }
               </p>
-              <p className="info-date">
+              <p className="text-gray-400 text-sm">
                 Booked on: {new Date(data.created_at || "").toLocaleDateString("en-IN", {
                   day: "numeric",
                   month: "short",
@@ -1223,48 +550,101 @@ export default function BookingDetailsPage() {
                 })}
               </p>
             </div>
-          </section>
-
-          {/* Action Buttons */}
-          <div className="action-buttons">
-            <button
-              onClick={() => router.push("/dashboard")}
-              className="primary-button blue"
-            >
-              <Users className="w-5 h-5" />
-              View All Bookings
-            </button>
-
-            <Link
-              href="/"
-              className="secondary-button"
-            >
-              <Gamepad2 className="w-5 h-5" />
-              Book Another Session
-            </Link>
-
-            {canCancel && (
-              <button
-                onClick={handleCancelBooking}
-                disabled={isCancelling}
-                className="cancel-button"
-              >
-                {isCancelling ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin inline mr-2" />
-                    Cancelling...
-                  </>
-                ) : (
-                  <>
-                    <AlertTriangle className="w-4 h-4 inline mr-2" />
-                    Cancel Booking
-                  </>
-                )}
-              </button>
-            )}
           </div>
         </div>
+
+        {/* Action Buttons - BLACK/RED */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="px-6 py-4 bg-gradient-to-r from-red-600 to-red-800 rounded-xl font-bold text-lg hover:opacity-90 transition flex items-center justify-center gap-3"
+          >
+            <Users className="w-5 h-5" />
+            View All Bookings
+          </button>
+
+          <Link
+            href="/"
+            className="px-6 py-4 bg-gray-900 border border-gray-800 rounded-xl font-bold text-lg hover:bg-gray-800 transition flex items-center justify-center gap-3 text-center"
+          >
+            <Gamepad2 className="w-5 h-5" />
+            Book Another Session
+          </Link>
+
+          <button
+            onClick={() => navigator.clipboard.writeText(window.location.href)}
+            className="px-6 py-4 bg-gray-900 border border-gray-800 rounded-xl font-bold text-lg hover:bg-gray-800 transition flex items-center justify-center gap-3"
+          >
+            <Share2 className="w-5 h-5" />
+            Share Booking
+          </button>
+        </div>
+
+        {/* Cancel Button - BLACK/RED */}
+        {canCancel && (
+          <div className="text-center">
+            <button
+              onClick={handleCancelBooking}
+              disabled={isCancelling}
+              className="px-8 py-4 bg-gradient-to-r from-red-500/20 to-red-700/20 border border-red-500/30 text-red-400 rounded-xl font-bold text-lg hover:bg-red-500/30 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3 mx-auto"
+            >
+              {isCancelling ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  Cancelling...
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-5 h-5" />
+                  Cancel Booking
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
-    </>
+
+      {/* Add Tailwind styles - BLACK/RED THEME */}
+      <style jsx global>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+          font-family: 'Inter', sans-serif;
+          overflow-x: hidden;
+          background: black;
+        }
+        
+        /* Smooth animations */
+        * {
+          transition: all 0.3s ease;
+        }
+        
+        /* Custom scrollbar - RED THEME */
+        ::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+          background: linear-gradient(to bottom, #dc2626, #7f1d1d);
+          border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(to bottom, #ef4444, #991b1b);
+        }
+        
+        /* Gradient text utility - RED THEME */
+        .gradient-text {
+          background: linear-gradient(to right, #ef4444, #dc2626, #b91c1c);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+      `}</style>
+    </div>
   );
 }

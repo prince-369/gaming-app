@@ -12,7 +12,7 @@ import {
   Monitor,
   DollarSign,
   Car,
-  Telescope,
+  RectangleGoggles,
   Target,
   MonitorPlay,
   Zap,
@@ -707,7 +707,7 @@ function EquipmentIconsMobile({ cafe }: { cafe: Cafe }) {
     },
     { 
       key: "vr_count", 
-      icon: <Telescope className="mobile-icon-small" />, 
+      icon: <RectangleGoggles className="mobile-icon-small" />, 
       label: "VR",
       show: (((cafe as any)["vr_count"] as number | null) ?? 0) > 0 
     },

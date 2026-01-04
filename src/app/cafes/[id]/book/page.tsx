@@ -29,7 +29,7 @@ import {
   Monitor,
   Car,
   Target,
-  Telescope,
+  RectangleGoggles,
   Zap,
   AlertCircle,
   CheckCircle,
@@ -45,7 +45,13 @@ import {
   BadgeCheck,
   Sparkles,
   Crown,
-  DollarSign
+  IndianRupee,
+  Users,
+  CalendarDays,
+  CalendarRange,
+  CrownIcon as Crown2,
+  Ticket,
+  Rocket
 } from "lucide-react";
 
 // ============ TYPES ============
@@ -147,7 +153,7 @@ const CONSOLES: ConsoleOption[] = [
   { 
     id: "vr", 
     label: CONSOLE_LABELS.vr, 
-    icon: <Telescope className="w-5 h-5" />, 
+    icon: <RectangleGoggles className="w-5 h-5" />, 
     color: CONSOLE_COLORS.vr, 
     dbKey: CONSOLE_DB_KEYS.vr 
   },
@@ -794,56 +800,65 @@ export default function BookingPage() {
       <div className="booking-container">
         {/* Header */}
         <header className="booking-header">
-          <button
-            onClick={() => (step === 2 ? handleBackToDateTime() : router.back())}
-            className="back-button"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            {step === 2 ? "Change Date & Time" : "Back"}
-          </button>
-
-          <div className="header-top">
-            <p className="cafe-name">{cafeName}</p>
-
-            {(googleMapsUrl || instagramUrl) && (
-              <div className="social-links">
-                {googleMapsUrl && (
-                  <a
-                    href={googleMapsUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-button maps"
-                  >
-                    <MapPin className="w-4 h-4" />
-                  </a>
-                )}
-                {instagramUrl && (
-                  <a
-                    href={instagramUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-button instagram"
-                  >
-                    <Instagram className="w-4 h-4" />
-                  </a>
-                )}
-              </div>
-            )}
+          <div className="header-nav">
+            <button
+              onClick={() => (step === 2 ? handleBackToDateTime() : router.back())}
+              className="back-button"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              {step === 2 ? "Change Date & Time" : "Back"}
+            </button>
+            
+            <div className="social-links">
+              {googleMapsUrl && (
+                <a
+                  href={googleMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-button maps"
+                  title="View on Google Maps"
+                >
+                  <MapPin className="w-4 h-4" />
+                </a>
+              )}
+              {instagramUrl && (
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-button instagram"
+                  title="Follow on Instagram"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+              )}
+            </div>
           </div>
 
-          <h1 className="booking-title">
+          <div className="cafe-info">
+            <div className="cafe-icon">
+              <Gamepad2 className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="cafe-name">{cafeName}</h1>
+              <div className="cafe-tag">Premium Gaming Zone</div>
+            </div>
+          </div>
+
+          <h2 className="booking-title">
             {step === 1 ? "Select Date & Time" : "Choose Your Setup"}
-          </h1>
+          </h2>
 
           {/* Step indicator */}
           <div className="step-indicator">
             <div className="step">
-              <div className="step-label">Step 1: Date & Time</div>
-              <div className="step-bar active" />
+              <div className={`step-circle ${step >= 1 ? 'active' : ''}`}>1</div>
+              <div className={`step-label ${step >= 1 ? 'active' : ''}`}>Date & Time</div>
             </div>
+            <div className="step-connector" />
             <div className="step">
-              <div className={`step-label ${step === 2 ? "active" : ""}`}>Step 2: Consoles</div>
-              <div className={`step-bar ${step === 2 ? "active" : ""}`} />
+              <div className={`step-circle ${step >= 2 ? 'active' : ''}`}>2</div>
+              <div className={`step-label ${step >= 2 ? 'active' : ''}`}>Consoles</div>
             </div>
           </div>
         </header>
@@ -853,10 +868,10 @@ export default function BookingPage() {
           <>
             {/* Date Selection */}
             <section className="date-section">
-              <h2 className="section-heading">
-                <Calendar className="w-5 h-5" />
-                Select Date
-              </h2>
+              <div className="section-header">
+                <CalendarDays className="w-5 h-5" />
+                <h3>Select Date</h3>
+              </div>
 
               <div className="date-grid">
                 {DAY_OPTIONS.map((day) => {
@@ -866,13 +881,12 @@ export default function BookingPage() {
                       key={day.key}
                       onClick={() => setSelectedDate(day.key)}
                       className={`date-button ${isActive ? 'active' : ''}`}
-                      style={{ borderColor: isActive ? colors.red : colors.border }}
                     >
                       <div className={`day-name ${day.isToday ? 'today' : ''}`}>
-                        {day.isToday ? "TODAY" : day.dayName}
+                        {day.isToday ? "TODAY" : day.dayName.toUpperCase()}
                       </div>
                       <div className="day-number">{day.dayNum}</div>
-                      <div className="month">{day.month}</div>
+                      <div className="month">{day.month.toUpperCase()}</div>
                     </button>
                   );
                 })}
@@ -881,16 +895,16 @@ export default function BookingPage() {
 
             {/* Time Selection */}
             <section className="time-section">
-              <h2 className="section-heading">
+              <div className="section-header">
                 <Clock className="w-5 h-5" />
-                Select Time
-              </h2>
+                <h3>Select Time Slot</h3>
+              </div>
 
               {filteredTimeSlots.length === 0 ? (
                 <div className="no-slots">
-                  <AlertCircle className="w-12 h-12 mb-3 text-gray-400" />
-                  <p className="no-slots-title">No slots available for today</p>
-                  <p className="no-slots-subtitle">Please select another date</p>
+                  <CalendarRange className="w-16 h-16 mb-4 text-gray-500" />
+                  <h4>No Slots Available</h4>
+                  <p>Please select another date for booking</p>
                 </div>
               ) : (
                 <>
@@ -902,21 +916,23 @@ export default function BookingPage() {
                           key={slot.label}
                           onClick={() => setSelectedTime(slot.label)}
                           className={`time-button ${isActive ? 'active' : ''}`}
-                          style={{ borderColor: isActive ? colors.red : colors.border }}
                         >
                           <span className="time-label">{slot.label}</span>
                           {slot.isPeak && (
-                            <div className="peak-indicator" />
+                            <span className="peak-badge">
+                              <Zap className="w-3 h-3" />
+                              Peak
+                            </span>
                           )}
                         </button>
                       );
                     })}
                   </div>
 
-                  <p className="peak-note">
-                    <span className="peak-dot" />
-                    Peak hours (6 PM - 10 PM) may have higher demand
-                  </p>
+                  <div className="peak-info">
+                    <div className="peak-dot" />
+                    <span>Peak hours (6 PM - 10 PM) may have higher demand</span>
+                  </div>
                 </>
               )}
             </section>
@@ -927,102 +943,109 @@ export default function BookingPage() {
         {step === 2 && (
           <>
             {/* Selected Date/Time Summary */}
-            <div className="booking-summary">
-              <div className="summary-content">
-                <div className="summary-header">
+            <div className="booking-summary-card">
+              <div className="summary-header">
+                <div className="summary-icon">
+                  <Calendar className="w-6 h-6" />
+                </div>
+                <div className="summary-details">
+                  <h3>Selected Booking</h3>
                   <div className="summary-info">
-                    <div className="summary-label">Your Booking</div>
-                    <div className="summary-date">{dateLabel}</div>
-                    <div className="summary-time">
+                    <span className="summary-date">{dateLabel}</span>
+                    <span className="summary-time">
                       <Clock className="w-4 h-4" />
                       {selectedTime} - {getEndTime(selectedTime, selectedDuration)}
-                    </div>
+                    </span>
                   </div>
-                  <button
-                    onClick={handleBackToDateTime}
-                    className="change-button"
-                  >
-                    Change
-                  </button>
                 </div>
-
-                <div className="duration-badge">
-                  <Clock className="w-4 h-4" />
-                  <span>{selectedDuration === 30 ? "30 min" : selectedDuration === 60 ? "1 hour" : "1.5 hours"}</span>
-                </div>
+                <button
+                  onClick={handleBackToDateTime}
+                  className="change-button"
+                >
+                  Change
+                </button>
+              </div>
+              
+              <div className="duration-tag">
+                <Clock className="w-4 h-4" />
+                <span>{selectedDuration === 30 ? "30 min" : selectedDuration === 60 ? "1 hour" : "1.5 hours"}</span>
               </div>
             </div>
 
             {/* Duration Selector */}
-            <div className="duration-section">
-              <h2 className="section-heading">
+            <section className="duration-section">
+              <div className="section-header">
                 <Clock className="w-5 h-5" />
-                Select Duration
-              </h2>
+                <h3>Select Duration</h3>
+              </div>
+              
               <div className="duration-grid">
                 <button
                   onClick={() => { setSelectedDuration(30); setQuantities({}); }}
-                  className={`duration-button ${selectedDuration === 30 ? 'active' : ''}`}
+                  className={`duration-card ${selectedDuration === 30 ? 'active' : ''}`}
                 >
                   <div className="duration-number">30</div>
-                  <div className="duration-label">min</div>
+                  <div className="duration-label">MINUTES</div>
+                  <div className="duration-price">
+                    <IndianRupee className="w-3 h-3" />
+                    {Math.round(cafePrice * 0.5)}
+                  </div>
                 </button>
+                
                 <button
                   onClick={() => { setSelectedDuration(60); setQuantities({}); }}
-                  className={`duration-button ${selectedDuration === 60 ? 'active' : ''}`}
+                  className={`duration-card ${selectedDuration === 60 ? 'active' : ''}`}
                 >
                   <div className="duration-number">60</div>
-                  <div className="duration-label">min</div>
+                  <div className="duration-label">MINUTES</div>
+                  <div className="duration-price">
+                    <IndianRupee className="w-3 h-3" />
+                    {cafePrice}
+                  </div>
                 </button>
+                
                 <button
                   onClick={() => { setSelectedDuration(90); setQuantities({}); }}
-                  className={`duration-button premium ${selectedDuration === 90 ? 'active' : ''}`}
+                  className={`duration-card premium ${selectedDuration === 90 ? 'active' : ''}`}
                 >
-                  <Crown className="w-3 h-3 absolute top-2 right-2" />
+                  <Crown className="w-4 h-4 absolute top-3 right-3 text-yellow-400" />
                   <div className="duration-number">90</div>
-                  <div className="duration-label">min</div>
+                  <div className="duration-label">MINUTES</div>
+                  <div className="duration-price">
+                    <IndianRupee className="w-3 h-3" />
+                    {Math.round(cafePrice * 1.5)}
+                  </div>
+                  <div className="premium-badge">Popular</div>
                 </button>
               </div>
-            </div>
+            </section>
 
             {/* Live Availability Banner */}
-            <div className="availability-banner">
-              <div className="availability-info">
-                <div className="live-indicator" />
-                <span className="live-text">Live Availability</span>
-                <span className="live-note">(accounts for overlapping bookings)</span>
+            <div className="live-availability-banner">
+              <div className="live-badge">
+                <div className="live-dot" />
+                <span>LIVE AVAILABILITY</span>
               </div>
-              <div className="availability-actions">
-                {loadingAvailability && (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                )}
-                {lastUpdated && (
-                  <span className="update-time">
-                    Updated{" "}
-                    {lastUpdated.toLocaleTimeString("en-IN", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </span>
-                )}
+              <div className="live-info">
+                <span className="live-text">Real-time updates every 30 seconds</span>
                 <button
                   onClick={fetchLiveAvailability}
                   disabled={loadingAvailability}
-                  className="refresh-button"
+                  className="refresh-btn"
                 >
-                  <RefreshCw className="w-3 h-3" />
+                  <RefreshCw className={`w-4 h-4 ${loadingAvailability ? 'animate-spin' : ''}`} />
                 </button>
               </div>
             </div>
 
             {/* Console Selection */}
             <section className="console-section">
-              <h2 className="section-heading">
+              <div className="section-header">
                 <Gamepad2 className="w-5 h-5" />
-                Select Console
-              </h2>
+                <h3>Select Console Type</h3>
+              </div>
 
-              <div className="console-grid">
+              <div className="console-scroll">
                 {availableConsoles.map((consoleId) => {
                   const console = CONSOLES.find((c) => c.id === consoleId);
                   if (!console) return null;
@@ -1041,38 +1064,39 @@ export default function BookingPage() {
                       key={consoleId}
                       onClick={() => !isSoldOut && setSelectedConsole(consoleId)}
                       disabled={isSoldOut}
-                      className={`console-card ${isActive ? 'active' : ''} ${isSoldOut ? 'sold-out' : ''}`}
-                      style={{ 
-                        borderColor: isActive ? console.color : colors.border,
-                        background: isActive ? `linear-gradient(135deg, ${console.color}25 0%, ${console.color}10 100%)` : colors.darkCard
-                      }}
+                      className={`console-button ${isActive ? 'active' : ''} ${isSoldOut ? 'sold-out' : ''}`}
                     >
-                      <div className={`console-icon ${isSoldOut ? 'disabled' : ''}`}>
-                        {console.icon}
+                      <div className="console-icon-wrapper">
+                        <div className={`console-icon ${isSoldOut ? 'disabled' : ''}`}>
+                          {console.icon}
+                        </div>
+                        {mySelection > 0 && (
+                          <div className="selection-badge" style={{ background: console.color }}>
+                            {mySelection}
+                          </div>
+                        )}
                       </div>
-
-                      <div className="console-name" style={{ color: isActive ? console.color : colors.textPrimary }}>
-                        {console.label}
-                      </div>
-
+                      
+                      <div className="console-name">{console.label}</div>
+                      
                       <div className="console-price">
-                        <DollarSign className="w-3 h-3 inline" />
+                        <IndianRupee className="w-3 h-3" />
                         {selectedDuration === 90
-                          ? ((consolePricing[consoleId]?.qty1_60min ?? cafePrice) + (consolePricing[consoleId]?.qty1_30min ?? cafePrice * 0.5))
-                          : (consolePricing[consoleId]?.[`qty1_${selectedDuration}min` as keyof ConsolePricingTier] ?? (selectedDuration === 30 ? cafePrice * 0.5 : cafePrice))
+                          ? Math.round((consolePricing[consoleId]?.qty1_60min ?? cafePrice) + (consolePricing[consoleId]?.qty1_30min ?? cafePrice * 0.5))
+                          : Math.round(consolePricing[consoleId]?.[`qty1_${selectedDuration}min` as keyof ConsolePricingTier] ?? (selectedDuration === 30 ? cafePrice * 0.5 : cafePrice))
                         }
                       </div>
-
-                      <div className={`availability-badge ${isSoldOut ? 'sold-out' : isLowStock ? 'low-stock' : 'available'}`}>
-                        {isSoldOut ? "Sold Out" : `${availableSlots}/${totalSlots}`}
+                      
+                      <div className={`availability-status ${isSoldOut ? 'sold-out' : isLowStock ? 'low-stock' : 'available'}`}>
+                        {isSoldOut ? (
+                          <span className="status-text">SOLD OUT</span>
+                        ) : (
+                          <>
+                            <span className="status-dot" />
+                            <span className="status-text">{availableSlots} LEFT</span>
+                          </>
+                        )}
                       </div>
-
-                      {mySelection > 0 && (
-                        <div className="selected-indicator" style={{ background: `${console.color}30`, color: console.color }}>
-                          <CheckCircle className="w-3 h-3" />
-                          {mySelection}
-                        </div>
-                      )}
                     </button>
                   );
                 })}
@@ -1081,37 +1105,36 @@ export default function BookingPage() {
 
             {/* Ticket Cards */}
             <section className="tickets-section">
-              <div className="tickets-header">
-                <h2 className="section-heading">
-                  <CreditCard className="w-5 h-5" />
-                  Select Tickets
-                </h2>
-
-                {!atLimit && remainingForSelected > 0 && (
-                  <span className={`availability-text ${remainingForSelected <= 2 ? 'low' : 'high'}`}>
-                    {remainingForSelected} slot{remainingForSelected > 1 ? "s" : ""} available
-                  </span>
-                )}
+              <div className="section-header">
+                <Ticket className="w-5 h-5" />
+                <div className="section-title">
+                  <h3>Select Tickets</h3>
+                  {!atLimit && remainingForSelected > 0 && (
+                    <span className={`availability-counter ${remainingForSelected <= 2 ? 'low' : ''}`}>
+                      {remainingForSelected} slot{remainingForSelected > 1 ? "s" : ""} remaining
+                    </span>
+                  )}
+                </div>
               </div>
 
               {atLimit && usedForSelected === 0 ? (
-                <div className="sold-out-card">
-                  <AlertCircle className="w-10 h-10 mb-3 text-red-500" />
-                  <p className="sold-out-title">Sold Out for This Time Slot</p>
-                  <p className="sold-out-subtitle">
-                    All {CONSOLE_LABELS[selectedConsole]} setups are booked for{" "}
-                    {selectedTime} - {getEndTime(selectedTime)}.
-                  </p>
-                  {liveAvailability[selectedConsole]?.nextAvailableAt && (
-                    <div className="next-available">
-                      <Clock className="w-4 h-4" />
-                      <span>Available from {liveAvailability[selectedConsole]?.nextAvailableAt}</span>
-                    </div>
-                  )}
-                  <p className="sold-out-hint">Try selecting a different time or console.</p>
+                <div className="sold-out-message">
+                  <div className="sold-out-icon">
+                    <AlertCircle className="w-8 h-8" />
+                  </div>
+                  <div className="sold-out-content">
+                    <h4>Fully Booked!</h4>
+                    <p>All {CONSOLE_LABELS[selectedConsole]} setups are booked for this time slot.</p>
+                    {liveAvailability[selectedConsole]?.nextAvailableAt && (
+                      <div className="next-available">
+                        <Clock className="w-4 h-4" />
+                        <span>Available from {liveAvailability[selectedConsole]?.nextAvailableAt}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <div className="tickets-list">
+                <div className="tickets-grid">
                   {tickets.map((ticket) => {
                     const qty = getQty(ticket.id);
                     const hasQty = qty > 0;
@@ -1119,38 +1142,50 @@ export default function BookingPage() {
 
                     return (
                       <div key={ticket.id} className={`ticket-card ${hasQty ? 'selected' : ''}`}>
-                        <div className="ticket-content">
-                          <div className="ticket-info">
-                            <div className="ticket-title">{ticket.title}</div>
-                            <div className="ticket-price">
-                              <DollarSign className="w-4 h-4 inline" />
-                              {ticket.price}
-                              <span className="price-unit">/hr</span>
-                            </div>
-                            <p className="ticket-description">{ticket.description}</p>
+                        <div className="ticket-header">
+                          <div className="ticket-icon">
+                            <Users className="w-5 h-5" />
                           </div>
-
+                          <div className="ticket-badge">
+                            {ticket.players} PLAYER{ticket.players > 1 ? "S" : ""}
+                          </div>
+                        </div>
+                        
+                        <div className="ticket-body">
+                          <h4 className="ticket-title">{ticket.title}</h4>
+                          <p className="ticket-desc">{ticket.description}</p>
+                        </div>
+                        
+                        <div className="ticket-footer">
+                          <div className="ticket-price">
+                            <span className="price-amount">
+                              <IndianRupee className="w-4 h-4 inline" />
+                              {ticket.price}
+                            </span>
+                            <span className="price-unit">total</span>
+                          </div>
+                          
                           {!hasQty ? (
                             <button
                               disabled={!canAdd}
                               onClick={() => canAdd && setQty(ticket.id, 1)}
-                              className={`add-button ${canAdd ? 'enabled' : 'disabled'}`}
+                              className={`add-button ${canAdd ? 'active' : 'disabled'}`}
                             >
-                              Add
+                              ADD
                             </button>
                           ) : (
-                            <div className="quantity-selector">
+                            <div className="quantity-controls">
                               <button
                                 onClick={() => setQty(ticket.id, qty - 1)}
-                                className="quantity-btn minus"
+                                className="qty-btn"
                               >
                                 <Minus className="w-4 h-4" />
                               </button>
-                              <span className="quantity-display">{qty}</span>
+                              <span className="qty-display">{qty}</span>
                               <button
                                 disabled={!canAdd}
                                 onClick={() => canAdd && setQty(ticket.id, qty + 1)}
-                                className={`quantity-btn plus ${!canAdd ? 'disabled' : ''}`}
+                                className={`qty-btn ${!canAdd ? 'disabled' : ''}`}
                               >
                                 <Plus className="w-4 h-4" />
                               </button>
@@ -1169,54 +1204,61 @@ export default function BookingPage() {
 
       {/* Bottom Action Bar */}
       <div className="action-bar">
-        <div className="action-content">
+        <div className="action-container">
           {step === 1 ? (
             <>
-              <div className="step1-info">
-                <div className="date-display">
-                  {selectedDate ? dateLabel : "Select a date"}
+              <div className="selection-info">
+                <div className="date-info">
+                  <Calendar className="w-4 h-4" />
+                  <span>{selectedDate ? dateLabel : "Select a date"}</span>
                 </div>
-                <div className={`time-display ${selectedTime ? 'selected' : ''}`}>
-                  {selectedTime || "Select a time"}
+                <div className={`time-info ${selectedTime ? 'selected' : ''}`}>
+                  <Clock className="w-4 h-4" />
+                  <span>{selectedTime || "Select a time"}</span>
                 </div>
               </div>
               <button
                 onClick={handleContinueToTickets}
                 disabled={!selectedDate || !selectedTime}
-                className={`continue-button ${selectedDate && selectedTime ? 'enabled' : 'disabled'}`}
+                className={`continue-btn ${selectedDate && selectedTime ? 'active' : 'disabled'}`}
               >
-                Continue <ChevronRight className="w-4 h-4" />
+                CONTINUE TO TICKETS
+                <ChevronRight className="w-4 h-4" />
               </button>
             </>
           ) : (
             <>
-              <div className="step2-info">
+              <div className="booking-summary">
                 {summary.totalTickets > 0 ? (
                   <>
-                    <div className="ticket-count">
-                      {summary.totalTickets} ticket{summary.totalTickets > 1 ? "s" : ""} selected
+                    <div className="summary-tickets">
+                      <Ticket className="w-4 h-4" />
+                      <span>{summary.totalTickets} ticket{summary.totalTickets > 1 ? "s" : ""} selected</span>
                     </div>
-                    <div className="booking-details">
+                    <div className="summary-details">
                       {dateLabel} • {selectedTime}
                     </div>
                   </>
                 ) : (
-                  <div className="no-tickets">Add tickets to continue</div>
+                  <div className="no-tickets">
+                    <AlertCircle className="w-4 h-4" />
+                    <span>Add tickets to continue</span>
+                  </div>
                 )}
               </div>
               <button
                 onClick={handleConfirmBooking}
                 disabled={summary.totalTickets === 0 || isSubmitting}
-                className={`confirm-button ${summary.totalTickets > 0 && !isSubmitting ? 'enabled' : 'disabled'}`}
+                className={`confirm-btn ${summary.totalTickets > 0 && !isSubmitting ? 'active' : 'disabled'}`}
               >
                 {isSubmitting && (
-                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
                 )}
                 {isSubmitting
-                  ? "Processing..."
+                  ? "PROCESSING..."
                   : summary.totalTickets > 0
-                  ? `Pay ₹${summary.totalAmount}`
-                  : "Select Tickets"}
+                  ? `PAY ₹${summary.totalAmount}`
+                  : "SELECT TICKETS"}
               </button>
             </>
           )}
@@ -1279,13 +1321,20 @@ export default function BookingPage() {
         .booking-container {
           max-width: 600px;
           margin: 0 auto;
-          padding: 16px 16px 140px;
+          padding: 20px 16px 160px;
           position: relative;
           z-index: 1;
         }
 
         /* Header */
         .booking-header {
+          margin-bottom: 32px;
+        }
+
+        .header-nav {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           margin-bottom: 24px;
         }
 
@@ -1298,28 +1347,12 @@ export default function BookingPage() {
           color: ${colors.textSecondary};
           font-size: 14px;
           cursor: pointer;
-          padding: 0;
-          margin-bottom: 16px;
-        }
-
-        .header-top {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-bottom: 4px;
-        }
-
-        .cafe-name {
-          font-size: 12px;
-          color: ${colors.cyan};
-          text-transform: uppercase;
-          letter-spacing: 2px;
-          margin: 0;
+          padding: 8px 0;
+          font-weight: 500;
         }
 
         .social-links {
           display: flex;
-          align-items: center;
           gap: 8px;
         }
 
@@ -1327,31 +1360,43 @@ export default function BookingPage() {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 32px;
-          height: 32px;
-          border-radius: 8px;
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
           transition: all 0.2s ease;
           text-decoration: none;
         }
 
         .social-button.maps {
-          background: linear-gradient(135deg, rgba(66, 133, 244, 0.2) 0%, rgba(66, 133, 244, 0.1) 100%);
+          background: linear-gradient(135deg, rgba(66, 133, 244, 0.15) 0%, rgba(66, 133, 244, 0.05) 100%);
           border: 1px solid rgba(66, 133, 244, 0.3);
           color: #4285f4;
         }
 
         .social-button.instagram {
-          background: linear-gradient(135deg, rgba(225, 48, 108, 0.2) 0%, rgba(193, 53, 132, 0.1) 100%);
+          background: linear-gradient(135deg, rgba(225, 48, 108, 0.15) 0%, rgba(193, 53, 132, 0.05) 100%);
           border: 1px solid rgba(225, 48, 108, 0.3);
           color: #e1306c;
         }
 
-        .social-button:hover {
-          transform: scale(1.1);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        .cafe-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
         }
 
-        .booking-title {
+        .cafe-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          background: linear-gradient(135deg, ${colors.red} 0%, ${colors.cyan} 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .cafe-name {
           font-family: ${fonts.heading};
           font-size: 24px;
           font-weight: 800;
@@ -1359,63 +1404,104 @@ export default function BookingPage() {
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
-          margin: 0 0 8px 0;
+          margin: 0 0 4px 0;
+        }
+
+        .cafe-tag {
+          font-size: 12px;
+          color: ${colors.textMuted};
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .booking-title {
+          font-family: ${fonts.heading};
+          font-size: 20px;
+          font-weight: 700;
+          color: ${colors.textPrimary};
+          margin: 0 0 24px 0;
         }
 
         .step-indicator {
           display: flex;
           align-items: center;
-          gap: 12px;
-          margin-top: 16px;
+          justify-content: center;
+          gap: 8px;
+          margin-top: 32px;
         }
 
         .step {
-          flex: 1;
-        }
-
-        .step-label {
-          font-size: 10px;
-          color: ${colors.textMuted};
-          margin-bottom: 6px;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .step-label.active {
-          color: ${colors.cyan};
-        }
-
-        .step-bar {
-          height: 4px;
-          border-radius: 4px;
-          background: rgba(255, 255, 255, 0.1);
-        }
-
-        .step-bar.active {
-          background: linear-gradient(90deg, ${colors.red} 0%, ${colors.cyan} 100%);
-        }
-
-        /* Section Styles */
-        .section-heading {
-          font-size: 13px;
-          font-weight: 600;
-          color: ${colors.textSecondary};
-          margin-bottom: 12px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
           display: flex;
+          flex-direction: column;
           align-items: center;
           gap: 8px;
         }
 
+        .step-circle {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          border: 2px solid ${colors.border};
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 14px;
+          font-weight: 700;
+          color: ${colors.textMuted};
+          transition: all 0.3s ease;
+        }
+
+        .step-circle.active {
+          background: linear-gradient(135deg, ${colors.red} 0%, ${colors.cyan} 100%);
+          border-color: transparent;
+          color: white;
+          box-shadow: 0 4px 12px rgba(255, 7, 58, 0.3);
+        }
+
+        .step-label {
+          font-size: 12px;
+          color: ${colors.textMuted};
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          font-weight: 500;
+        }
+
+        .step-label.active {
+          color: ${colors.textPrimary};
+          font-weight: 600;
+        }
+
+        .step-connector {
+          width: 40px;
+          height: 2px;
+          background: rgba(255, 255, 255, 0.1);
+          margin: 0 4px;
+        }
+
+        /* Section Styles */
+        .section-header {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 20px;
+        }
+
+        .section-header h3 {
+          font-size: 18px;
+          font-weight: 700;
+          color: ${colors.textPrimary};
+          margin: 0;
+        }
+
         /* Date Section */
         .date-section {
-          margin-bottom: 20px;
+          margin-bottom: 32px;
         }
 
         .date-grid {
           display: flex;
-          gap: 8px;
+          gap: 10px;
           overflow-x: auto;
           padding-bottom: 8px;
           scrollbar-width: none;
@@ -1427,28 +1513,29 @@ export default function BookingPage() {
 
         .date-button {
           flex-shrink: 0;
-          width: 68px;
-          padding: 10px 6px;
-          border-radius: 10px;
-          border: 1px solid ${colors.border};
-          background: ${colors.darkCard};
+          width: 80px;
+          padding: 16px 8px;
+          border-radius: 16px;
+          border: 1.5px solid ${colors.border};
+          background: rgba(255, 255, 255, 0.03);
           cursor: pointer;
           text-align: center;
-          transition: all 0.2s ease;
-          min-height: 48px;
+          transition: all 0.3s ease;
         }
 
         .date-button.active {
           border: 2px solid ${colors.red};
-          background: linear-gradient(135deg, rgba(255, 7, 58, 0.2) 0%, rgba(255, 7, 58, 0.1) 100%);
-          box-shadow: 0 0 20px rgba(255, 7, 58, 0.3);
+          background: linear-gradient(135deg, rgba(255, 7, 58, 0.15) 0%, rgba(255, 7, 58, 0.05) 100%);
+          box-shadow: 0 8px 24px rgba(255, 7, 58, 0.2);
+          transform: translateY(-2px);
         }
 
         .day-name {
-          font-size: 11px;
+          font-size: 10px;
           color: ${colors.textMuted};
-          margin-bottom: 4px;
-          font-weight: 500;
+          margin-bottom: 8px;
+          font-weight: 700;
+          letter-spacing: 0.5px;
         }
 
         .day-name.today {
@@ -1457,88 +1544,98 @@ export default function BookingPage() {
 
         .day-number {
           font-family: ${fonts.heading};
-          font-size: 20px;
-          font-weight: 700;
+          font-size: 24px;
+          font-weight: 800;
           color: ${colors.textPrimary};
+          line-height: 1;
+          margin-bottom: 4px;
         }
 
         .month {
-          font-size: 11px;
+          font-size: 10px;
           color: ${colors.textMuted};
-          margin-top: 2px;
+          font-weight: 600;
+          letter-spacing: 0.5px;
         }
 
         /* Time Section */
         .time-section {
-          margin-bottom: 20px;
+          margin-bottom: 32px;
         }
 
         .time-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 8px;
+          gap: 10px;
         }
 
         .time-button {
-          padding: 10px 6px;
-          min-height: 44px;
-          border-radius: 8px;
-          border: 1px solid ${colors.border};
-          background: ${colors.darkCard};
+          padding: 14px 8px;
+          border-radius: 12px;
+          border: 1.5px solid ${colors.border};
+          background: rgba(255, 255, 255, 0.03);
           cursor: pointer;
           text-align: center;
-          transition: all 0.2s ease;
-          position: relative;
+          transition: all 0.3s ease;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
         }
 
         .time-button.active {
-          border: 2px solid ${colors.red};
-          background: linear-gradient(135deg, rgba(255, 7, 58, 0.2) 0%, rgba(255, 7, 58, 0.1) 100%);
-          box-shadow: 0 0 20px rgba(255, 7, 58, 0.3);
+          border: 2px solid ${colors.cyan};
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 240, 255, 0.05) 100%);
+          box-shadow: 0 8px 24px rgba(0, 240, 255, 0.2);
+          transform: translateY(-2px);
         }
 
         .time-label {
-          font-size: 13px;
-          font-weight: 600;
+          font-size: 14px;
+          font-weight: 700;
           color: ${colors.textPrimary};
         }
 
-        .peak-indicator {
-          position: absolute;
-          top: 4px;
-          right: 4px;
-          width: 6px;
-          height: 6px;
-          border-radius: 50%;
-          background: #f59e0b;
+        .peak-badge {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          padding: 4px 8px;
+          background: rgba(245, 158, 11, 0.15);
+          border-radius: 6px;
+          font-size: 10px;
+          color: #f59e0b;
+          font-weight: 600;
         }
 
         .no-slots {
-          padding: 32px 20px;
-          background: ${colors.darkCard};
-          border-radius: 12px;
-          border: 1px solid ${colors.border};
+          padding: 48px 20px;
+          background: rgba(255, 255, 255, 0.03);
+          border-radius: 20px;
+          border: 1.5px solid ${colors.border};
           text-align: center;
         }
 
-        .no-slots-title {
-          font-size: 14px;
+        .no-slots h4 {
+          font-size: 16px;
           color: ${colors.textSecondary};
           margin-bottom: 8px;
         }
 
-        .no-slots-subtitle {
-          font-size: 12px;
+        .no-slots p {
+          font-size: 14px;
           color: ${colors.textMuted};
         }
 
-        .peak-note {
-          font-size: 12px;
-          color: ${colors.textMuted};
-          margin-top: 12px;
+        .peak-info {
           display: flex;
           align-items: center;
           gap: 8px;
+          padding: 12px 16px;
+          background: rgba(245, 158, 11, 0.1);
+          border-radius: 10px;
+          border: 1px solid rgba(245, 158, 11, 0.2);
+          margin-top: 16px;
         }
 
         .peak-dot {
@@ -1546,169 +1643,198 @@ export default function BookingPage() {
           height: 8px;
           border-radius: 50%;
           background: #f59e0b;
-          display: inline-block;
         }
 
         /* Step 2 Styles */
-        .booking-summary {
-          padding: 18px 20px;
-          background: linear-gradient(135deg, rgba(0, 240, 255, 0.08) 0%, rgba(255, 7, 58, 0.08) 100%);
-          border-radius: 16px;
-          border: 2px solid rgba(0, 240, 255, 0.2);
+        .booking-summary-card {
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(255, 7, 58, 0.1) 100%);
+          border-radius: 20px;
+          border: 2px solid rgba(0, 240, 255, 0.3);
+          padding: 20px;
           margin-bottom: 24px;
           position: relative;
           overflow: hidden;
-        }
-
-        .summary-content {
-          position: relative;
-          z-index: 1;
         }
 
         .summary-header {
           display: flex;
           align-items: flex-start;
           justify-content: space-between;
-          margin-bottom: 12px;
+          margin-bottom: 16px;
         }
 
-        .summary-label {
-          font-size: 11px;
-          color: ${colors.textMuted};
-          text-transform: uppercase;
-          letter-spacing: 1px;
+        .summary-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          background: rgba(0, 240, 255, 0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${colors.cyan};
+        }
+
+        .summary-details {
+          flex: 1;
+          margin: 0 16px;
+        }
+
+        .summary-details h3 {
+          font-size: 16px;
+          color: ${colors.textSecondary};
           margin-bottom: 6px;
         }
 
+        .summary-info {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+
         .summary-date {
-          font-size: 16px;
+          font-size: 18px;
           font-weight: 700;
           color: ${colors.textPrimary};
           font-family: ${fonts.heading};
-          margin-bottom: 4px;
         }
 
         .summary-time {
-          font-size: 15px;
-          color: ${colors.cyan};
-          font-weight: 600;
           display: flex;
           align-items: center;
           gap: 6px;
+          font-size: 15px;
+          color: ${colors.cyan};
+          font-weight: 600;
         }
 
         .change-button {
           padding: 8px 16px;
-          background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 240, 255, 0.25) 100%);
-          border: 1px solid ${colors.cyan};
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid ${colors.border};
           border-radius: 10px;
-          color: ${colors.cyan};
+          color: ${colors.textPrimary};
           font-size: 12px;
-          font-weight: 700;
+          font-weight: 600;
           cursor: pointer;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
+          transition: all 0.2s ease;
         }
 
-        .duration-badge {
+        .change-button:hover {
+          background: rgba(255, 255, 255, 0.15);
+        }
+
+        .duration-tag {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 6px 12px;
-          border-radius: 999px;
-          background: rgba(0, 240, 255, 0.15);
-          border: 1px solid ${colors.cyan};
-          font-size: 11px;
+          padding: 8px 16px;
+          background: rgba(0, 240, 255, 0.2);
+          border-radius: 20px;
+          font-size: 12px;
           font-weight: 700;
           color: ${colors.cyan};
         }
 
         /* Duration Selector */
         .duration-section {
-          margin-bottom: 24px;
+          margin-bottom: 28px;
         }
 
         .duration-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
+          gap: 12px;
         }
 
-        .duration-button {
-          padding: 16px 12px;
-          min-height: 80px;
-          border-radius: 14px;
-          border: 1.5px solid ${colors.border};
-          background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+        .duration-card {
+          padding: 20px 12px;
+          border-radius: 16px;
+          border: 2px solid ${colors.border};
+          background: rgba(255, 255, 255, 0.03);
           cursor: pointer;
-          transition: all 0.2s ease;
+          text-align: center;
+          transition: all 0.3s ease;
           position: relative;
         }
 
-        .duration-button.active {
-          border: 2.5px solid ${colors.cyan};
-          background: linear-gradient(135deg, rgba(0, 240, 255, 0.22) 0%, rgba(0, 240, 255, 0.10) 100%);
-          box-shadow: 0 6px 20px rgba(0, 240, 255, 0.3);
-          transform: translateY(-1px);
+        .duration-card.active {
+          border: 2px solid ${colors.cyan};
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.15) 0%, rgba(0, 240, 255, 0.05) 100%);
+          box-shadow: 0 8px 24px rgba(0, 240, 255, 0.2);
+          transform: translateY(-2px);
         }
 
-        .duration-button.premium.active {
-          border-color: ${colors.red};
-          background: linear-gradient(135deg, rgba(255, 7, 58, 0.22) 0%, rgba(255, 7, 58, 0.10) 100%);
-          box-shadow: 0 6px 20px rgba(255, 7, 58, 0.3);
+        .duration-card.premium.active {
+          border: 2px solid ${colors.red};
+          background: linear-gradient(135deg, rgba(255, 7, 58, 0.15) 0%, rgba(255, 7, 58, 0.05) 100%);
+          box-shadow: 0 8px 24px rgba(255, 7, 58, 0.2);
         }
 
         .duration-number {
-          font-size: 26px;
-          font-weight: 900;
           font-family: ${fonts.heading};
+          font-size: 32px;
+          font-weight: 800;
           color: ${colors.textPrimary};
-          margin-bottom: 4px;
-          letter-spacing: -0.5px;
           line-height: 1;
-        }
-
-        .duration-button.active .duration-number {
-          color: ${colors.cyan};
-        }
-
-        .duration-button.premium.active .duration-number {
-          color: ${colors.red};
+          margin-bottom: 4px;
         }
 
         .duration-label {
-          font-size: 12px;
+          font-size: 11px;
           color: ${colors.textMuted};
-          font-weight: 600;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin-bottom: 12px;
         }
 
-        .duration-button.active .duration-label {
+        .duration-price {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          font-family: ${fonts.heading};
+          font-size: 18px;
+          font-weight: 700;
           color: ${colors.cyan};
         }
 
-        .duration-button.premium.active .duration-label {
+        .duration-card.premium.active .duration-price {
           color: ${colors.red};
         }
 
-        /* Availability Banner */
-        .availability-banner {
+        .premium-badge {
+          position: absolute;
+          top: 8px;
+          right: 8px;
+          padding: 4px 8px;
+          background: ${colors.red};
+          border-radius: 6px;
+          font-size: 10px;
+          color: white;
+          font-weight: 700;
+          text-transform: uppercase;
+        }
+
+        /* Live Availability Banner */
+        .live-availability-banner {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 12px 16px;
-          background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(0, 240, 255, 0.05) 100%);
-          border-radius: 10px;
-          border: 1px solid rgba(0, 240, 255, 0.2);
-          margin-bottom: 20px;
+          padding: 16px;
+          background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.05) 100%);
+          border-radius: 16px;
+          border: 1.5px solid rgba(34, 197, 94, 0.2);
+          margin-bottom: 24px;
         }
 
-        .availability-info {
+        .live-badge {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 8px;
         }
 
-        .live-indicator {
+        .live-dot {
           width: 8px;
           height: 8px;
           border-radius: 50%;
@@ -1717,77 +1843,85 @@ export default function BookingPage() {
         }
 
         @keyframes pulse {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.5; }
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.8); }
+        }
+
+        .live-badge span {
+          font-size: 12px;
+          font-weight: 700;
+          color: ${colors.green};
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .live-info {
+          display: flex;
+          align-items: center;
+          gap: 12px;
         }
 
         .live-text {
-          font-size: 13px;
-          color: ${colors.cyan};
-          font-weight: 500;
-        }
-
-        .live-note {
-          font-size: 11px;
+          font-size: 12px;
           color: ${colors.textMuted};
         }
 
-        .availability-actions {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-
-        .update-time {
-          font-size: 11px;
-          color: ${colors.textMuted};
-        }
-
-        .refresh-button {
-          padding: 4px 10px;
+        .refresh-btn {
+          padding: 6px;
           background: rgba(255, 255, 255, 0.05);
           border: 1px solid ${colors.border};
-          border-radius: 6px;
+          border-radius: 8px;
           color: ${colors.textSecondary};
-          font-size: 11px;
           cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
         }
 
-        /* Console Grid */
-        .console-grid {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          justify-content: flex-start;
+        /* Console Selection */
+        .console-section {
+          margin-bottom: 28px;
         }
 
-        .console-card {
-          min-width: 85px;
-          max-width: 85px;
-          padding: 10px 6px;
-          border-radius: 10px;
-          border: 1px solid ${colors.border};
-          background: ${colors.darkCard};
+        .console-scroll {
+          display: flex;
+          gap: 12px;
+          overflow-x: auto;
+          padding-bottom: 8px;
+          scrollbar-width: none;
+        }
+
+        .console-scroll::-webkit-scrollbar {
+          display: none;
+        }
+
+        .console-button {
+          flex-shrink: 0;
+          width: 120px;
+          padding: 16px 12px;
+          border-radius: 16px;
+          border: 2px solid ${colors.border};
+          background: rgba(255, 255, 255, 0.03);
           cursor: pointer;
-          transition: all 0.2s ease;
           text-align: center;
+          transition: all 0.3s ease;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 4px;
+          gap: 8px;
         }
 
-        .console-card.active {
-          box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-          transform: scale(1.02);
+        .console-button.active {
+          border: 2px solid ${colors.cyan};
+          background: linear-gradient(135deg, rgba(0, 240, 255, 0.1) 0%, rgba(0, 240, 255, 0.05) 100%);
+          box-shadow: 0 8px 24px rgba(0, 240, 255, 0.2);
+          transform: translateY(-2px);
         }
 
-        .console-card.sold-out {
+        .console-button.sold-out {
           opacity: 0.5;
           cursor: not-allowed;
+        }
+
+        .console-icon-wrapper {
+          position: relative;
         }
 
         .console-icon {
@@ -1799,184 +1933,242 @@ export default function BookingPage() {
           filter: grayscale(1);
         }
 
+        .selection-badge {
+          position: absolute;
+          top: -6px;
+          right: -6px;
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 10px;
+          color: white;
+          font-weight: 700;
+        }
+
         .console-name {
-          font-size: 11px;
-          font-weight: 800;
-          font-family: ${fonts.heading};
-          margin-bottom: 2px;
-          letter-spacing: -0.2px;
+          font-size: 14px;
+          font-weight: 700;
+          color: ${colors.textPrimary};
+          line-height: 1.2;
         }
 
         .console-price {
-          font-size: 10px;
-          color: ${colors.textMuted};
-          font-weight: 600;
-          margin-bottom: 6px;
-        }
-
-        .availability-badge {
-          padding: 4px 8px;
-          border-radius: 6px;
-          font-size: 9px;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          font-family: ${fonts.heading};
+          font-size: 16px;
           font-weight: 700;
-          margin-bottom: 6px;
+          color: ${colors.cyan};
         }
 
-        .availability-badge.available {
-          background: rgba(34, 197, 94, 0.2);
+        .availability-status {
+          padding: 6px 10px;
+          border-radius: 8px;
+          font-size: 10px;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .availability-status.available {
+          background: rgba(34, 197, 94, 0.15);
           color: ${colors.green};
         }
 
-        .availability-badge.low-stock {
-          background: rgba(245, 158, 11, 0.2);
+        .availability-status.low-stock {
+          background: rgba(245, 158, 11, 0.15);
           color: ${colors.orange};
         }
 
-        .availability-badge.sold-out {
-          background: rgba(239, 68, 68, 0.2);
+        .availability-status.sold-out {
+          background: rgba(239, 68, 68, 0.15);
           color: #ef4444;
         }
 
-        .selected-indicator {
-          padding: 3px 6px;
-          border-radius: 5px;
-          font-size: 9px;
-          font-weight: 700;
-          display: flex;
-          align-items: center;
-          gap: 2px;
+        .status-dot {
+          display: inline-block;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: currentColor;
+          margin-right: 6px;
         }
 
         /* Tickets Section */
-        .tickets-header {
+        .section-title {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 12px;
+          flex: 1;
         }
 
-        .availability-text {
+        .availability-counter {
           font-size: 12px;
-          font-weight: 500;
-        }
-
-        .availability-text.high {
+          font-weight: 600;
+          padding: 4px 8px;
+          border-radius: 6px;
+          background: rgba(34, 197, 94, 0.15);
           color: ${colors.green};
         }
 
-        .availability-text.low {
+        .availability-counter.low {
+          background: rgba(245, 158, 11, 0.15);
           color: ${colors.orange};
         }
 
-        .sold-out-card {
-          padding: 32px 20px;
-          background: ${colors.darkCard};
-          border-radius: 14px;
-          border: 1px solid rgba(239, 68, 68, 0.2);
-          text-align: center;
+        .sold-out-message {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 24px;
+          background: rgba(239, 68, 68, 0.1);
+          border-radius: 16px;
+          border: 1.5px solid rgba(239, 68, 68, 0.2);
         }
 
-        .sold-out-title {
-          font-size: 15px;
-          font-weight: 600;
+        .sold-out-icon {
+          width: 48px;
+          height: 48px;
+          border-radius: 12px;
+          background: rgba(239, 68, 68, 0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
           color: #ef4444;
+        }
+
+        .sold-out-content h4 {
+          font-size: 16px;
+          color: #ef4444;
+          margin-bottom: 4px;
+        }
+
+        .sold-out-content p {
+          font-size: 14px;
+          color: ${colors.textSecondary};
           margin-bottom: 8px;
         }
 
-        .sold-out-subtitle {
-          font-size: 13px;
-          color: ${colors.textMuted};
-          margin-bottom: 12px;
-        }
-
         .next-available {
-          display: inline-flex;
+          display: flex;
           align-items: center;
-          gap: 8px;
-          padding: 10px 16px;
-          background: rgba(0, 240, 255, 0.1);
-          border: 1px solid rgba(0, 240, 255, 0.2);
-          border-radius: 10px;
-          margin-bottom: 12px;
+          gap: 6px;
+          font-size: 13px;
+          color: ${colors.cyan};
+          font-weight: 600;
         }
 
-        .sold-out-hint {
-          font-size: 12px;
-          color: ${colors.textMuted};
-        }
-
-        .tickets-list {
+        .tickets-grid {
           display: flex;
           flex-direction: column;
           gap: 12px;
         }
 
         .ticket-card {
-          padding: 16px;
-          background: ${colors.darkCard};
-          border-radius: 14px;
-          border: 1px solid ${colors.border};
-          transition: all 0.2s ease;
+          padding: 20px;
+          border-radius: 16px;
+          border: 2px solid ${colors.border};
+          background: rgba(255, 255, 255, 0.03);
+          transition: all 0.3s ease;
         }
 
         .ticket-card.selected {
-          background: linear-gradient(135deg, rgba(255, 7, 58, 0.1) 0%, ${colors.darkCard} 100%);
-          border: 1px solid rgba(255, 7, 58, 0.3);
+          border: 2px solid ${colors.red};
+          background: linear-gradient(135deg, rgba(255, 7, 58, 0.1) 0%, rgba(255, 7, 58, 0.05) 100%);
+          box-shadow: 0 8px 24px rgba(255, 7, 58, 0.2);
         }
 
-        .ticket-content {
+        .ticket-header {
           display: flex;
+          align-items: center;
           justify-content: space-between;
-          align-items: flex-start;
-          gap: 12px;
+          margin-bottom: 16px;
         }
 
-        .ticket-info {
-          flex: 1;
+        .ticket-icon {
+          width: 36px;
+          height: 36px;
+          border-radius: 10px;
+          background: rgba(0, 240, 255, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: ${colors.cyan};
+        }
+
+        .ticket-badge {
+          padding: 6px 12px;
+          background: rgba(0, 240, 255, 0.15);
+          border-radius: 20px;
+          font-size: 10px;
+          font-weight: 700;
+          color: ${colors.cyan};
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .ticket-body {
+          margin-bottom: 16px;
         }
 
         .ticket-title {
-          font-size: 15px;
-          font-weight: 600;
+          font-size: 16px;
+          font-weight: 700;
           color: ${colors.textPrimary};
-          margin-bottom: 6px;
+          margin-bottom: 8px;
+        }
+
+        .ticket-desc {
+          font-size: 14px;
+          color: ${colors.textSecondary};
+          line-height: 1.4;
+        }
+
+        .ticket-footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
         }
 
         .ticket-price {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .price-amount {
           font-family: ${fonts.heading};
-          font-size: 22px;
-          font-weight: 700;
+          font-size: 24px;
+          font-weight: 800;
           color: ${colors.cyan};
-          margin-bottom: 8px;
+          display: flex;
+          align-items: center;
+          gap: 2px;
         }
 
         .price-unit {
           font-size: 12px;
           color: ${colors.textMuted};
-          font-family: ${fonts.body};
-          font-weight: 400;
-        }
-
-        .ticket-description {
-          font-size: 13px;
-          color: ${colors.textSecondary};
-          line-height: 1.4;
         }
 
         .add-button {
-          padding: 10px 20px;
-          min-height: 44px;
+          padding: 12px 24px;
           border: none;
-          border-radius: 10px;
-          color: white;
+          border-radius: 12px;
           font-size: 13px;
-          font-weight: 600;
+          font-weight: 700;
           cursor: pointer;
           transition: all 0.2s ease;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
         }
 
-        .add-button.enabled {
+        .add-button.active {
           background: linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%);
+          color: white;
         }
 
         .add-button.disabled {
@@ -1985,18 +2177,18 @@ export default function BookingPage() {
           cursor: not-allowed;
         }
 
-        .quantity-selector {
+        .quantity-controls {
           display: flex;
           align-items: center;
           gap: 0;
           background: ${colors.red};
-          border-radius: 10px;
+          border-radius: 12px;
           overflow: hidden;
         }
 
-        .quantity-btn {
-          width: 36px;
-          height: 36px;
+        .qty-btn {
+          width: 40px;
+          height: 40px;
           background: transparent;
           border: none;
           color: white;
@@ -2006,13 +2198,13 @@ export default function BookingPage() {
           justify-content: center;
         }
 
-        .quantity-btn.disabled {
+        .qty-btn.disabled {
           color: rgba(255, 255, 255, 0.4);
           cursor: not-allowed;
         }
 
-        .quantity-display {
-          width: 32px;
+        .qty-display {
+          width: 36px;
           text-align: center;
           font-family: ${fonts.heading};
           font-size: 16px;
@@ -2026,159 +2218,159 @@ export default function BookingPage() {
           bottom: 0;
           left: 0;
           right: 0;
-          background: rgba(15, 15, 20, 0.95);
+          background: rgba(10, 10, 16, 0.95);
           backdrop-filter: blur(20px);
           border-top: 1px solid ${colors.border};
-          padding: 16px;
+          padding: 20px 16px;
           z-index: 100;
         }
 
-        .action-content {
+        .action-container {
           max-width: 600px;
           margin: 0 auto;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 16px;
+          gap: 20px;
         }
 
-        .step1-info {
+        .selection-info {
           flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
         }
 
-        .date-display {
+        .date-info, .time-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
           font-size: 14px;
-          font-weight: 600;
-          color: ${colors.textPrimary};
-          margin-bottom: 4px;
+          color: ${colors.textSecondary};
         }
 
-        .time-display {
-          font-size: 13px;
-          color: ${colors.textMuted};
-        }
-
-        .time-display.selected {
+        .time-info.selected {
           color: ${colors.cyan};
         }
 
-        .step2-info {
+        .booking-summary {
           flex: 1;
         }
 
-        .ticket-count {
-          font-size: 14px;
-          font-weight: 600;
+        .summary-tickets {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 15px;
+          font-weight: 700;
           color: ${colors.textPrimary};
           margin-bottom: 4px;
         }
 
-        .booking-details {
+        .summary-details {
           font-size: 13px;
           color: ${colors.textSecondary};
         }
 
         .no-tickets {
+          display: flex;
+          align-items: center;
+          gap: 8px;
           font-size: 14px;
           color: ${colors.textMuted};
         }
 
-        .continue-button, .confirm-button {
-          padding: 14px 28px;
+        .continue-btn, .confirm-btn {
+          padding: 16px 28px;
           border: none;
-          border-radius: 12px;
+          border-radius: 14px;
           font-family: ${fonts.heading};
           font-size: 13px;
-          font-weight: 600;
+          font-weight: 700;
           text-transform: uppercase;
           letter-spacing: 1px;
           cursor: pointer;
-          transition: all 0.2s ease;
+          transition: all 0.3s ease;
           display: flex;
           align-items: center;
           gap: 8px;
-          min-width: 140px;
+          min-width: 180px;
           justify-content: center;
         }
 
-        .continue-button.enabled {
+        .continue-btn.active {
           background: linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%);
           color: white;
+          box-shadow: 0 8px 24px rgba(255, 7, 58, 0.3);
         }
 
-        .continue-button.disabled {
-          background: rgba(255, 255, 255, 0.1);
+        .continue-btn.disabled, .confirm-btn.disabled {
+          background: rgba(255, 255, 255, 0.05);
           color: ${colors.textMuted};
           cursor: not-allowed;
         }
 
-        .confirm-button.enabled {
+        .confirm-btn.active {
           background: linear-gradient(135deg, ${colors.green} 0%, #16a34a 100%);
           color: white;
-        }
-
-        .confirm-button.disabled {
-          background: rgba(255, 255, 255, 0.1);
-          color: ${colors.textMuted};
-          cursor: not-allowed;
+          box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
         }
 
         /* Mobile Responsive */
         @media (max-width: 480px) {
           .booking-container {
-            padding: 12px 12px 120px;
+            padding: 16px 12px 140px;
           }
 
-          .booking-title {
+          .cafe-name {
             font-size: 20px;
           }
 
+          .booking-title {
+            font-size: 18px;
+          }
+
           .date-button {
-            width: 60px;
-            padding: 8px 4px;
+            width: 70px;
+            padding: 12px 6px;
           }
 
           .time-grid {
             grid-template-columns: repeat(2, 1fr);
           }
 
-          .console-grid {
-            justify-content: center;
-          }
-
-          .console-card {
-            min-width: 75px;
-            max-width: 75px;
-            padding: 8px 4px;
-          }
-
           .duration-grid {
             grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
           }
 
-          .duration-button {
-            padding: 12px 8px;
-            min-height: 70px;
+          .duration-card {
+            padding: 16px 8px;
           }
 
           .duration-number {
-            font-size: 22px;
+            font-size: 28px;
           }
 
-          .action-content {
+          .console-button {
+            width: 100px;
+            padding: 12px 8px;
+          }
+
+          .action-container {
             gap: 12px;
           }
 
-          .continue-button, .confirm-button {
-            padding: 12px 20px;
+          .continue-btn, .confirm-btn {
+            padding: 14px 20px;
             font-size: 12px;
-            min-width: 120px;
+            min-width: 150px;
           }
         }
 
         @media (min-width: 640px) {
           .booking-container {
-            padding: 20px 16px 140px;
+            padding: 24px 20px 160px;
           }
 
           .booking-title {
@@ -2190,8 +2382,8 @@ export default function BookingPage() {
           }
 
           .date-button {
-            width: 72px;
-            padding: 12px 8px;
+            width: 84px;
+            padding: 16px 10px;
           }
         }
 

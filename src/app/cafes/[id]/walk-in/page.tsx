@@ -10,7 +10,7 @@ import {
   Monitor,
   Car,
   Target,
-  Telescope,
+  RectangleGoggles,
   User,
   Phone,
   Clock,
@@ -21,23 +21,44 @@ import {
   CreditCard,
   Shield,
   Sparkles,
-  DollarSign,
   Hash,
-  Users
+  Users,
+  Crown,
+  Zap,
+  IndianRupee,
+  Receipt,
+  UserCheck,
+  Smartphone,
+  Timer,
+  Wallet,
+  ArrowRight,
+  BadgeCheck,
+  Star,
+  Award,
+  Trophy,
+  Flame,
+  Rocket,
+  ShieldCheck,
+  CheckSquare,
+  CalendarClock,
+  QrCode,
+  Tv,
+  Cpu,
+  Disc
 } from "lucide-react";
 
 type ConsoleId = "ps5" | "ps4" | "xbox" | "pc" | "pool" | "arcade" | "snooker" | "vr" | "steering_wheel";
 
-const CONSOLES: { id: ConsoleId; label: string; icon: React.ReactNode; color: string }[] = [
-  { id: "ps5", label: "PS5", icon: <Gamepad2 className="w-6 h-6" />, color: "#3b82f6" },
-  { id: "ps4", label: "PS4", icon: <Gamepad2 className="w-6 h-6" />, color: "#1d4ed8" },
-  { id: "xbox", label: "Xbox", icon: <Gamepad2 className="w-6 h-6" />, color: "#16a34a" },
-  { id: "pc", label: "PC", icon: <Monitor className="w-6 h-6" />, color: "#ef4444" },
-  { id: "pool", label: "Pool Table", icon: <Target className="w-6 h-6" />, color: "#92400e" },
-  { id: "arcade", label: "Arcade", icon: <Gamepad2 className="w-6 h-6" />, color: "#ea580c" },
-  { id: "snooker", label: "Snooker", icon: <Target className="w-6 h-6" />, color: "#059669" },
-  { id: "vr", label: "VR", icon: <Telescope className="w-6 h-6" />, color: "#7c3aed" },
-  { id: "steering_wheel", label: "Racing Rig", icon: <Car className="w-6 h-6" />, color: "#dc2626" },
+const CONSOLES: { id: ConsoleId; label: string; icon: React.ReactNode; color: string; gradient: string }[] = [
+  { id: "ps5", label: "PS5", icon: <Gamepad2 className="w-6 h-6" />, color: "#3b82f6", gradient: "from-blue-500 to-cyan-500" },
+  { id: "ps4", label: "PS4", icon: <Gamepad2 className="w-6 h-6" />, color: "#1d4ed8", gradient: "from-blue-600 to-blue-800" },
+  { id: "xbox", label: "Xbox", icon: <Gamepad2 className="w-6 h-6" />, color: "#16a34a", gradient: "from-green-500 to-emerald-600" },
+  { id: "pc", label: "PC Gaming", icon: <Monitor className="w-6 h-6" />, color: "#ef4444", gradient: "from-red-500 to-pink-600" },
+  { id: "pool", label: "Pool Table", icon: <Target className="w-6 h-6" />, color: "#92400e", gradient: "from-amber-700 to-yellow-600" },
+  { id: "arcade", label: "Arcade", icon: <Gamepad2 className="w-6 h-6" />, color: "#ea580c", gradient: "from-orange-500 to-red-500" },
+  { id: "snooker", label: "Snooker", icon: <Target className="w-6 h-6" />, color: "#059669", gradient: "from-emerald-500 to-teal-600" },
+  { id: "vr", label: "VR Experience", icon: <RectangleGoggles className="w-6 h-6" />, color: "#7c3aed", gradient: "from-purple-500 to-violet-600" },
+  { id: "steering_wheel", label: "Racing Rig", icon: <Car className="w-6 h-6" />, color: "#dc2626", gradient: "from-red-600 to-rose-700" },
 ];
 
 const CONSOLE_DB_KEYS: Record<ConsoleId, string> = {
@@ -311,18 +332,39 @@ export default function WalkInBookingPage() {
 
   if (loading) {
     return (
-      <div className="loading-container">
-        <Loader2 className="loading-spinner" />
-        <p className="loading-text">Loading café details...</p>
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center space-y-6">
+          <div className="relative">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-r from-red-600 via-cyan-500 to-blue-600 animate-spin mx-auto"></div>
+            <Gamepad2 className="w-12 h-12 text-white absolute inset-0 m-auto" />
+          </div>
+          <div>
+            <p className="text-gray-400 font-medium mb-2">Loading Gaming Zone...</p>
+            <div className="w-48 h-2 bg-gray-800 rounded-full overflow-hidden mx-auto">
+              <div className="h-full bg-gradient-to-r from-red-500 to-cyan-400 animate-pulse"></div>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (error && !cafeId) {
     return (
-      <div className="error-container">
-        <AlertCircle className="error-icon" />
-        <h1 className="error-title">{error}</h1>
+      <div className="min-h-screen bg-black flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-r from-red-500/20 to-red-900/20 flex items-center justify-center mx-auto mb-6">
+            <AlertCircle className="w-10 h-10 text-red-500" />
+          </div>
+          <h1 className="text-2xl font-bold text-white mb-3">Café Not Found</h1>
+          <p className="text-gray-400 mb-8">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-gradient-to-r from-red-600 to-red-800 text-white rounded-lg font-semibold hover:opacity-90 transition"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -331,545 +373,206 @@ export default function WalkInBookingPage() {
   const availableConsoleOptions = CONSOLES.filter(c => availableConsoles.includes(c.id));
 
   return (
-    <>
-      <style jsx global>{`
-        .walk-in-page {
-          min-height: 100vh;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          font-family: ${fonts.body};
-          padding: 20px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
+    <div className="min-h-screen bg-black text-white">
+      {/* Background Effects */}
+      <div className="fixed inset-0 overflow-hidden">
+        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
+      </div>
 
-        .walk-in-container {
-          max-width: 480px;
-          width: 100%;
-        }
-
-        /* Loading States */
-        .loading-container {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          font-family: ${fonts.body};
-        }
-
-        .loading-spinner {
-          width: 40px;
-          height: 40px;
-          color: ${colors.blue};
-          animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-          margin-top: 12px;
-          font-size: 14px;
-          color: ${colors.textSecondary};
-        }
-
-        /* Error States */
-        .error-container {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-          font-family: ${fonts.body};
-          padding: 20px;
-          text-align: center;
-        }
-
-        .error-icon {
-          width: 48px;
-          height: 48px;
-          color: ${colors.red};
-          margin-bottom: 16px;
-        }
-
-        .error-title {
-          color: ${colors.red};
-          font-size: 18px;
-          font-family: ${fonts.heading};
-        }
-
-        /* Success State */
-        .success-card {
-          background: rgba(20, 20, 28, 0.95);
-          border: 2px solid rgba(34, 197, 94, 0.5);
-          border-radius: 20px;
-          padding: 40px 24px;
-          text-align: center;
-          animation: fadeIn 0.3s ease;
-        }
-
-        .success-icon {
-          font-size: 64px;
-          margin-bottom: 16px;
-          animation: scaleIn 0.5s ease;
-          color: #22c55e;
-        }
-
-        .success-title {
-          color: #22c55e;
-          font-family: ${fonts.heading};
-          font-size: 24px;
-          font-weight: 700;
-          margin-bottom: 8px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        .booking-id {
-          color: ${colors.textPrimary};
-          font-size: 16px;
-          margin-bottom: 8px;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-
-        .success-message {
-          color: ${colors.textSecondary};
-          font-size: 14px;
-          margin-top: 16px;
-        }
-
-        .amount-card {
-          margin-top: 24px;
-          padding: 16px;
-          background: rgba(255, 7, 58, 0.1);
-          border-radius: 12px;
-        }
-
-        .amount-label {
-          color: ${colors.textSecondary};
-          font-size: 13px;
-          margin-bottom: 4px;
-        }
-
-        .amount-value {
-          color: ${colors.red};
-          font-size: 32px;
-          font-weight: 700;
-          font-family: ${fonts.heading};
-        }
-
-        /* Header */
-        .header {
-          text-align: center;
-          margin-bottom: 24px;
-        }
-
-        .cafe-name {
-          font-family: ${fonts.heading};
-          font-size: 28px;
-          font-weight: 700;
-          color: ${colors.textPrimary};
-          margin-bottom: 8px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        .page-title {
-          color: ${colors.textSecondary};
-          font-size: 13px;
-        }
-
-        /* Form */
-        .form-container {
-          background: rgba(20, 20, 28, 0.95);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 20px;
-          padding: 24px;
-        }
-
-        /* Error Message */
-        .error-message {
-          background: rgba(239, 68, 68, 0.15);
-          border: 1px solid rgba(239, 68, 68, 0.4);
-          border-radius: 12px;
-          padding: 12px 16px;
-          margin-bottom: 20px;
-          color: #ef4444;
-          font-size: 14px;
-          text-align: center;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-
-        /* Form Inputs */
-        .form-group {
-          margin-bottom: 16px;
-        }
-
-        .form-label {
-          display: block;
-          color: ${colors.textPrimary};
-          font-size: 13px;
-          font-weight: 600;
-          margin-bottom: 8px;
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-
-        .form-input {
-          width: 100%;
-          padding: 14px 16px;
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 12px;
-          color: ${colors.textPrimary};
-          font-size: 16px;
-          font-family: ${fonts.body};
-          outline: none;
-          transition: all 0.2s ease;
-        }
-
-        .form-input:focus {
-          border-color: ${colors.blue};
-          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .form-input:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        /* Console Selection */
-        .console-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
-        }
-
-        .console-button {
-          padding: 14px 8px;
-          border-radius: 12px;
-          color: ${colors.textPrimary};
-          cursor: pointer;
-          transition: all 0.2s;
-          text-align: center;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 4px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.03);
-        }
-
-        .console-button.selected {
-          border-width: 2px;
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .console-button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        .console-icon {
-          margin-bottom: 4px;
-        }
-
-        .console-label {
-          font-size: 12px;
-          font-weight: 600;
-        }
-
-        /* Quantity Selection */
-        .quantity-grid {
-          display: flex;
-          gap: 8px;
-        }
-
-        .quantity-button {
-          flex: 1;
-          padding: 14px;
-          border-radius: 12px;
-          color: ${colors.textPrimary};
-          font-size: 18px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.05);
-        }
-
-        .quantity-button.selected {
-          background: linear-gradient(135deg, ${colors.red} 0%, #cc0530 100%);
-          border-color: ${colors.red};
-          color: white;
-          box-shadow: 0 4px 12px rgba(255, 7, 58, 0.2);
-        }
-
-        .quantity-button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        /* Duration Selection */
-        .duration-grid {
-          display: flex;
-          gap: 10px;
-        }
-
-        .duration-button {
-          flex: 1;
-          padding: 14px;
-          border-radius: 12px;
-          color: ${colors.textPrimary};
-          font-size: 16px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.2s;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          background: rgba(255, 255, 255, 0.05);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 6px;
-        }
-
-        .duration-button.selected {
-          background: linear-gradient(135deg, ${colors.cyan} 0%, #00b8d4 100%);
-          border-color: ${colors.cyan};
-          color: white;
-          box-shadow: 0 4px 12px rgba(0, 240, 255, 0.2);
-        }
-
-        .duration-button:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
-
-        /* Amount Display */
-        .total-amount-card {
-          background: rgba(255, 7, 58, 0.1);
-          border: 1px solid rgba(255, 7, 58, 0.3);
-          border-radius: 16px;
-          padding: 20px;
-          margin-bottom: 24px;
-        }
-
-        .amount-content {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        }
-
-        .amount-info {
-          display: flex;
-          flex-direction: column;
-        }
-
-        .amount-label {
-          color: ${colors.textSecondary};
-          font-size: 13px;
-          margin-bottom: 4px;
-        }
-
-        .amount-note {
-          color: ${colors.textPrimary};
-          font-size: 11px;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-        }
-
-        .amount-value {
-          font-family: ${fonts.heading};
-          font-size: 36px;
-          font-weight: 700;
-          color: ${colors.red};
-        }
-
-        /* Submit Button */
-        .submit-button {
-          width: 100%;
-          padding: 18px;
-          border: none;
-          border-radius: 14px;
-          color: white;
-          font-size: 17px;
-          font-weight: 700;
-          font-family: ${fonts.heading};
-          text-transform: uppercase;
-          letter-spacing: 1.5px;
-          cursor: pointer;
-          transition: all 0.2s;
-          background: linear-gradient(135deg, ${colors.red} 0%, #ff3366 100%);
-          box-shadow: 0 4px 20px rgba(255, 7, 58, 0.3);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-        }
-
-        .submit-button:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          background: rgba(148, 163, 184, 0.3);
-          box-shadow: none;
-        }
-
-        .submit-button:not(:disabled):hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 25px rgba(255, 7, 58, 0.4);
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes scaleIn {
-          from { transform: scale(0.5); }
-          to { transform: scale(1); }
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 480px) {
-          .walk-in-page {
-            padding: 12px;
-          }
-
-          .console-grid {
-            grid-template-columns: repeat(2, 1fr);
-          }
-
-          .cafe-name {
-            font-size: 24px;
-          }
-
-          .form-container {
-            padding: 20px 16px;
-          }
-
-          .quantity-button,
-          .duration-button {
-            padding: 12px;
-            font-size: 16px;
-          }
-
-          .amount-value {
-            font-size: 28px;
-          }
-
-          .submit-button {
-            padding: 16px;
-            font-size: 15px;
-          }
-        }
-
-        @media (min-width: 640px) {
-          .walk-in-page {
-            padding: 24px;
-          }
-
-          .form-container {
-            padding: 32px;
-          }
-        }
-      `}</style>
-
-      <div className="walk-in-page">
-        <div className="walk-in-container">
-          {/* Success Message */}
-          {success ? (
-            <div className="success-card">
-              <CheckCircle className="success-icon" />
-              <div className="success-title">Booking Confirmed!</div>
-              <div className="booking-id">
-                <Hash className="w-4 h-4" />
-                Booking ID: #{bookingId}
+      <div className="relative max-w-2xl mx-auto px-4 py-8">
+        {/* Success State */}
+        {success ? (
+          <div className="text-center space-y-8">
+            <div className="relative">
+              <div className="w-32 h-32 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-600/20 flex items-center justify-center mx-auto animate-pulse">
+                <CheckCircle className="w-20 h-20 text-green-400" />
               </div>
-              <div className="success-message">
-                Please proceed to the counter for payment
-              </div>
-              <div className="amount-card">
-                <div className="amount-label">Amount to Pay</div>
-                <div className="amount-value">₹{totalAmount}</div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-40 h-40 rounded-full border-2 border-green-400/30 animate-ping"></div>
               </div>
             </div>
-          ) : (
-            <>
-              {/* Header */}
-              <div className="header">
-                <h1 className="cafe-name">{cafeName}</h1>
-                <p className="page-title">
-                  <Calendar className="inline w-4 h-4 mr-2" />
-                  Walk-In Booking Form
-                </p>
+
+            <div className="space-y-4">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+                BOOKING CONFIRMED!
+              </h1>
+              <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-full">
+                <Hash className="w-5 h-5 text-cyan-400" />
+                <span className="font-mono text-xl font-bold">#{bookingId}</span>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 p-8">
+              <div className="space-y-6">
+                <div className="flex items-center justify-center gap-4">
+                  <Receipt className="w-8 h-8 text-cyan-400" />
+                  <span className="text-2xl font-bold">Payment Summary</span>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center py-4 border-b border-gray-800">
+                    <span className="text-gray-400">Console</span>
+                    <span className="font-semibold">
+                      {CONSOLES.find(c => c.id === selectedConsole)?.label}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center py-4 border-b border-gray-800">
+                    <span className="text-gray-400">Players</span>
+                    <span className="font-semibold">{quantity} person(s)</span>
+                  </div>
+                  <div className="flex justify-between items-center py-4 border-b border-gray-800">
+                    <span className="text-gray-400">Duration</span>
+                    <span className="font-semibold">{duration} minutes</span>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-red-500/10 to-red-900/10 border border-red-500/20 rounded-2xl p-6">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="text-gray-400 text-sm mb-2">Total Amount</p>
+                      <p className="text-3xl font-bold text-white">
+                        ₹{totalAmount}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-400 text-sm mb-2">Status</p>
+                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
+                        <ShieldCheck className="w-4 h-4 text-green-400" />
+                        <span className="font-semibold text-green-400">PENDING PAYMENT</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-4">
+                  <div className="flex items-start gap-3">
+                    <CheckSquare className="w-5 h-5 text-cyan-400 mt-1" />
+                    <div>
+                      <p className="font-semibold text-cyan-400">Proceed to Counter</p>
+                      <p className="text-gray-400 text-sm mt-1">
+                        Show this booking ID at the counter for payment and seat allocation
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* Header */}
+            <div className="text-center mb-10">
+              <div className="inline-flex items-center gap-3 mb-6">
+                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 via-cyan-500 to-blue-600 flex items-center justify-center">
+                  <Gamepad2 className="w-8 h-8 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                    {cafeName}
+                  </h1>
+                  <p className="text-gray-400 mt-2">Premium Gaming Experience</p>
+                </div>
+              </div>
+
+              <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500/10 to-cyan-500/10 border border-red-500/20 rounded-full">
+                <CalendarClock className="w-5 h-5 text-cyan-400" />
+                <span className="font-semibold">WALK-IN BOOKING</span>
+                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+              </div>
+            </div>
+
+            {/* Main Card */}
+            <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 overflow-hidden mb-8 shadow-2xl">
+              {/* Card Header */}
+              <div className="p-8 border-b border-gray-800">
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-red-500 to-cyan-500 flex items-center justify-center">
+                      <Rocket className="w-6 h-6 text-white" />
+                    </div>
+                    <div>
+                      <h2 className="text-2xl font-bold">Quick Booking</h2>
+                      <p className="text-gray-400">Fill details & start gaming instantly!</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500/20 to-cyan-500/20 rounded-full border border-red-500/30">
+                      <Zap className="w-4 h-4 text-cyan-400" />
+                      <span className="font-semibold text-sm">INSTANT CONFIRMATION</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="form-container">
+              <form onSubmit={handleSubmit} className="p-8">
                 {/* Error Message */}
                 {error && (
-                  <div className="error-message">
-                    <AlertCircle className="w-4 h-4" />
-                    {error}
+                  <div className="mb-8 p-4 bg-gradient-to-r from-red-500/10 to-red-900/10 border border-red-500/30 rounded-2xl">
+                    <div className="flex items-center gap-3">
+                      <AlertCircle className="w-5 h-5 text-red-400" />
+                      <p className="font-semibold text-red-400">{error}</p>
+                    </div>
                   </div>
                 )}
 
-                {/* Name Input */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <User className="w-4 h-4" />
-                    Your Name *
-                  </label>
-                  <input
-                    type="text"
-                    value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    placeholder="Enter your full name"
-                    disabled={submitting}
-                    autoComplete="name"
-                    className="form-input"
-                  />
-                </div>
+                {/* Personal Details Section */}
+                <div className="mb-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                      <UserCheck className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <h3 className="text-xl font-bold">Personal Details</h3>
+                  </div>
 
-                {/* Phone Input */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <Phone className="w-4 h-4" />
-                    Phone Number *
-                  </label>
-                  <input
-                    type="tel"
-                    value={customerPhone}
-                    onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                    placeholder="10-digit mobile number"
-                    disabled={submitting}
-                    autoComplete="tel"
-                    inputMode="numeric"
-                    className="form-input"
-                  />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-400 flex items-center gap-2">
+                        <User className="w-4 h-4" />
+                        Your Name *
+                      </label>
+                      <input
+                        type="text"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Enter your full name"
+                        disabled={submitting}
+                        autoComplete="name"
+                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-800 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-semibold text-gray-400 flex items-center gap-2">
+                        <Smartphone className="w-4 h-4" />
+                        Phone Number *
+                      </label>
+                      <input
+                        type="tel"
+                        value={customerPhone}
+                        onChange={(e) => setCustomerPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
+                        placeholder="10-digit mobile number"
+                        disabled={submitting}
+                        autoComplete="tel"
+                        inputMode="numeric"
+                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-800 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition"
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Console Selection */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <Gamepad2 className="w-4 h-4" />
-                    Select Console *
-                  </label>
-                  <div className="console-grid">
+                <div className="mb-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                      <Cpu className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <h3 className="text-xl font-bold">Select Gaming Console</h3>
+                  </div>
+
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {availableConsoleOptions.map((console) => {
                       const isSelected = selectedConsole === console.id;
 
@@ -879,86 +582,186 @@ export default function WalkInBookingPage() {
                           type="button"
                           onClick={() => setSelectedConsole(console.id)}
                           disabled={submitting}
-                          className={`console-button ${isSelected ? 'selected' : ''}`}
-                          style={{
-                            borderColor: isSelected ? console.color : undefined,
-                            background: isSelected ? `linear-gradient(135deg, ${console.color}33 0%, ${console.color}11 100%)` : undefined
-                          }}
+                          className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
+                            isSelected 
+                              ? 'border-cyan-500 scale-105 shadow-2xl' 
+                              : 'border-gray-800 hover:border-gray-700 hover:scale-102'
+                          }`}
                         >
-                          <div className="console-icon" style={{ color: isSelected ? console.color : colors.textPrimary }}>
-                            {console.icon}
+                          {/* Background Gradient */}
+                          {isSelected && (
+                            <div className={`absolute inset-0 bg-gradient-to-br ${console.gradient} opacity-10 rounded-2xl`}></div>
+                          )}
+
+                          <div className="relative">
+                            <div className={`flex flex-col items-center gap-3 ${isSelected ? 'text-white' : 'text-gray-400'}`}>
+                              <div className={`p-3 rounded-xl ${
+                                isSelected 
+                                  ? `bg-gradient-to-br ${console.gradient}` 
+                                  : 'bg-gray-900'
+                              }`}>
+                                <div className={`${isSelected ? 'text-white' : 'text-gray-400'}`}>
+                                  {console.icon}
+                                </div>
+                              </div>
+                              <div className="font-semibold text-center">
+                                {console.label}
+                              </div>
+                            </div>
                           </div>
-                          <div className="console-label">{console.label}</div>
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                {/* Quantity Selection */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <Users className="w-4 h-4" />
-                    No. of Players
-                  </label>
-                  <div className="quantity-grid">
-                    {[1, 2, 3, 4].map((num) => {
-                      const isSelected = quantity === num;
+                {/* Players & Duration */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                  {/* Players Selection */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                        <Users className="w-4 h-4 text-cyan-400" />
+                      </div>
+                      <h4 className="font-bold">No. of Players</h4>
+                    </div>
+                    
+                    <div className="grid grid-cols-4 gap-3">
+                      {[1, 2, 3, 4].map((num) => {
+                        const isSelected = quantity === num;
 
-                      return (
-                        <button
-                          key={num}
-                          type="button"
-                          onClick={() => setQuantity(num)}
-                          disabled={submitting}
-                          className={`quantity-button ${isSelected ? 'selected' : ''}`}
-                        >
-                          {num}
-                        </button>
-                      );
-                    })}
+                        return (
+                          <button
+                            key={num}
+                            type="button"
+                            onClick={() => setQuantity(num)}
+                            disabled={submitting}
+                            className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                              isSelected 
+                                ? 'border-cyan-500 bg-cyan-500/10 scale-105' 
+                                : 'border-gray-800 hover:border-gray-700'
+                            }`}
+                          >
+                            <div className="text-center">
+                              <div className={`text-2xl font-bold ${isSelected ? 'text-cyan-400' : 'text-gray-400'}`}>
+                                {num}
+                              </div>
+                              <div className={`text-xs mt-1 ${isSelected ? 'text-cyan-400' : 'text-gray-500'}`}>
+                                Player{num > 1 ? 's' : ''}
+                              </div>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Duration Selection */}
+                  <div>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                        <Timer className="w-4 h-4 text-cyan-400" />
+                      </div>
+                      <h4 className="font-bold">Duration</h4>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setDuration(30)}
+                        disabled={submitting}
+                        className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                          duration === 30 
+                            ? 'border-cyan-500 bg-cyan-500/10 scale-105' 
+                            : 'border-gray-800 hover:border-gray-700'
+                        }`}
+                      >
+                        <div className="text-center">
+                          <div className={`text-2xl font-bold ${duration === 30 ? 'text-cyan-400' : 'text-gray-400'}`}>
+                            30
+                          </div>
+                          <div className={`text-xs mt-1 ${duration === 30 ? 'text-cyan-400' : 'text-gray-500'}`}>
+                            Minutes
+                          </div>
+                        </div>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setDuration(60)}
+                        disabled={submitting}
+                        className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                          duration === 60 
+                            ? 'border-red-500 bg-red-500/10 scale-105' 
+                            : 'border-gray-800 hover:border-gray-700'
+                        }`}
+                      >
+                        <div className="text-center">
+                          <div className={`text-2xl font-bold ${duration === 60 ? 'text-red-400' : 'text-gray-400'}`}>
+                            60
+                          </div>
+                          <div className={`text-xs mt-1 ${duration === 60 ? 'text-red-400' : 'text-gray-500'}`}>
+                            Minutes
+                          </div>
+                          <div className="absolute top-2 right-2">
+                            <Crown className={`w-3 h-3 ${duration === 60 ? 'text-yellow-400' : 'text-gray-600'}`} />
+                          </div>
+                        </div>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* Duration Selection */}
-                <div className="form-group">
-                  <label className="form-label">
-                    <Clock className="w-4 h-4" />
-                    Duration
-                  </label>
-                  <div className="duration-grid">
-                    <button
-                      type="button"
-                      onClick={() => setDuration(30)}
-                      disabled={submitting}
-                      className={`duration-button ${duration === 30 ? 'selected' : ''}`}
-                    >
-                      <Clock className="w-4 h-4" />
-                      30 min
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDuration(60)}
-                      disabled={submitting}
-                      className={`duration-button ${duration === 60 ? 'selected' : ''}`}
-                    >
-                      <Clock className="w-4 h-4" />
-                      60 min
-                    </button>
+                {/* Amount Summary */}
+                <div className="mb-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                      <Wallet className="w-5 h-5 text-cyan-400" />
+                    </div>
+                    <h3 className="text-xl font-bold">Payment Summary</h3>
                   </div>
-                </div>
 
-                {/* Amount Display */}
-                <div className="total-amount-card">
-                  <div className="amount-content">
-                    <div className="amount-info">
-                      <div className="amount-label">Total Amount</div>
-                      <div className="amount-note">
-                        <CreditCard className="w-3 h-3" />
-                        Pay at Counter
+                  <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl p-6">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                      <div className="text-center">
+                        <p className="text-sm text-gray-400 mb-2">Console</p>
+                        <p className="font-semibold">
+                          {selectedConsole ? CONSOLES.find(c => c.id === selectedConsole)?.label : '--'}
+                        </p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-400 mb-2">Players</p>
+                        <p className="font-semibold">{quantity}</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-400 mb-2">Duration</p>
+                        <p className="font-semibold">{duration} min</p>
+                      </div>
+                      <div className="text-center">
+                        <p className="text-sm text-gray-400 mb-2">Total</p>
+                        <p className="text-2xl font-bold text-cyan-400">
+                          ₹{totalAmount}
+                        </p>
                       </div>
                     </div>
-                    <div className="amount-value">₹{totalAmount}</div>
+
+                    <div className="bg-gradient-to-r from-red-500/10 to-cyan-500/10 border border-red-500/20 rounded-xl p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <CreditCard className="w-5 h-5 text-cyan-400" />
+                          <div>
+                            <p className="font-semibold text-cyan-400">Pay at Counter</p>
+                            <p className="text-gray-400 text-sm">Complete payment at reception</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
+                            <Shield className="w-4 h-4 text-green-400" />
+                            <span className="font-semibold text-sm text-green-400">SECURE</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
@@ -966,25 +769,56 @@ export default function WalkInBookingPage() {
                 <button
                   type="submit"
                   disabled={submitting || !selectedConsole}
-                  className="submit-button"
+                  className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 ${
+                    submitting || !selectedConsole
+                      ? 'bg-gray-900 text-gray-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-red-600 via-red-500 to-cyan-500 hover:from-red-700 hover:via-red-600 hover:to-cyan-600 hover:scale-[1.02] active:scale-100 shadow-xl hover:shadow-2xl'
+                  }`}
                 >
                   {submitting ? (
                     <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Creating...
+                      <Loader2 className="w-6 h-6 animate-spin" />
+                      CREATING BOOKING...
                     </>
                   ) : (
                     <>
-                      <Shield className="w-5 h-5" />
-                      Confirm Booking
+                      <CheckCircle className="w-6 h-6" />
+                      CONFIRM WALK-IN BOOKING
+                      <ArrowRight className="w-6 h-6" />
                     </>
                   )}
                 </button>
               </form>
-            </>
-          )}
-        </div>
+            </div>
+
+            {/* Info Banner */}
+            <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 backdrop-blur-xl rounded-2xl border border-cyan-500/20 p-6">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
+                    <Zap className="w-6 h-6 text-cyan-400" />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-lg">Instant Gaming Access</h4>
+                    <p className="text-gray-400 text-sm">Your seat will be allocated immediately after booking</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-cyan-400">24/7</div>
+                    <div className="text-gray-400 text-sm">Support</div>
+                  </div>
+                  <div className="w-px h-8 bg-gray-800"></div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-green-400">100%</div>
+                    <div className="text-gray-400 text-sm">Success Rate</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
-    </>
+    </div>
   );
 }

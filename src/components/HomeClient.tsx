@@ -2,6 +2,7 @@
 "use client";
 
 import { useMemo, useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import CafeList from "@/components/CafeList";
 import type { Cafe } from "../types/cafe";
 import { 
@@ -19,12 +20,13 @@ import {
   Monitor,
   CircleDollarSign,
   Car,
-  Telescope,
+  RectangleGoggles,
   Target,
   Frown,
   Check,
   TrendingUp,
   TrendingDown
+  
 } from "lucide-react";
 
 type Props = {
@@ -34,6 +36,7 @@ type Props = {
 type SortKey = "relevance" | "price_asc" | "price_desc";
 
 export default function HomeClient({ cafes }: Props) {
+  const router = useRouter();
   const safeCafes: Cafe[] = Array.isArray(cafes) ? cafes : [];
 
   const [query, setQuery] = useState("");
@@ -46,7 +49,6 @@ export default function HomeClient({ cafes }: Props) {
   const [sortBy, setSortBy] = useState<SortKey>("relevance");
   const [mounted, setMounted] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
-  const [activeFeature, setActiveFeature] = useState<string | null>(null);
 
   const listRef = useRef<HTMLDivElement | null>(null);
 
@@ -66,26 +68,12 @@ export default function HomeClient({ cafes }: Props) {
     };
   }, [showFilters]);
 
-  // Feature highlight timeout
-  useEffect(() => {
-    if (activeFeature) {
-      const timer = setTimeout(() => {
-        setActiveFeature(null);
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [activeFeature]);
-
   const handleScrollToList = () => {
     if (!listRef.current) return;
     listRef.current.scrollIntoView({
       behavior: "smooth",
       block: "start",
     });
-  };
-
-  const handleComingSoon = (feature: string) => {
-    setActiveFeature(feature);
   };
 
   const filteredCafes = useMemo(() => {
@@ -186,7 +174,7 @@ export default function HomeClient({ cafes }: Props) {
     { 
       key: "vr", 
       label: "VR", 
-      icon: <Telescope className="w-4 h-4" />, 
+      icon: <RectangleGoggles className="w-4 h-4" />, 
       active: onlyVr, 
       toggle: () => setOnlyVr((v) => !v) 
     },
@@ -672,18 +660,6 @@ export default function HomeClient({ cafes }: Props) {
       `}</style>
 
       <main className="min-h-screen bg-main text-white relative">
-        {/* Active Feature Notification */}
-        {activeFeature && (
-          <div className="fixed top-20 left-0 right-0 z-50 flex justify-center pointer-events-none">
-            <div className="animate-feature-highlight bg-gradient-to-r from-[#ff073a] to-[#00f0ff] text-black px-6 py-3 rounded-full flex items-center gap-2 shadow-2xl">
-              <Sparkles className="w-5 h-5" />
-              <span className="font-bold" style={{ fontFamily: 'Orbitron, sans-serif' }}>
-                {activeFeature} Coming Soon!
-              </span>
-            </div>
-          </div>
-        )}
-
         {/* Background Patterns */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-slate-950/80 z-10" />
@@ -822,7 +798,7 @@ export default function HomeClient({ cafes }: Props) {
                   
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleComingSoon("Membership")}
+                      onClick={() => router.push("/membership")}
                       className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
@@ -830,7 +806,7 @@ export default function HomeClient({ cafes }: Props) {
                       <span>Membership</span>
                     </button>
                     <button
-                      onClick={() => handleComingSoon("Tournaments")}
+                      onClick={() => router.push("/tournaments")}
                       className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
