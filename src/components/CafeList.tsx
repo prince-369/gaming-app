@@ -9,6 +9,7 @@ import {
   Star,
   Clock,
   Gamepad2,
+  GamepadDirectional,
   Monitor,
   DollarSign,
   Car,
@@ -602,7 +603,7 @@ const CONSOLE_CONFIG: {
 }[] = [
   { 
     key: "ps5_count", 
-    icon: <Gamepad2 className="w-4 h-4" />, 
+    icon: <GamepadDirectional className="w-4 h-4" />, 
     label: "PS5", 
     color: "linear-gradient(135deg, rgba(0, 112, 243, 0.2) 0%, rgba(0, 112, 243, 0.1) 100%)" 
   },
@@ -614,7 +615,7 @@ const CONSOLE_CONFIG: {
   },
   { 
     key: "xbox_count", 
-    icon: <span className="text-green-400">X</span>, 
+    icon: <Gamepad2 className="w-4 h-4 text-green-400" />, 
     label: "Xbox", 
     color: "linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%)" 
   },
@@ -677,7 +678,7 @@ function EquipmentIconsMobile({ cafe }: { cafe: Cafe }) {
   const mobileIcons = [
     { 
       key: "ps5_count", 
-      icon: <Gamepad2 className="mobile-icon-small" />, 
+      icon: <GamepadDirectional className="mobile-icon-small" />, 
       label: "PS5",
       show: (((cafe as any)["ps5_count"] as number | null) ?? 0) > 0 
     },
@@ -689,7 +690,7 @@ function EquipmentIconsMobile({ cafe }: { cafe: Cafe }) {
     },
     { 
       key: "xbox_count", 
-      icon: <span className="text-xs font-bold" style={{ fontSize: '8px' }}>X</span>, 
+      icon: <Gamepad2 className="mobile-icon-small" />, 
       label: "Xbox",
       show: (((cafe as any)["xbox_count"] as number | null) ?? 0) > 0 
     },

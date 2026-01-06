@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabaseClient";
 import Image from "next/image";
 import dynamicImport from "next/dynamic";
 import Link from "next/link";
-import { Gamepad, MapPin, Camera, Info, Check, Monitor, Cpu } from "lucide-react";
+import { Gamepad, Gamepad2, GamepadDirectional, MapPin, Camera, Info, Check, Monitor, Cpu, Car, RectangleGoggles } from "lucide-react";
 import StickyFullWidthCTA from "@/components/StickyFullWidthCTA";
 
 // Lazy load heavy components
@@ -41,15 +41,15 @@ const CONSOLE_CONFIG: {
   icon: string;
   color: string;
 }[] = [
-  { key: "ps5_count", label: "PS5", icon: "gamepad", color: "#0070d1" },
+  { key: "ps5_count", label: "PS5", icon: "ps5", color: "#0070d1" },
   { key: "ps4_count", label: "PS4", icon: "gamepad", color: "#003791" },
-  { key: "xbox_count", label: "Xbox", icon: "gamepad", color: "#107c10" },
+  { key: "xbox_count", label: "Xbox", icon: "xbox", color: "#107c10" },
   { key: "pc_count", label: "PC", icon: "monitor", color: "#ff073a" },
   { key: "pool_count", label: "Pool", icon: "cpu", color: "#8b4513" },
   { key: "arcade_count", label: "Arcade", icon: "gamepad", color: "#ff6b00" },
   { key: "snooker_count", label: "Snooker", icon: "cpu", color: "#228b22" },
   { key: "steering_wheel_count", label: "Racing", icon: "steering", color: "#e10600" },
-  { key: "vr_count", label: "VR", icon: "gamepad", color: "#9945ff" },
+  { key: "vr_count", label: "VR", icon: "vr", color: "#9945ff" },
 ];
 
 export const dynamic = "force-dynamic";
@@ -199,12 +199,18 @@ export default async function CafePage({ params }: CafePageProps) {
   const renderConsoleIcon = (iconName: string, color: string) => {
     const baseStyle: React.CSSProperties = { color, display: "inline-flex" };
     switch (iconName) {
+      case "ps5":
+        return <GamepadDirectional size={16} style={baseStyle} />;
+      case "xbox":
+        return <Gamepad2 size={16} style={baseStyle} />;
+      case "vr":
+        return <RectangleGoggles size={16} style={baseStyle} />;
       case "monitor":
         return <Monitor size={16} style={baseStyle} />;
       case "cpu":
         return <Cpu size={16} style={baseStyle} />;
       case "steering":
-        return <Gamepad size={16} style={baseStyle} />;
+        return <Car size={16} style={baseStyle} />;
       default:
         return <Gamepad size={16} style={baseStyle} />;
     }

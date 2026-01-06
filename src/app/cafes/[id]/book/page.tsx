@@ -26,6 +26,7 @@ import {
   Calendar,
   Clock,
   Gamepad2,
+  GamepadDirectional,
   Monitor,
   Car,
   Target,
@@ -104,7 +105,7 @@ const CONSOLES: ConsoleOption[] = [
   { 
     id: "ps5", 
     label: CONSOLE_LABELS.ps5, 
-    icon: <Gamepad2 className="w-5 h-5" />, 
+    icon: <GamepadDirectional className="w-5 h-5" />, 
     color: CONSOLE_COLORS.ps5, 
     dbKey: CONSOLE_DB_KEYS.ps5 
   },

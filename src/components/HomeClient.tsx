@@ -16,7 +16,7 @@ import {
   Clock,
   Zap,
   Sparkles,
-  Gamepad2,
+  GamepadDirectional,
   Monitor,
   CircleDollarSign,
   Car,
@@ -146,7 +146,7 @@ export default function HomeClient({ cafes }: Props) {
     { 
       key: "ps5", 
       label: "PS5", 
-      icon: <Gamepad2 className="w-4 h-4" />, 
+      icon: <GamepadDirectional className="w-4 h-4" />, 
       active: onlyPs5, 
       toggle: () => setOnlyPs5((v) => !v) 
     },

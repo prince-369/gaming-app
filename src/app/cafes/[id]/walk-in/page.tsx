@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { colors, fonts } from "@/lib/constants";
 import {
   Gamepad2,
+  GamepadDirectional,
   Monitor,
   Car,
   Target,
@@ -50,7 +51,7 @@ import {
 type ConsoleId = "ps5" | "ps4" | "xbox" | "pc" | "pool" | "arcade" | "snooker" | "vr" | "steering_wheel";
 
 const CONSOLES: { id: ConsoleId; label: string; icon: React.ReactNode; color: string; gradient: string }[] = [
-  { id: "ps5", label: "PS5", icon: <Gamepad2 className="w-6 h-6" />, color: "#3b82f6", gradient: "from-blue-500 to-cyan-500" },
+  { id: "ps5", label: "PS5", icon: <GamepadDirectional className="w-6 h-6" />, color: "#3b82f6", gradient: "from-blue-500 to-cyan-500" },
   { id: "ps4", label: "PS4", icon: <Gamepad2 className="w-6 h-6" />, color: "#1d4ed8", gradient: "from-blue-600 to-blue-800" },
   { id: "xbox", label: "Xbox", icon: <Gamepad2 className="w-6 h-6" />, color: "#16a34a", gradient: "from-green-500 to-emerald-600" },
   { id: "pc", label: "PC Gaming", icon: <Monitor className="w-6 h-6" />, color: "#ef4444", gradient: "from-red-500 to-pink-600" },

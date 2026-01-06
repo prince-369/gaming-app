@@ -9,6 +9,7 @@ import { formatDate } from "@/lib/timeUtils";
 import {
   CheckCircle,
   Gamepad2,
+  GamepadDirectional,
   Calendar,
   Clock,
   Ticket,
@@ -29,7 +30,9 @@ import {
   Sparkles,
   Award,
   ThumbsUp,
-  Share2
+  Share2,
+  RectangleGoggles,
+  Car
 } from "lucide-react";
 
 type BookingRow = {
@@ -69,16 +72,16 @@ type FullBooking = {
 
 // Console icons mapping
 const consoleIcons: Record<string, React.ReactNode> = {
-  ps5: <Gamepad2 className="w-6 h-6" />,
+  ps5: <GamepadDirectional className="w-6 h-6" />,
   ps4: <Gamepad2 className="w-6 h-6" />,
   xbox: <Gamepad2 className="w-6 h-6" />,
   pc: <Gamepad2 className="w-6 h-6" />,
   pool: <Gamepad2 className="w-6 h-6" />,
   arcade: <Gamepad2 className="w-6 h-6" />,
   snooker: <Gamepad2 className="w-6 h-6" />,
-  vr: <Gamepad2 className="w-6 h-6" />,
-  steering: <Gamepad2 className="w-6 h-6" />,
-  steering_wheel: <Gamepad2 className="w-6 h-6" />,
+  vr: <RectangleGoggles className="w-6 h-6" />,
+  steering: <Car className="w-6 h-6" />,
+  steering_wheel: <Car className="w-6 h-6" />,
 };
 
 function BookingSuccessContent() {
