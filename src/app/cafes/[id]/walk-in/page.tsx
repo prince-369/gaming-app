@@ -4,10 +4,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabaseClient";
-import { colors, fonts } from "@/lib/constants";
 import {
   Gamepad2,
-  GamepadDirectional,
   Monitor,
   Car,
   Target,
@@ -21,7 +19,6 @@ import {
   Calendar,
   CreditCard,
   Shield,
-  Sparkles,
   Hash,
   Users,
   Crown,
@@ -33,33 +30,27 @@ import {
   Timer,
   Wallet,
   ArrowRight,
-  BadgeCheck,
-  Star,
-  Award,
-  Trophy,
-  Flame,
-  Rocket,
   ShieldCheck,
   CheckSquare,
   CalendarClock,
-  QrCode,
-  Tv,
   Cpu,
-  Disc
+  Joystick,
+  SquareActivity,
+  Bolt
 } from "lucide-react";
 
 type ConsoleId = "ps5" | "ps4" | "xbox" | "pc" | "pool" | "arcade" | "snooker" | "vr" | "steering_wheel";
 
 const CONSOLES: { id: ConsoleId; label: string; icon: React.ReactNode; color: string; gradient: string }[] = [
-  { id: "ps5", label: "PS5", icon: <GamepadDirectional className="w-6 h-6" />, color: "#3b82f6", gradient: "from-blue-500 to-cyan-500" },
-  { id: "ps4", label: "PS4", icon: <Gamepad2 className="w-6 h-6" />, color: "#1d4ed8", gradient: "from-blue-600 to-blue-800" },
-  { id: "xbox", label: "Xbox", icon: <Gamepad2 className="w-6 h-6" />, color: "#16a34a", gradient: "from-green-500 to-emerald-600" },
-  { id: "pc", label: "PC Gaming", icon: <Monitor className="w-6 h-6" />, color: "#ef4444", gradient: "from-red-500 to-pink-600" },
-  { id: "pool", label: "Pool Table", icon: <Target className="w-6 h-6" />, color: "#92400e", gradient: "from-amber-700 to-yellow-600" },
-  { id: "arcade", label: "Arcade", icon: <Gamepad2 className="w-6 h-6" />, color: "#ea580c", gradient: "from-orange-500 to-red-500" },
-  { id: "snooker", label: "Snooker", icon: <Target className="w-6 h-6" />, color: "#059669", gradient: "from-emerald-500 to-teal-600" },
-  { id: "vr", label: "VR Experience", icon: <RectangleGoggles className="w-6 h-6" />, color: "#7c3aed", gradient: "from-purple-500 to-violet-600" },
-  { id: "steering_wheel", label: "Racing Rig", icon: <Car className="w-6 h-6" />, color: "#dc2626", gradient: "from-red-600 to-rose-700" },
+  { id: "ps5", label: "PS5", icon: <Gamepad2 className="w-5 h-5 md:w-6 md:h-6" />, color: "#3b82f6", gradient: "from-blue-500 to-cyan-500" },
+  { id: "ps4", label: "PS4", icon: <Joystick className="w-5 h-5 md:w-6 md:h-6" />, color: "#1d4ed8", gradient: "from-blue-600 to-blue-800" },
+  { id: "xbox", label: "Xbox", icon: <SquareActivity className="w-5 h-5 md:w-6 md:h-6" />, color: "#16a34a", gradient: "from-green-500 to-emerald-600" },
+  { id: "pc", label: "PC Gaming", icon: <Monitor className="w-5 h-5 md:w-6 md:h-6" />, color: "#ef4444", gradient: "from-red-500 to-pink-600" },
+  { id: "pool", label: "Pool Table", icon: <Target className="w-5 h-5 md:w-6 md:h-6" />, color: "#92400e", gradient: "from-amber-700 to-yellow-600" },
+  { id: "arcade", label: "Arcade", icon: <Gamepad2 className="w-5 h-5 md:w-6 md:h-6" />, color: "#ea580c", gradient: "from-orange-500 to-red-500" },
+  { id: "snooker", label: "Snooker", icon: <Target className="w-5 h-5 md:w-6 md:h-6" />, color: "#059669", gradient: "from-emerald-500 to-teal-600" },
+  { id: "vr", label: "VR Experience", icon: <RectangleGoggles className="w-5 h-5 md:w-6 md:h-6" />, color: "#7c3aed", gradient: "from-purple-500 to-violet-600" },
+  { id: "steering_wheel", label: "Racing Rig", icon: <Car className="w-5 h-5 md:w-6 md:h-6" />, color: "#dc2626", gradient: "from-red-600 to-rose-700" },
 ];
 
 const CONSOLE_DB_KEYS: Record<ConsoleId, string> = {
@@ -382,7 +373,7 @@ export default function WalkInBookingPage() {
         <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black"></div>
       </div>
 
-      <div className="relative max-w-2xl mx-auto px-4 py-8">
+      <div className="relative max-w-2xl mx-auto px-3 sm:px-4 py-6 sm:py-8">
         {/* Success State */}
         {success ? (
           <div className="text-center space-y-8">
@@ -396,52 +387,52 @@ export default function WalkInBookingPage() {
             </div>
 
             <div className="space-y-4">
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+              <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
                 BOOKING CONFIRMED!
               </h1>
-              <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-full">
-                <Hash className="w-5 h-5 text-cyan-400" />
-                <span className="font-mono text-xl font-bold">#{bookingId}</span>
+              <div className="inline-flex items-center gap-3 px-4 sm:px-6 py-3 bg-gradient-to-r from-gray-900 to-black border border-gray-800 rounded-full">
+                <Hash className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
+                <span className="font-mono text-lg sm:text-xl font-bold">#{bookingId}</span>
               </div>
             </div>
 
-            <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 p-8">
+            <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 p-6 sm:p-8">
               <div className="space-y-6">
-                <div className="flex items-center justify-center gap-4">
-                  <Receipt className="w-8 h-8 text-cyan-400" />
-                  <span className="text-2xl font-bold">Payment Summary</span>
+                <div className="flex items-center justify-center gap-3 sm:gap-4">
+                  <Receipt className="w-6 h-6 sm:w-8 sm:h-8 text-cyan-400" />
+                  <span className="text-xl sm:text-2xl font-bold">Payment Summary</span>
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex justify-between items-center py-4 border-b border-gray-800">
-                    <span className="text-gray-400">Console</span>
-                    <span className="font-semibold">
+                    <span className="text-gray-400 text-sm sm:text-base">Console</span>
+                    <span className="font-semibold text-sm sm:text-base">
                       {CONSOLES.find(c => c.id === selectedConsole)?.label}
                     </span>
                   </div>
                   <div className="flex justify-between items-center py-4 border-b border-gray-800">
-                    <span className="text-gray-400">Players</span>
-                    <span className="font-semibold">{quantity} person(s)</span>
+                    <span className="text-gray-400 text-sm sm:text-base">Players</span>
+                    <span className="font-semibold text-sm sm:text-base">{quantity} person(s)</span>
                   </div>
                   <div className="flex justify-between items-center py-4 border-b border-gray-800">
-                    <span className="text-gray-400">Duration</span>
-                    <span className="font-semibold">{duration} minutes</span>
+                    <span className="text-gray-400 text-sm sm:text-base">Duration</span>
+                    <span className="font-semibold text-sm sm:text-base">{duration} minutes</span>
                   </div>
                 </div>
 
-                <div className="bg-gradient-to-r from-red-500/10 to-red-900/10 border border-red-500/20 rounded-2xl p-6">
-                  <div className="flex justify-between items-center">
+                <div className="bg-gradient-to-r from-red-500/10 to-red-900/10 border border-red-500/20 rounded-2xl p-4 sm:p-6">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <div>
                       <p className="text-gray-400 text-sm mb-2">Total Amount</p>
-                      <p className="text-3xl font-bold text-white">
+                      <p className="text-2xl sm:text-3xl font-bold text-white">
                         ₹{totalAmount}
                       </p>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <p className="text-gray-400 text-sm mb-2">Status</p>
-                      <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
-                        <ShieldCheck className="w-4 h-4 text-green-400" />
-                        <span className="font-semibold text-green-400">PENDING PAYMENT</span>
+                      <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
+                        <ShieldCheck className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
+                        <span className="font-semibold text-xs sm:text-sm text-green-400">PENDING PAYMENT</span>
                       </div>
                     </div>
                   </div>
@@ -449,10 +440,10 @@ export default function WalkInBookingPage() {
 
                 <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 border border-cyan-500/20 rounded-xl p-4">
                   <div className="flex items-start gap-3">
-                    <CheckSquare className="w-5 h-5 text-cyan-400 mt-1" />
+                    <CheckSquare className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 mt-1" />
                     <div>
-                      <p className="font-semibold text-cyan-400">Proceed to Counter</p>
-                      <p className="text-gray-400 text-sm mt-1">
+                      <p className="font-semibold text-cyan-400 text-sm sm:text-base">Proceed to Counter</p>
+                      <p className="text-gray-400 text-xs sm:text-sm mt-1">
                         Show this booking ID at the counter for payment and seat allocation
                       </p>
                     </div>
@@ -464,74 +455,74 @@ export default function WalkInBookingPage() {
         ) : (
           <>
             {/* Header */}
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-3 mb-6">
-                <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-red-600 via-cyan-500 to-blue-600 flex items-center justify-center">
-                  <Gamepad2 className="w-8 h-8 text-white" />
+            <div className="text-center mb-6 sm:mb-10">
+              <div className="inline-flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-red-600 via-cyan-500 to-blue-600 flex items-center justify-center">
+                  <Gamepad2 className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
                 <div>
-                  <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
+                  <h1 className="text-2xl sm:text-4xl font-bold bg-gradient-to-r from-red-400 via-cyan-400 to-blue-400 bg-clip-text text-transparent">
                     {cafeName}
                   </h1>
-                  <p className="text-gray-400 mt-2">Premium Gaming Experience</p>
+                  <p className="text-gray-400 text-xs sm:text-sm mt-1 sm:mt-2">Premium Gaming Experience</p>
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500/10 to-cyan-500/10 border border-red-500/20 rounded-full">
-                <CalendarClock className="w-5 h-5 text-cyan-400" />
-                <span className="font-semibold">WALK-IN BOOKING</span>
-                <div className="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></div>
+              <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-red-500/10 to-cyan-500/10 border border-red-500/20 rounded-full max-w-[90vw] mx-auto overflow-hidden">
+                <CalendarClock className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 flex-shrink-0" />
+                <span className="font-semibold text-xs sm:text-sm truncate">WALK-IN BOOKING</span>
+                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-cyan-400 rounded-full animate-pulse flex-shrink-0"></div>
               </div>
             </div>
 
             {/* Main Card */}
-            <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 overflow-hidden mb-8 shadow-2xl">
+            <div className="bg-gradient-to-br from-gray-900/90 to-black/90 backdrop-blur-xl rounded-3xl border border-gray-800 overflow-hidden mb-6 sm:mb-8 shadow-2xl">
               {/* Card Header */}
-              <div className="p-8 border-b border-gray-800">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-red-500 to-cyan-500 flex items-center justify-center">
-                      <Rocket className="w-6 h-6 text-white" />
+              <div className="p-4 sm:p-8 border-b border-gray-800">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4 sm:mb-6">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-r from-red-500 to-cyan-500 flex items-center justify-center">
+                      <Bolt className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold">Quick Booking</h2>
-                      <p className="text-gray-400">Fill details & start gaming instantly!</p>
+                      <h2 className="text-lg sm:text-2xl font-bold">Quick Booking</h2>
+                      <p className="text-gray-400 text-xs sm:text-sm">Fill details & start gaming instantly!</p>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500/20 to-cyan-500/20 rounded-full border border-red-500/30">
-                      <Zap className="w-4 h-4 text-cyan-400" />
-                      <span className="font-semibold text-sm">INSTANT CONFIRMATION</span>
+                  <div className="text-left sm:text-right">
+                    <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-red-500/20 to-cyan-500/20 rounded-full border border-red-500/30 max-w-full overflow-hidden">
+                      <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
+                      <span className="font-semibold text-xs truncate">INSTANT CONFIRMATION</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="p-8">
+              <form onSubmit={handleSubmit} className="p-4 sm:p-8">
                 {/* Error Message */}
                 {error && (
-                  <div className="mb-8 p-4 bg-gradient-to-r from-red-500/10 to-red-900/10 border border-red-500/30 rounded-2xl">
-                    <div className="flex items-center gap-3">
-                      <AlertCircle className="w-5 h-5 text-red-400" />
-                      <p className="font-semibold text-red-400">{error}</p>
+                  <div className="mb-6 sm:mb-8 p-3 sm:p-4 bg-gradient-to-r from-red-500/10 to-red-900/10 border border-red-500/30 rounded-2xl">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-400 flex-shrink-0" />
+                      <p className="font-semibold text-red-400 text-sm sm:text-base">{error}</p>
                     </div>
                   </div>
                 )}
 
                 {/* Personal Details Section */}
-                <div className="mb-10">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
-                      <UserCheck className="w-5 h-5 text-cyan-400" />
+                <div className="mb-8 sm:mb-10">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                      <UserCheck className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                     </div>
-                    <h3 className="text-xl font-bold">Personal Details</h3>
+                    <h3 className="text-lg sm:text-xl font-bold">Personal Details</h3>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-400 flex items-center gap-2">
-                        <User className="w-4 h-4" />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <label className="text-xs sm:text-sm font-semibold text-gray-400 flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                        <User className="w-3 h-3 sm:w-4 sm:h-4" />
                         Your Name *
                       </label>
                       <input
@@ -541,13 +532,13 @@ export default function WalkInBookingPage() {
                         placeholder="Enter your full name"
                         disabled={submitting}
                         autoComplete="name"
-                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-800 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 border border-gray-800 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition text-center text-sm sm:text-base"
                       />
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="text-sm font-semibold text-gray-400 flex items-center gap-2">
-                        <Smartphone className="w-4 h-4" />
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <label className="text-xs sm:text-sm font-semibold text-gray-400 flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3">
+                        <Smartphone className="w-3 h-3 sm:w-4 sm:h-4" />
                         Phone Number *
                       </label>
                       <input
@@ -558,22 +549,25 @@ export default function WalkInBookingPage() {
                         disabled={submitting}
                         autoComplete="tel"
                         inputMode="numeric"
-                        className="w-full px-4 py-3 bg-gray-900/50 border border-gray-800 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition"
+                        className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-900/50 border border-gray-800 rounded-xl focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition text-center text-sm sm:text-base"
                       />
                     </div>
                   </div>
                 </div>
 
                 {/* Console Selection */}
-                <div className="mb-10">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
-                      <Cpu className="w-5 h-5 text-cyan-400" />
+                <div className="mb-8 sm:mb-10">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                      <Cpu className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                     </div>
-                    <h3 className="text-xl font-bold">Select Gaming Console</h3>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold mb-0.5 sm:mb-1">Select Gaming Console</h3>
+                      <p className="text-gray-400 text-xs sm:text-sm">Choose your preferred gaming setup</p>
+                    </div>
                   </div>
 
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4">
                     {availableConsoleOptions.map((console) => {
                       const isSelected = selectedConsole === console.id;
 
@@ -583,32 +577,37 @@ export default function WalkInBookingPage() {
                           type="button"
                           onClick={() => setSelectedConsole(console.id)}
                           disabled={submitting}
-                          className={`relative p-4 rounded-2xl border-2 transition-all duration-300 ${
+                          className={`relative p-3 sm:p-4 rounded-xl sm:rounded-2xl border-2 transition-all duration-300 flex flex-col items-center justify-center min-h-[110px] sm:min-h-[140px] w-full ${
                             isSelected 
-                              ? 'border-cyan-500 scale-105 shadow-2xl' 
+                              ? 'border-cyan-500 scale-105 shadow-xl sm:shadow-2xl' 
                               : 'border-gray-800 hover:border-gray-700 hover:scale-102'
                           }`}
                         >
                           {/* Background Gradient */}
                           {isSelected && (
-                            <div className={`absolute inset-0 bg-gradient-to-br ${console.gradient} opacity-10 rounded-2xl`}></div>
+                            <div className={`absolute inset-0 bg-gradient-to-br ${console.gradient} opacity-10 rounded-xl sm:rounded-2xl`}></div>
                           )}
 
-                          <div className="relative">
-                            <div className={`flex flex-col items-center gap-3 ${isSelected ? 'text-white' : 'text-gray-400'}`}>
-                              <div className={`p-3 rounded-xl ${
-                                isSelected 
-                                  ? `bg-gradient-to-br ${console.gradient}` 
-                                  : 'bg-gray-900'
-                              }`}>
-                                <div className={`${isSelected ? 'text-white' : 'text-gray-400'}`}>
-                                  {console.icon}
-                                </div>
-                              </div>
-                              <div className="font-semibold text-center">
-                                {console.label}
+                          <div className="relative flex flex-col items-center justify-center w-full h-full space-y-2 sm:space-y-3">
+                            <div className={`p-2 sm:p-3 rounded-lg sm:rounded-xl ${
+                              isSelected 
+                                ? `bg-gradient-to-br ${console.gradient}` 
+                                : 'bg-gray-900'
+                            }`}>
+                              <div className={`${isSelected ? 'text-white' : 'text-gray-400'}`}>
+                                {console.icon}
                               </div>
                             </div>
+                            
+                            <div className="font-semibold text-center text-sm sm:text-lg px-1 break-words">
+                              {console.label}
+                            </div>
+                            
+                            {isSelected && (
+                              <div className="absolute -top-1.5 -right-1.5 sm:-top-2 sm:-right-2 w-6 h-6 sm:w-8 sm:h-8 bg-cyan-500 rounded-full flex items-center justify-center">
+                                <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
+                              </div>
+                            )}
                           </div>
                         </button>
                       );
@@ -617,17 +616,20 @@ export default function WalkInBookingPage() {
                 </div>
 
                 {/* Players & Duration */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-8 mb-8 sm:mb-10">
                   {/* Players Selection */}
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
-                        <Users className="w-4 h-4 text-cyan-400" />
+                  <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                        <Users className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                       </div>
-                      <h4 className="font-bold">No. of Players</h4>
+                      <div>
+                        <h4 className="font-bold text-base sm:text-lg">No. of Players</h4>
+                        <p className="text-gray-400 text-xs sm:text-sm">Select number of players</p>
+                      </div>
                     </div>
                     
-                    <div className="grid grid-cols-4 gap-3">
+                    <div className="grid grid-cols-4 gap-2 sm:gap-3">
                       {[1, 2, 3, 4].map((num) => {
                         const isSelected = quantity === num;
 
@@ -637,18 +639,18 @@ export default function WalkInBookingPage() {
                             type="button"
                             onClick={() => setQuantity(num)}
                             disabled={submitting}
-                            className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                            className={`relative p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center min-h-[80px] sm:min-h-[100px] w-full ${
                               isSelected 
-                                ? 'border-cyan-500 bg-cyan-500/10 scale-105' 
+                                ? 'border-cyan-500 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 scale-105' 
                                 : 'border-gray-800 hover:border-gray-700'
                             }`}
                           >
-                            <div className="text-center">
-                              <div className={`text-2xl font-bold ${isSelected ? 'text-cyan-400' : 'text-gray-400'}`}>
+                            <div className="text-center space-y-1 sm:space-y-2">
+                              <div className={`text-2xl sm:text-3xl font-bold ${isSelected ? 'text-cyan-400' : 'text-gray-400'}`}>
                                 {num}
                               </div>
-                              <div className={`text-xs mt-1 ${isSelected ? 'text-cyan-400' : 'text-gray-500'}`}>
-                                Player{num > 1 ? 's' : ''}
+                              <div className={`text-xs sm:text-start ${isSelected ? 'text-cyan-400 font-semibold' : 'text-gray-500'}`}>
+                                {num === 1 ? 'Player' : 'Players'}
                               </div>
                             </div>
                           </button>
@@ -658,30 +660,33 @@ export default function WalkInBookingPage() {
                   </div>
 
                   {/* Duration Selection */}
-                  <div>
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-8 h-8 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
-                        <Timer className="w-4 h-4 text-cyan-400" />
+                  <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                    <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                        <Timer className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                       </div>
-                      <h4 className="font-bold">Duration</h4>
+                      <div>
+                        <h4 className="font-bold text-base sm:text-lg">Duration</h4>
+                        <p className="text-gray-400 text-xs sm:text-sm">Select gaming session length</p>
+                      </div>
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3">
                       <button
                         type="button"
                         onClick={() => setDuration(30)}
                         disabled={submitting}
-                        className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                        className={`relative p-4 sm:p-6 rounded-lg sm:rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] w-full ${
                           duration === 30 
-                            ? 'border-cyan-500 bg-cyan-500/10 scale-105' 
+                            ? 'border-cyan-500 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 scale-105' 
                             : 'border-gray-800 hover:border-gray-700'
                         }`}
                       >
-                        <div className="text-center">
-                          <div className={`text-2xl font-bold ${duration === 30 ? 'text-cyan-400' : 'text-gray-400'}`}>
+                        <div className="text-center space-y-1.5 sm:space-y-3">
+                          <div className={`text-3xl sm:text-4xl font-bold ${duration === 30 ? 'text-cyan-400' : 'text-gray-400'}`}>
                             30
                           </div>
-                          <div className={`text-xs mt-1 ${duration === 30 ? 'text-cyan-400' : 'text-gray-500'}`}>
+                          <div className={`text-xs sm:text-sm ${duration === 30 ? 'text-cyan-400 font-semibold' : 'text-gray-500'}`}>
                             Minutes
                           </div>
                         </div>
@@ -691,21 +696,24 @@ export default function WalkInBookingPage() {
                         type="button"
                         onClick={() => setDuration(60)}
                         disabled={submitting}
-                        className={`relative p-4 rounded-xl border-2 transition-all duration-300 ${
+                        className={`relative p-4 sm:p-6 rounded-lg sm:rounded-xl border-2 transition-all duration-300 flex flex-col items-center justify-center min-h-[100px] sm:min-h-[120px] w-full ${
                           duration === 60 
-                            ? 'border-red-500 bg-red-500/10 scale-105' 
+                            ? 'border-red-500 bg-gradient-to-br from-red-500/20 to-pink-500/20 scale-105' 
                             : 'border-gray-800 hover:border-gray-700'
                         }`}
                       >
-                        <div className="text-center">
-                          <div className={`text-2xl font-bold ${duration === 60 ? 'text-red-400' : 'text-gray-400'}`}>
+                        <div className="absolute top-2 right-2 sm:top-3 sm:right-3">
+                          <Crown className={`w-3 h-3 sm:w-4 sm:h-4 ${duration === 60 ? 'text-yellow-400' : 'text-gray-600'}`} />
+                        </div>
+                        <div className="text-center space-y-1.5 sm:space-y-3">
+                          <div className={`text-3xl sm:text-4xl font-bold ${duration === 60 ? 'text-red-400' : 'text-gray-400'}`}>
                             60
                           </div>
-                          <div className={`text-xs mt-1 ${duration === 60 ? 'text-red-400' : 'text-gray-500'}`}>
+                          <div className={`text-xs sm:text-sm ${duration === 60 ? 'text-red-400 font-semibold' : 'text-gray-500'}`}>
                             Minutes
                           </div>
-                          <div className="absolute top-2 right-2">
-                            <Crown className={`w-3 h-3 ${duration === 60 ? 'text-yellow-400' : 'text-gray-600'}`} />
+                          <div className={`mt-1 sm:mt-2 text-xs px-2 sm:px-3 py-0.5 sm:py-1 rounded-full ${duration === 60 ? 'bg-red-500/20 text-red-400' : 'bg-gray-800 text-gray-600'}`}>
+                            Popular
                           </div>
                         </div>
                       </button>
@@ -714,51 +722,51 @@ export default function WalkInBookingPage() {
                 </div>
 
                 {/* Amount Summary */}
-                <div className="mb-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
-                      <Wallet className="w-5 h-5 text-cyan-400" />
+                <div className="mb-6 sm:mb-8">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-r from-red-500/20 to-cyan-500/20 flex items-center justify-center">
+                      <Wallet className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                     </div>
-                    <h3 className="text-xl font-bold">Payment Summary</h3>
+                    <h3 className="text-lg sm:text-xl font-bold">Payment Summary</h3>
                   </div>
 
-                  <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-2xl p-6">
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                  <div className="bg-gradient-to-br from-gray-900 to-black border border-gray-800 rounded-xl sm:rounded-2xl p-4 sm:p-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 mb-4 sm:mb-6">
                       <div className="text-center">
-                        <p className="text-sm text-gray-400 mb-2">Console</p>
-                        <p className="font-semibold">
+                        <p className="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2">Console</p>
+                        <p className="font-semibold text-sm sm:text-lg">
                           {selectedConsole ? CONSOLES.find(c => c.id === selectedConsole)?.label : '--'}
                         </p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-gray-400 mb-2">Players</p>
-                        <p className="font-semibold">{quantity}</p>
+                        <p className="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2">Players</p>
+                        <p className="font-semibold text-sm sm:text-lg">{quantity}</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-gray-400 mb-2">Duration</p>
-                        <p className="font-semibold">{duration} min</p>
+                        <p className="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2">Duration</p>
+                        <p className="font-semibold text-sm sm:text-lg">{duration} min</p>
                       </div>
                       <div className="text-center">
-                        <p className="text-sm text-gray-400 mb-2">Total</p>
-                        <p className="text-2xl font-bold text-cyan-400">
+                        <p className="text-xs sm:text-sm text-gray-400 mb-1 sm:mb-2">Total</p>
+                        <p className="text-2xl sm:text-3xl font-bold text-cyan-400">
                           ₹{totalAmount}
                         </p>
                       </div>
                     </div>
 
-                    <div className="bg-gradient-to-r from-red-500/10 to-cyan-500/10 border border-red-500/20 rounded-xl p-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <CreditCard className="w-5 h-5 text-cyan-400" />
+                    <div className="bg-gradient-to-r from-red-500/10 to-cyan-500/10 border border-red-500/20 rounded-lg sm:rounded-xl p-3 sm:p-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-0">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <CreditCard className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400 flex-shrink-0" />
                           <div>
-                            <p className="font-semibold text-cyan-400">Pay at Counter</p>
-                            <p className="text-gray-400 text-sm">Complete payment at reception</p>
+                            <p className="font-semibold text-cyan-400 text-sm sm:text-base">Pay at Counter</p>
+                            <p className="text-gray-400 text-xs sm:text-sm">Complete payment at reception</p>
                           </div>
                         </div>
-                        <div className="text-right">
-                          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
-                            <Shield className="w-4 h-4 text-green-400" />
-                            <span className="font-semibold text-sm text-green-400">SECURE</span>
+                        <div className="text-left sm:text-right">
+                          <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-full border border-green-500/30">
+                            <Shield className="w-3 h-3 sm:w-4 sm:h-4 text-green-400" />
+                            <span className="font-semibold text-xs sm:text-sm text-green-400">SECURE</span>
                           </div>
                         </div>
                       </div>
@@ -770,7 +778,7 @@ export default function WalkInBookingPage() {
                 <button
                   type="submit"
                   disabled={submitting || !selectedConsole}
-                  className={`w-full py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center justify-center gap-3 ${
+                  className={`w-full py-3 sm:py-4 md:py-5 rounded-xl sm:rounded-2xl font-bold text-base sm:text-lg transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 ${
                     submitting || !selectedConsole
                       ? 'bg-gray-900 text-gray-500 cursor-not-allowed'
                       : 'bg-gradient-to-r from-red-600 via-red-500 to-cyan-500 hover:from-red-700 hover:via-red-600 hover:to-cyan-600 hover:scale-[1.02] active:scale-100 shadow-xl hover:shadow-2xl'
@@ -778,14 +786,14 @@ export default function WalkInBookingPage() {
                 >
                   {submitting ? (
                     <>
-                      <Loader2 className="w-6 h-6 animate-spin" />
-                      CREATING BOOKING...
+                      <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin" />
+                      <span className="text-sm sm:text-base">CREATING BOOKING...</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle className="w-6 h-6" />
-                      CONFIRM WALK-IN BOOKING
-                      <ArrowRight className="w-6 h-6" />
+                      <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6" />
+                      <span className="text-sm sm:text-base">CONFIRM WALK-IN BOOKING</span>
+                      <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
                     </>
                   )}
                 </button>
@@ -793,26 +801,26 @@ export default function WalkInBookingPage() {
             </div>
 
             {/* Info Banner */}
-            <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 backdrop-blur-xl rounded-2xl border border-cyan-500/20 p-6">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
-                    <Zap className="w-6 h-6 text-cyan-400" />
+            <div className="bg-gradient-to-r from-cyan-500/10 to-blue-500/10 backdrop-blur-xl rounded-xl sm:rounded-2xl border border-cyan-500/20 p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-r from-cyan-500/20 to-blue-500/20 flex items-center justify-center">
+                    <Zap className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
                   </div>
                   <div>
-                    <h4 className="font-bold text-lg">Instant Gaming Access</h4>
-                    <p className="text-gray-400 text-sm">Your seat will be allocated immediately after booking</p>
+                    <h4 className="font-bold text-sm sm:text-lg">Instant Gaming Access</h4>
+                    <p className="text-gray-400 text-xs sm:text-sm">Your seat will be allocated immediately after booking</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-cyan-400">24/7</div>
-                    <div className="text-gray-400 text-sm">Support</div>
+                <div className="flex items-center gap-4 sm:gap-6">
+                  <div className="text-center">
+                    <div className="text-xl sm:text-2xl font-bold text-cyan-400">24/7</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">Support</div>
                   </div>
-                  <div className="w-px h-8 bg-gray-800"></div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-green-400">100%</div>
-                    <div className="text-gray-400 text-sm">Success Rate</div>
+                  <div className="w-px h-6 sm:h-8 bg-gray-800"></div>
+                  <div className="text-center">
+                    <div className="text-xl sm:text-2xl font-bold text-green-400">100%</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">Success Rate</div>
                   </div>
                 </div>
               </div>

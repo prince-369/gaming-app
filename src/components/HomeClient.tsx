@@ -34,11 +34,13 @@ type Props = {
 };
 
 type SortKey = "relevance" | "price_asc" | "price_desc";
+type TabType = "book" | "membership" | "tournaments";
 
 export default function HomeClient({ cafes }: Props) {
   const router = useRouter();
   const safeCafes: Cafe[] = Array.isArray(cafes) ? cafes : [];
 
+  const [activeTab, setActiveTab] = useState<TabType>("book");
   const [query, setQuery] = useState("");
   const [onlyPs5, setOnlyPs5] = useState(false);
   const [onlyPc, setOnlyPc] = useState(false);
@@ -784,50 +786,70 @@ export default function HomeClient({ cafes }: Props) {
                   </div>
                 </div>
 
-                {/* CTA Buttons */}
-                <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mb-4 cta-buttons">
+                {/* Tabs Navigation */}
+                <div className="flex gap-2 justify-center items-center mb-4">
                   <button
-                    onClick={handleScrollToList}
-                    className="btn-glow px-6 py-3 rounded-xl text-sm md:text-lg font-bold tracking-wide uppercase flex items-center gap-2 group"
+                    onClick={() => {
+                      setActiveTab("book");
+                      handleScrollToList();
+                    }}
+                    className={`px-6 py-3 rounded-xl text-sm md:text-lg font-bold tracking-wide uppercase flex items-center gap-2 group transition-all ${
+                      activeTab === "book" 
+                        ? 'btn-glow' 
+                        : 'btn-ghost'
+                    }`}
                     style={{ fontFamily: 'Orbitron, sans-serif' }}
                   >
                     <Zap className="w-4 h-4 md:w-5 md:h-5 group-hover:scale-125 transition-transform" />
                     <span>Book Now</span>
-                    <ChevronRight className="w-4 h-4 md:w-5 md:h-5 group-hover:translate-x-1 transition-transform" />
                   </button>
                   
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => router.push("/membership")}
-                      className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      <Trophy className="w-4 h-4 text-zinc-400" />
-                      <span>Membership</span>
-                    </button>
-                    <button
-                      onClick={() => router.push("/tournaments")}
-                      className="btn-ghost px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2"
-                      style={{ fontFamily: 'Inter, sans-serif' }}
-                    >
-                      <Award className="w-4 h-4 text-zinc-400" />
-                      <span>Tournaments</span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => {
+                      setActiveTab("membership");
+                      handleScrollToList();
+                    }}
+                    className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all ${
+                      activeTab === "membership" 
+                        ? 'btn-glow' 
+                        : 'btn-ghost'
+                    }`}
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    <Trophy className="w-4 h-4 text-zinc-400" />
+                    <span>Membership</span>
+                  </button>
+                  
+                  <button
+                    onClick={() => {
+                      setActiveTab("tournaments");
+                      handleScrollToList();
+                    }}
+                    className={`px-4 py-3 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all ${
+                      activeTab === "tournaments" 
+                        ? 'btn-glow' 
+                        : 'btn-ghost'
+                    }`}
+                    style={{ fontFamily: 'Inter, sans-serif' }}
+                  >
+                    <Award className="w-4 h-4 text-zinc-400" />
+                    <span>Tournaments</span>
+                  </button>
                 </div>
 
                 
               </div>
             </section>
 
-            {/* ===== SEARCH & FILTERS ===== */}
-            <section 
-              ref={listRef}
-              className={`sticky top-16 z-30 mb-4 lg:mb-12 bg-[#08080c]/95 backdrop-blur-xl rounded-2xl border border-white/5 p-4 shadow-xl filters-compact ${
-                mounted ? 'animate-fade-in' : 'opacity-0'
-              }`}
-              style={{ animationDelay: '0.1s' }}
-            >
+            {/* ===== SEARCH & FILTERS (Only for Book Now tab) ===== */}
+            {activeTab === "book" && (
+              <section 
+                ref={listRef}
+                className={`sticky top-16 z-30 mb-4 lg:mb-12 bg-[#08080c]/95 backdrop-blur-xl rounded-2xl border border-white/5 p-4 shadow-xl filters-compact ${
+                  mounted ? 'animate-fade-in' : 'opacity-0'
+                }`}
+                style={{ animationDelay: '0.1s' }}
+              >
               {/* Search Bar */}
               <div className="relative mb-4">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none search-icon-mobile">
@@ -967,85 +989,297 @@ export default function HomeClient({ cafes }: Props) {
                 </div>
               </div>
             </section>
+            )}
 
-            {/* ===== RESULTS SECTION ===== */}
+            {/* ===== CONTENT SECTION ===== */}
             <section 
+              ref={activeTab !== "book" ? listRef : undefined}
               className={`${mounted ? 'animate-fade-in' : 'opacity-0'}`}
               style={{ animationDelay: '0.15s' }}
             >
-              {/* Results Header */}
-              <div className="flex items-center justify-between mb-4 results-header">
-                <div>
-                  <h2 
-                    className="text-xl font-bold text-white mb-1"
-                    style={{ fontFamily: 'Orbitron, sans-serif' }}
-                  >
-                    {query || activeFiltersCount > 0 ? 'Filtered Cafes' : 'All Gaming Cafes'}
-                  </h2>
-                  <p 
-                    className="text-zinc-400"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    {filteredCafes.length} venue{filteredCafes.length !== 1 ? 's' : ''} found
-                  </p>
-                </div>
-                
-                {activeFiltersCount > 0 && (
-                  <button
-                    onClick={clearAllFilters}
-                    className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    <X className="w-3 h-3" />
-                    <span className="text-sm">Clear Filters</span>
-                  </button>
-                )}
-              </div>
-
-              {/* Café List or Empty State */}
-              {filteredCafes.length > 0 ? (
-                <CafeList cafes={filteredCafes} />
-              ) : (
-                <div className="card-glass rounded-2xl p-6 text-center empty-state">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#ff073a]/10 to-[#00f0ff]/10 flex items-center justify-center">
-                    <Frown className="w-8 h-8 text-zinc-600" />
+              {/* Book Now Tab Content */}
+              {activeTab === "book" && (
+                <>
+                  {/* Results Header */}
+                  <div className="flex items-center justify-between mb-4 results-header">
+                    <div>
+                      <h2 
+                        className="text-xl font-bold text-white mb-1"
+                        style={{ fontFamily: 'Orbitron, sans-serif' }}
+                      >
+                        {query || activeFiltersCount > 0 ? 'Filtered Cafes' : 'All Gaming Cafes'}
+                      </h2>
+                      <p 
+                        className="text-zinc-400"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        {filteredCafes.length} venue{filteredCafes.length !== 1 ? 's' : ''} found
+                      </p>
+                    </div>
+                    
+                    {activeFiltersCount > 0 && (
+                      <button
+                        onClick={clearAllFilters}
+                        className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        <X className="w-3 h-3" />
+                        <span className="text-sm">Clear Filters</span>
+                      </button>
+                    )}
                   </div>
-                  <h3 
-                    className="text-xl font-bold text-white mb-2"
-                    style={{ fontFamily: 'Orbitron, sans-serif' }}
-                  >
-                    No Venues Found
-                  </h3>
-                  <p 
-                    className="text-zinc-400 mb-6 max-w-md mx-auto"
-                    style={{ fontFamily: 'Inter, sans-serif' }}
-                  >
-                    Try adjusting your filters or search terms.
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                    <button
-                      onClick={clearAllFilters}
-                      className="btn-glow px-6 py-2.5 rounded-lg text-sm font-bold"
+
+                  {/* Café List or Empty State */}
+                  {filteredCafes.length > 0 ? (
+                    <CafeList cafes={filteredCafes} />
+                  ) : (
+                    <div className="card-glass rounded-2xl p-6 text-center empty-state">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-[#ff073a]/10 to-[#00f0ff]/10 flex items-center justify-center">
+                        <Frown className="w-8 h-8 text-zinc-600" />
+                      </div>
+                      <h3 
+                        className="text-xl font-bold text-white mb-2"
+                        style={{ fontFamily: 'Orbitron, sans-serif' }}
+                      >
+                        No Venues Found
+                      </h3>
+                      <p 
+                        className="text-zinc-400 mb-6 max-w-md mx-auto"
+                        style={{ fontFamily: 'Inter, sans-serif' }}
+                      >
+                        Try adjusting your filters or search terms.
+                      </p>
+                      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                        <button
+                          onClick={clearAllFilters}
+                          className="btn-glow px-6 py-2.5 rounded-lg text-sm font-bold"
+                          style={{ fontFamily: 'Orbitron, sans-serif' }}
+                        >
+                          Clear All Filters
+                        </button>
+                        <button
+                          onClick={() => setQuery("")}
+                          className="btn-ghost px-6 py-2.5 rounded-lg text-sm font-semibold"
+                          style={{ fontFamily: 'Inter, sans-serif' }}
+                        >
+                          Clear Search
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Membership Tab Content */}
+              {activeTab === "membership" && (
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <h2 
+                      className="text-3xl md:text-4xl font-bold text-white mb-3"
                       style={{ fontFamily: 'Orbitron, sans-serif' }}
                     >
-                      Clear All Filters
-                    </button>
-                    <button
-                      onClick={() => setQuery("")}
-                      className="btn-ghost px-6 py-2.5 rounded-lg text-sm font-semibold"
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff073a] to-[#00f0ff]">
+                        Premium Memberships
+                      </span>
+                    </h2>
+                    <p 
+                      className="text-zinc-400 text-lg"
                       style={{ fontFamily: 'Inter, sans-serif' }}
                     >
-                      Reset Search
-                    </button>
+                      Unlimited gaming at exclusive cafes
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Demo Membership Cards */}
+                    {[
+                      {
+                        cafeName: "GameZone Pro",
+                        image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600",
+                        price: 3000,
+                        duration: "3 months",
+                        features: ["Unlimited Gaming", "Priority Booking", "Free Drinks", "Tournament Access"]
+                      },
+                      {
+                        cafeName: "Elite Gaming Arena",
+                        image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600",
+                        price: 5000,
+                        duration: "6 months",
+                        features: ["Unlimited Gaming", "VIP Lounge", "Free Snacks", "Exclusive Events"]
+                      },
+                      {
+                        cafeName: "Pro Gamer Hub",
+                        image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600",
+                        price: 2000,
+                        duration: "2 months",
+                        features: ["Unlimited Gaming", "Weekend Priority", "Discount on Food", "Friends Bonus"]
+                      }
+                    ].map((membership, idx) => (
+                      <div 
+                        key={idx}
+                        className="card-glass rounded-2xl overflow-hidden group hover:scale-[1.02] transition-all duration-300"
+                      >
+                        {/* Image */}
+                        <div className="relative h-48 overflow-hidden">
+                          <img 
+                            src={membership.image} 
+                            alt={membership.cafeName}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#101016] via-transparent to-transparent" />
+                          <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#ff073a] to-[#ff3366] text-white text-xs font-bold">
+                            {membership.duration}
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6">
+                          <h3 
+                            className="text-xl font-bold text-white mb-2"
+                            style={{ fontFamily: 'Orbitron, sans-serif' }}
+                          >
+                            {membership.cafeName}
+                          </h3>
+                          
+                          <div className="flex items-baseline gap-2 mb-4">
+                            <span 
+                              className="text-3xl font-bold text-[#00f0ff]"
+                              style={{ fontFamily: 'Orbitron, sans-serif' }}
+                            >
+                              ₹{membership.price}
+                            </span>
+                            <span className="text-zinc-400 text-sm">
+                              for {membership.duration}
+                            </span>
+                          </div>
+
+                          <div className="space-y-2 mb-6">
+                            {membership.features.map((feature, i) => (
+                              <div key={i} className="flex items-center gap-2 text-zinc-300">
+                                <Check className="w-4 h-4 text-[#00f0ff]" />
+                                <span className="text-sm">{feature}</span>
+                              </div>
+                            ))}
+                          </div>
+
+                          <button
+                            className="w-full btn-glow py-3 rounded-xl font-bold"
+                            style={{ fontFamily: 'Orbitron, sans-serif' }}
+                          >
+                            Buy Membership
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Tournaments Tab Content */}
+              {activeTab === "tournaments" && (
+                <div className="space-y-6">
+                  <div className="text-center mb-8">
+                    <h2 
+                      className="text-3xl md:text-4xl font-bold text-white mb-3"
+                      style={{ fontFamily: 'Orbitron, sans-serif' }}
+                    >
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#ff073a] to-[#00f0ff]">
+                        Upcoming Tournaments
+                      </span>
+                    </h2>
+                    <p 
+                      className="text-zinc-400 text-lg"
+                      style={{ fontFamily: 'Inter, sans-serif' }}
+                    >
+                      Compete with the best and win amazing prizes
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {/* Demo Tournament Cards */}
+                    {[
+                      {
+                        name: "BGMI Championship",
+                        image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=600",
+                        date: "Jan 15, 2026",
+                        prize: "₹50,000",
+                        participants: "256",
+                        game: "BGMI"
+                      },
+                      {
+                        name: "FIFA Pro League",
+                        image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600",
+                        date: "Jan 20, 2026",
+                        prize: "₹30,000",
+                        participants: "128",
+                        game: "FIFA 24"
+                      },
+                      {
+                        name: "Valorant Masters",
+                        image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600",
+                        date: "Jan 25, 2026",
+                        prize: "₹75,000",
+                        participants: "64",
+                        game: "Valorant"
+                      }
+                    ].map((tournament, idx) => (
+                      <div 
+                        key={idx}
+                        className="card-glass rounded-2xl overflow-hidden group hover:scale-[1.02] transition-all duration-300"
+                      >
+                        {/* Image */}
+                        <div className="relative h-48 overflow-hidden">
+                          <img 
+                            src={tournament.image} 
+                            alt={tournament.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#101016] via-transparent to-transparent" />
+                          <div className="absolute top-4 right-4 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#00f0ff] to-[#00d4e6] text-black text-xs font-bold">
+                            {tournament.game}
+                          </div>
+                        </div>
+
+                        {/* Content */}
+                        <div className="p-6">
+                          <h3 
+                            className="text-xl font-bold text-white mb-3"
+                            style={{ fontFamily: 'Orbitron, sans-serif' }}
+                          >
+                            {tournament.name}
+                          </h3>
+                          
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center gap-2 text-zinc-300">
+                              <Clock className="w-4 h-4 text-[#00f0ff]" />
+                              <span className="text-sm">{tournament.date}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-zinc-300">
+                              <Trophy className="w-4 h-4 text-[#ff073a]" />
+                              <span className="text-sm">Prize Pool: {tournament.prize}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-zinc-300">
+                              <Users className="w-4 h-4 text-[#00f0ff]" />
+                              <span className="text-sm">{tournament.participants} Players</span>
+                            </div>
+                          </div>
+
+                          <button
+                            className="w-full btn-glow py-3 rounded-xl font-bold"
+                            style={{ fontFamily: 'Orbitron, sans-serif' }}
+                          >
+                            Register Now
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}
             </section>
-          </div>
-        </div>
 
-        {/* ===== MOBILE FILTER SHEET ===== */}
-        {showFilters && (
+            {/* ===== MOBILE FILTER SHEET ===== */}
+            {showFilters && (
           <div 
             className="fixed inset-0 z-50 mobile-filter-sheet"
             onClick={() => setShowFilters(false)}
@@ -1183,6 +1417,8 @@ export default function HomeClient({ cafes }: Props) {
             </div>
           </div>
         )}
+          </div>
+        </div>
       </main>
     </>
   );
